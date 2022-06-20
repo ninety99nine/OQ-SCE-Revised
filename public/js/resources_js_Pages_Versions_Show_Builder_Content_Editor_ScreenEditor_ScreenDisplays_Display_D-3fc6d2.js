@@ -126,12 +126,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         this.form.setError('input', 'This option input is already in use');
       }
 
-      console.log(this.mode == 'update');
-      console.log(totalExactMatchesByInput);
-      console.log(this.staticOption.input.code_editor_mode == false);
-      console.log(this.staticOption.input.text !== this.form.input.text);
-      console.log(this.useVersionBuilder.searchStaticOptionsByInput(this.staticOptions, this.form.input, true));
-
       if (this.form.hasErrors === false) {
         var staticOption = this.form.data();
 
@@ -420,13 +414,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _CreateOrUpdateStaticOptionModal_vue_vue_type_template_id_706d5de6__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CreateOrUpdateStaticOptionModal.vue?vue&type=template&id=706d5de6 */ "./resources/js/Pages/Versions/Show/Builder/Content/Editor/ScreenEditor/ScreenDisplays/Display/DisplayAction/SelectAction/StaticOptions/CreateOrUpdate/CreateOrUpdateStaticOptionModal.vue?vue&type=template&id=706d5de6");
 /* harmony import */ var _CreateOrUpdateStaticOptionModal_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CreateOrUpdateStaticOptionModal.vue?vue&type=script&lang=js */ "./resources/js/Pages/Versions/Show/Builder/Content/Editor/ScreenEditor/ScreenDisplays/Display/DisplayAction/SelectAction/StaticOptions/CreateOrUpdate/CreateOrUpdateStaticOptionModal.vue?vue&type=script&lang=js");
-/* harmony import */ var _Users_juliantabona_Sites_laravel_inertia_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+/* harmony import */ var _Users_juliantabona_Sites_OQ_SCE_Revised_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
 
 
 
 
 ;
-const __exports__ = /*#__PURE__*/(0,_Users_juliantabona_Sites_laravel_inertia_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__["default"])(_CreateOrUpdateStaticOptionModal_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_CreateOrUpdateStaticOptionModal_vue_vue_type_template_id_706d5de6__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"resources/js/Pages/Versions/Show/Builder/Content/Editor/ScreenEditor/ScreenDisplays/Display/DisplayAction/SelectAction/StaticOptions/CreateOrUpdate/CreateOrUpdateStaticOptionModal.vue"]])
+const __exports__ = /*#__PURE__*/(0,_Users_juliantabona_Sites_OQ_SCE_Revised_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__["default"])(_CreateOrUpdateStaticOptionModal_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_CreateOrUpdateStaticOptionModal_vue_vue_type_template_id_706d5de6__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"resources/js/Pages/Versions/Show/Builder/Content/Editor/ScreenEditor/ScreenDisplays/Display/DisplayAction/SelectAction/StaticOptions/CreateOrUpdate/CreateOrUpdateStaticOptionModal.vue"]])
 /* hot reload */
 if (false) {}
 

@@ -31,6 +31,9 @@
 
         </div>
 
+        <!-- Screen / Display Selector -->
+        <ScreenOrDisplaySelector v-model="display.content.action.input_value.multi_value_input.link"></ScreenOrDisplaySelector>
+
     </div>
 
 </template>
@@ -40,10 +43,11 @@
     import VariableInput from '@components/Input/VariableInput';
     import PrimaryButton from '@components/Button/PrimaryButton';
     import DefaultSelect from '@components/Select/DefaultSelect';
+    import ScreenOrDisplaySelector from '@builderComponents/ScreenOrDisplaySelector';
 
     export default {
         props: ['display'],
-        components: { VariableInput, PrimaryButton, DefaultSelect },
+        components: { VariableInput, PrimaryButton, DefaultSelect, ScreenOrDisplaySelector },
         data(){
             return {
                 separatorTypes: [

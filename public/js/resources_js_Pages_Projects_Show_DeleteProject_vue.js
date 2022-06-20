@@ -28,7 +28,7 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       form: (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_0__.useForm)({
-        delete_code: ''
+        confirmation_code: ''
       }),
       search: this.route().params.search
     };
@@ -89,7 +89,7 @@ var _hoisted_3 = {
   "class": "text-sm text-gray-500 border-b pb-5 mb-5"
 };
 
-var _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Once you delete a project, there is no going back. Please be certain. Enter the delete code ");
+var _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Once you delete a project, there is no going back. Please be certain. Enter the confirmation code ");
 
 var _hoisted_5 = {
   "class": "text-gray-800 font-bold"
@@ -108,17 +108,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   var _component_DangerButton = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("DangerButton");
 
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Project name "), _hoisted_2, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_3, [_hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.projectPayload.delete_code), 1
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Project name "), _hoisted_2, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_3, [_hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.projectPayload.confirmation_code), 1
   /* TEXT */
   ), _hoisted_6]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_DefaultInput, {
-    modelValue: $data.form.delete_code,
+    modelValue: $data.form.confirmation_code,
     "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
-      return $data.form.delete_code = $event;
+      return $data.form.confirmation_code = $event;
     }),
     label: "Delete code",
-    placeholder: "Enter the delete code",
+    placeholder: "Enter the confirmation code",
     disabled: $data.form.processing,
-    error: $data.form.errors.delete_code,
+    error: $data.form.errors.confirmation_code,
     "class": "mb-6"
   }, null, 8
   /* PROPS */
@@ -153,13 +153,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _DeleteProject_vue_vue_type_template_id_2ec77178__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DeleteProject.vue?vue&type=template&id=2ec77178 */ "./resources/js/Pages/Projects/Show/DeleteProject.vue?vue&type=template&id=2ec77178");
 /* harmony import */ var _DeleteProject_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DeleteProject.vue?vue&type=script&lang=js */ "./resources/js/Pages/Projects/Show/DeleteProject.vue?vue&type=script&lang=js");
-/* harmony import */ var _Users_juliantabona_Sites_laravel_inertia_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+/* harmony import */ var _Users_juliantabona_Sites_OQ_SCE_Revised_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
 
 
 
 
 ;
-const __exports__ = /*#__PURE__*/(0,_Users_juliantabona_Sites_laravel_inertia_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__["default"])(_DeleteProject_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_DeleteProject_vue_vue_type_template_id_2ec77178__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"resources/js/Pages/Projects/Show/DeleteProject.vue"]])
+const __exports__ = /*#__PURE__*/(0,_Users_juliantabona_Sites_OQ_SCE_Revised_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__["default"])(_DeleteProject_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_DeleteProject_vue_vue_type_template_id_2ec77178__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"resources/js/Pages/Projects/Show/DeleteProject.vue"]])
 /* hot reload */
 if (false) {}
 

@@ -71,6 +71,12 @@
                 },
                 deep: true
             },
+            'useVersionBuilder.builder.appwrite_connection': {
+                handler: function (after, before) {
+                    this.configMenus = this.getConfigMenus();
+                },
+                deep: true
+            },
             'useVersionBuilder.builder.sms_connection': {
                 handler: function (after, before) {
                     this.configMenus = this.getConfigMenus();
@@ -82,7 +88,13 @@
                     this.configMenus = this.getConfigMenus();
                 },
                 deep: true
-            }
+            },
+            'useVersionBuilder.builder.log_settings': {
+                handler: function (after, before) {
+                    this.configMenus = this.getConfigMenus();
+                },
+                deep: true
+            },
         },
         methods: {
             getConfigMenus() {
@@ -133,6 +145,37 @@
                     }else{
 
                         var firebaseNote = {
+                            type: 'Success',
+                            message: 'Complete'
+                        };
+
+                    }
+
+                    //  If the appwrite configuration are not set via the text editor (Not set)
+                    if(
+                        this.useVersionBuilder.builder.appwrite_connection.endpoint.code_editor_mode == false && [null, ''].includes(this.useVersionBuilder.builder.appwrite_connection.endpoint.text) ||
+                        this.useVersionBuilder.builder.appwrite_connection.project_id.code_editor_mode == false && [null, ''].includes(this.useVersionBuilder.builder.appwrite_connection.project_id.text) ||
+                        this.useVersionBuilder.builder.appwrite_connection.api_key.code_editor_mode == false && [null, ''].includes(this.useVersionBuilder.builder.appwrite_connection.api_key.text)
+                    ) {
+
+                        var appwriteNote = {
+                            type: 'Default',
+                            message: 'Incomplete'
+                        };
+
+                    //  If the appwrite configuration are set via the code editor (Verify credentials)
+                    }else if(
+                        this.useVersionBuilder.builder.appwrite_connection.endpoint.code_editor_mode == true ||
+                        this.useVersionBuilder.builder.appwrite_connection.project_id.code_editor_mode == true  ||
+                        this.useVersionBuilder.builder.appwrite_connection.api_key.code_editor_mode == true
+                    ) {
+                        var appwriteNote = {
+                            type: 'Primary',
+                            message: 'Verify'
+                        };
+                    }else{
+
+                        var appwriteNote = {
                             type: 'Success',
                             message: 'Complete'
                         };
@@ -203,6 +246,18 @@
                             message: 'No'
                         };
 
+                    const logSettingsNote =
+                        this.useVersionBuilder.builder.log_settings.mobile.save_logs !== 'never' ||
+                        this.useVersionBuilder.builder.log_settings.simulator.save_logs !== 'never'
+                            ? {
+                                type: 'Primary',
+                                message: 'Enabled'
+                            }
+                            : {
+                                type: 'Default',
+                                message: 'Disabled'
+                            };
+
                     return [
                         {
                             name: 'Global Variables',
@@ -228,50 +283,45 @@
                         {
                             name: 'Restrictions',
                             onClick: () => {},
-                            note: {
-                                type: restrictionNote.type,
-                                message: restrictionNote.message,
-                            }
+                            note: restrictionNote
                         },
                         {
                             name: 'Select Screens Conditionally',
                             onClick: () => {},
-                            note: {
-                                type: conditionalScreensNote.type,
-                                message: conditionalScreensNote.message,
-                            }
+                            note: conditionalScreensNote
                         },
                         {
                             name: 'Sms Connection',
                             onClick: () => {},
                             borders: ['t'],
-                            note: {
-                                type: smsNote.type,
-                                message: smsNote.message,
-                            }
+                            note: smsNote
 
                         },
                         {
                             name: 'Firebase Connection',
                             onClick: () => {},
-                            note: {
-                                type: firebaseNote.type,
-                                message: firebaseNote.message,
-                            }
+                            note: firebaseNote
+                        },
+                        {
+                            name: 'AppWrite Connection',
+                            onClick: () => {},
+                            note: appwriteNote
                         },
                         {
                             name: 'Airtime Billing Connection',
                             onClick: () => {},
                             borders: ['b'],
-                            note: {
-                                type: airtimeBillingNote.type,
-                                message: airtimeBillingNote.message,
-                            }
+                            note: airtimeBillingNote
+                        },
+                        {
+                            name: 'Log Settings',
+                            onClick: () => {},
+                            note: logSettingsNote
                         },
                         {
                             name: 'Color Scheme',
                             onClick: () => {},
-                        }
+                        },
                     ]
 
                 } catch (error) {

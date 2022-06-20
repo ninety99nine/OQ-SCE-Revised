@@ -62,7 +62,7 @@
             <div class="flex justify-between p-4">
 
                 <!-- Comments -->
-                <span class="text-xs mr-4">{{ rule.comment ? rule.comment : 'No comments' }}</span>
+                <span class="flex-1 text-xs mr-4">{{ rule.comment ? rule.comment : 'No comments' }}</span>
 
                 <!-- Color Picker -->
                 <DefaultColorPicker v-model="rule.hexColor"></DefaultColorPicker>

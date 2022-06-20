@@ -12,7 +12,7 @@
                 <input :id="uniqueId" v-model="model" type="checkbox" class="sr-only" :disabled="disabled">
 
                 <!-- Background -->
-                <div class="w-11 h-6 bg-gray-200 rounded-full border border-gray-200 toggle-bg"></div>
+                <div :class="['w-11 h-6 bg-gray-200 rounded-full border border-gray-200 toggle-bg', { 'opacity-50': disabled }]"></div>
 
                 <!-- Note -->
                 <span v-if="note" class="text-xs text-gray-400 ml-2"> &#8212; {{ note }}</span>
@@ -75,6 +75,7 @@
                 },
                 set(value) {
                     this.$emit('update:modelValue', value);
+
                 },
             },
         },

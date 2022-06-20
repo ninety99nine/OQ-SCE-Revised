@@ -31,6 +31,7 @@ mix.js('resources/js/app.js', 'public/js')
                 '@builderComponents': __dirname + '/resources/js/Pages/Versions/Show/Builder/Components',
                 '@eventsEditor': __dirname + '/resources/js/Pages/Versions/Show/Builder/Content/Editor/EventsEditor',
                 '@screenEditor': __dirname + '/resources/js/Pages/Versions/Show/Builder/Content/Editor/ScreenEditor',
+                '@markersEditor': __dirname + '/resources/js/Pages/Versions/Show/Builder/Content/Editor/MarkersEditor',
                 '@paginationEditor': __dirname + '/resources/js/Pages/Versions/Show/Builder/Content/Editor/PaginationEditor'
             }
         },

@@ -26,7 +26,7 @@ class Version extends Model
      * @var array
      */
     protected $fillable = [
-        'number', 'description', 'builder', 'features', 'app_id', 'delete_code'
+        'number', 'description', 'builder', 'features', 'app_id', 'confirmation_code'
     ];
 
     /**
@@ -45,6 +45,14 @@ class Version extends Model
     public function app()
     {
         return $this->belongsTo(Project::class, 'app_id');
+    }
+
+    /*
+     *  Returns the sessions
+     */
+    public function sessions()
+    {
+        return $this->hasMany(UssdSession::class);
     }
 
 }

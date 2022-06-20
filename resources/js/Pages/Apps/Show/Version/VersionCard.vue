@@ -54,7 +54,7 @@
 
         <div v-if="version.updated_at" class="flex justify-between mb-4">
             <div class="flex items-center">
-                <span class="text-gray-600 text-xs">{{ moment(version.updated_at, 'YYYY-MM-DD HH:mm:ss').fromNow() }}</span>
+                <span class="text-gray-600 text-xs">{{ moment(version.updated_at).fromNow() }}</span>
                 <span class="text-gray-500 text-xs ml-1 italic"> &#8212; Last update</span>
             </div>
             <el-tag v-if="appPayload.active_version_id === version.id" size="small" type="success">

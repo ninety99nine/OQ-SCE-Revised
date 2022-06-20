@@ -3,16 +3,23 @@
     <div>
 
         <h5 class="text-sm font-semibold tracking-tight text-gray-600 mb-4">
-            <span>Simulator Logs</span>
+            <span>{{ origin == 'simulator' ? 'Simulator Logs' : 'Session Logs' }}</span>
             <NumberBadge v-if="totalLogs" :count="totalFilteredLogs" :active="false" class="ml-2"></NumberBadge>
         </h5>
 
-        <template v-if="useVersionBuilder.builder.simulator.debugger.return_logs == true && response !== null">
+        <template v-if="showLogs == true && totalLogs">
 
             <el-select v-model="selectedLogs" multiple placeholder="Select log types" class="w-full border rounded mb-4">
-                <el-option
-                    v-for="log in availableLogs" :key="log.value" :label="log.label" :value="log.value">
-                </el-option>
+                <el-option-group v-for="group in availableLogs" :key="group.label" :label="group.label">
+
+                    <el-option v-for="log in group.options" :key="log.value" :label="log.label + ' ('+log.count+')'" :value="log.value">
+                        <div class="flex items-center justify-between mt-2">
+                            <span class="text-xs">{{ log.label }}</span>
+                            <span class="text-xs text-gray-400 mr-2">{{ log.count == 0 ? '' : '('+log.count+')' }}</span>
+                        </div>
+                    </el-option>
+
+                </el-option-group>
             </el-select>
 
             <Transition name="fade" mode="out-in" appear>
@@ -57,6 +64,8 @@
 
                         </div>
 
+                        <div v-if="filteredLogs.length == 0" class="p-4 rounded-md border border-dashed border-gray-300">No Logs Found</div>
+
                     </div>
                 </div>
 
@@ -64,17 +73,22 @@
 
         </template>
 
-        <div v-if="useVersionBuilder.builder.simulator.debugger.return_logs == true && response == null">
+        <div v-if="showLogs == true && totalLogs == 0">
 
             <PrimaryAlert>
-                <span class="text-justify">
+                <!-- If the logs are related to the simulator -->
+                <span v-if="origin == 'simulator'" class="text-justify">
                     Launch the Simulator to see the applicaiton logs in realtime
+                </span>
+                <!-- If the logs are related to the session -->
+                <span v-if="origin == 'session'" class="text-justify">
+                    This session does not have logs to show
                 </span>
             </PrimaryAlert>
 
         </div>
 
-        <div v-if="useVersionBuilder.builder.simulator.debugger.return_logs == false">
+        <div v-if="origin == 'simulator' && showLogs == false">
 
             <PrimaryAlert>
                 <span class="text-justify">
@@ -96,28 +110,32 @@
 
     export default {
         props: {
-            response: Object
+            logs: {
+                type: Array,
+                default: () => {
+                    return [];
+                }
+            },
+            origin: {
+                type: String,
+                default: 'session',
+                validator(value) {
+                    return ['simulator', 'session'].includes(value)
+                }
+            },
+            showLogs: {
+                type: Boolean,
+                default: true
+            },
         },
         components: { NumberBadge, PrimaryAlert },
         data() {
             return {
                 renderkey: 1,
+                screenNames: [],
+                displayNames: [],
                 useVersionBuilder: useVersionBuilder(),
-                selectedLogs: ['info', 'warning', 'error'],
-                availableLogs: [
-                    {
-                        label: 'Info',
-                        value: 'info',
-                    },
-                    {
-                        label: 'Warnings',
-                        value: 'warning',
-                    },
-                    {
-                        label: 'Errors',
-                        value: 'error',
-                    }
-                ]
+                selectedLogs: ['info', 'warning', 'error']
             }
         },
 
@@ -126,12 +144,14 @@
         displayInfoListed: [],
 
         watch: {
-            response(newValue, oldValue) {
+            logs(newValue, oldValue) {
 
                 this.$nextTick(() => {
                     this.$options.screenInfoListed = [];
                     this.$options.displayInfoListed = [];
 
+                    this.screenNames = this.getScreenNames();
+                    this.displayNames = this.getDisplayNames();
                 });
 
                 ++this.renderkey;
@@ -140,12 +160,17 @@
         },
         computed: {
             totalLogs() {
-                return ((this.response || {}).logs || []).length;
+                return this.logs.length;
             },
             filteredLogs() {
                 if( this.totalLogs ) {
-                    return this.response.logs.filter((log) => {
-                        return this.selectedLogs.includes(log.type);
+                    return this.logs.filter((log) => {
+                        //  If the log matches the selected log types
+                        return this.selectedLogs.includes(log.type) ||
+                                //  If the log matches the selected screen name
+                               this.selectedLogs.includes('screen-' + log.screen) ||
+                                //  If the log matches the selected display name
+                               this.selectedLogs.includes('display-' + log.display);
                     });
                 }
                 return [];
@@ -153,8 +178,96 @@
             totalFilteredLogs() {
                 return this.filteredLogs.length;
             },
+            availableLogs() {
+                return [
+                    {
+                        label: 'Status',
+                        options: [
+                            {
+                                label: 'Info',
+                                value: 'info',
+                                count: this.logs.filter((log) => {
+                                    return log.type == 'info';
+                                }).length
+                            },
+                            {
+                                label: 'Warnings',
+                                value: 'warning',
+                                count: this.logs.filter((log) => {
+                                    return log.type == 'warning';
+                                }).length
+                            },
+                            {
+                                label: 'Errors',
+                                value: 'error',
+                                count: this.logs.filter((log) => {
+                                    return log.type == 'error';
+                                }).length
+                            }
+                        ]
+                    },
+                    {
+                        label: 'Screens',
+                        options: this.screenNames.map((screenName) => {
+                            return {
+                                label: screenName,
+                                value: 'screen-' + screenName,
+                                count: this.logs.filter((log) => {
+                                    //  If the log matches the selected screen name
+                                    return log.screen == screenName;
+                                }).length
+                            }
+                        })
+                    },
+                    {
+                        label: 'Displays',
+                        options: this.displayNames.map((displayName) => {
+                            return {
+                                label: displayName,
+                                value: 'display-' + displayName,
+                                count: this.logs.filter((log) => {
+                                    //  If the log matches the selected display name
+                                    return log.display == displayName;
+                                }).length
+                            }
+                        })
+                    }
+                ];
+            },
         },
         methods: {
+            getScreenNames() {
+                if( this.logs ) {
+
+                    const screenNames = this.logs.filter((log) => {
+                        return log.screen !== null;
+                    }).map((log) => {
+                        return log.screen;
+                    });
+
+                    //  Remove duplicates
+                    return _.uniqBy(screenNames);
+
+                }
+
+                return [];
+            },
+            getDisplayNames() {
+                if( this.logs ) {
+
+                    const displayNames = this.logs.filter((log) => {
+                        return log.display !== null;
+                    }).map((log) => {
+                        return log.display;
+                    });
+
+                    //  Remove duplicates
+                    return _.uniqBy(displayNames);
+
+                }
+
+                return [];
+            },
             canShowScreenInfo(log) {
                 if( log.screen === null || this.$options.screenInfoListed.includes(log.screen) ) {
                     return false;
@@ -181,6 +294,10 @@
                     return 'animate-bounce bg-red-100 border-red-500';
                 }
             }
+        },
+        created() {
+            this.screenNames = this.getScreenNames();
+            this.displayNames = this.getDisplayNames();
         }
     };
 

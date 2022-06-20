@@ -105,7 +105,7 @@
                         features: this.version.features ?? [],
                         number: this.version.number,
                         reset_builder: false,
-                        delete_code: '',
+                        confirmation_code: '',
 
                         //  Indicate that we should return to the app view
                         destination: 'app.show'
@@ -115,7 +115,7 @@
                 }else if(this.version && this.mode == 'Delete') {
 
                     return useForm({
-                        delete_code: ''
+                        confirmation_code: ''
                     });
 
                 //  If we are creating

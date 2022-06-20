@@ -64,7 +64,7 @@ class ProjectController extends Controller
 
         //  Create new project (Set the verison as the active app)
         $project = Project::create( array_merge($data, [
-            'delete_code' => random_int(100000, 999999)
+            'confirmation_code' => random_int(100000, 999999)
         ]));
 
         //  Add user to project
@@ -88,7 +88,7 @@ class ProjectController extends Controller
 
         //  Update the existing project
         $project->update( array_merge($data, [
-            'delete_code' => random_int(100000, 999999)
+            'confirmation_code' => random_int(100000, 999999)
         ]));
 
         return redirect()->route('project.show', ['project' => $project->id]);
@@ -98,11 +98,11 @@ class ProjectController extends Controller
     {
         //  Validate the request inputs
         Validator::make($request->all(), [
-            'delete_code' => ['required', 'string', 'size:6', Rule::exists('projects')->where(function ($query) use ($project) {
+            'confirmation_code' => ['required', 'string', 'size:6', Rule::exists('projects')->where(function ($query) use ($project) {
                 return $query->where('id', $project->id);
             })],
         ], [
-            'delete_code.exists' => 'The delete code provided is not valid'
+            'confirmation_code.exists' => 'The confirmation code provided is not valid'
         ])->validate();
 
         //  Delete the existing project

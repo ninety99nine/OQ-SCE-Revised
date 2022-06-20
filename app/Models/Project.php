@@ -22,7 +22,7 @@ class Project extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'delete_code'
+        'name', 'confirmation_code'
     ];
 
     /**
@@ -63,8 +63,13 @@ class Project extends Model
             //  before delete() method call this
             static::deleting(function ($project) {
 
-                //  Delete apps
-                $project->apps()->delete();
+                //  Foreach project app
+                foreach($project->apps as $app) {
+
+                    //  Delete the app
+                    $app->delete();
+
+                }
 
                 //  Delete user associations
                 DB::table('project_user')->where(['project_id' => $project->id])->delete();

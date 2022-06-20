@@ -16,18 +16,12 @@ use Illuminate\Support\Facades\Validator;
 
 class AppController extends Controller
 {
-    public function __construct()
-    {
-        //  Force a login
-        Auth::loginUsingId(1);
-    }
-
     public function show(Project $project, App $app)
     {
         //  Get the search term
         $search = request()->input('search');
 
-        //  Version optiosn
+        //  Version options
         $versionOptions = $app->versions()->select('id', 'number')->get();
 
         //  Get the user app versiosn
@@ -55,13 +49,14 @@ class AppController extends Controller
         //  Create new version
         $version = Version::create([
             'builder' => (new Version)->getBuilderTemplate(),
-            'delete_code' => random_int(100000, 999999),
+            'confirmation_code' => random_int(100000, 999999),
             'description' => $data['description'],
+            'features' => []
         ]);
 
         //  Create new app (Set the verison as the active version)
         $app = App::create( array_merge($data, [
-            'delete_code' => random_int(100000, 999999),
+            'confirmation_code' => random_int(100000, 999999),
             'active_version_id' => $version->id,
             'project_id' => $project->id,
         ]));
@@ -94,7 +89,7 @@ class AppController extends Controller
 
         //  Update the existing app
         $app->update( array_merge($data, [
-            'delete_code' => random_int(100000, 999999)
+            'confirmation_code' => random_int(100000, 999999)
         ]));
 
         //  Check if we should show the project
@@ -115,11 +110,11 @@ class AppController extends Controller
     {
         //  Validate the request inputs
         Validator::make($request->all(), [
-            'delete_code' => ['required', 'string', 'size:6', Rule::exists('apps')->where(function ($query) use ($app) {
+            'confirmation_code' => ['required', 'string', 'size:6', Rule::exists('apps')->where(function ($query) use ($app) {
                 return $query->where('id', $app->id);
             })],
         ], [
-            'delete_code.exists' => 'The delete code provided is not valid'
+            'confirmation_code.exists' => 'The confirmation code provided is not valid'
         ])->validate();
 
         //  Delete the existing app

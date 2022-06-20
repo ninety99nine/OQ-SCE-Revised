@@ -3,8 +3,8 @@
     <!-- Delete -->
     <template v-if="mode == 'Delete'">
 
-        <p class="text-sm text-gray-500 mb-5">Once you delete this app, there is no going back. Please be certain. Enter the delete code <span class="text-gray-800 font-bold">{{ app.delete_code }}</span> to confirm this action.</p>
-        <DefaultInput v-model="form.delete_code" label="Reset code" placeholder="Enter the reset code" :disabled="form.processing || form.processing" :error="form.errors.delete_code" class="mb-6"></DefaultInput>
+        <p class="text-sm text-gray-500 mb-5">Once you delete this app, there is no going back. Please be certain. Enter the confirmation code <span class="text-gray-800 font-bold">{{ app.confirmation_code }}</span> to confirm this action.</p>
+        <DefaultInput v-model="form.confirmation_code" label="Reset code" placeholder="Enter the reset code" :disabled="form.processing || form.processing" :error="form.errors.confirmation_code" class="mb-6"></DefaultInput>
 
     </template>
 

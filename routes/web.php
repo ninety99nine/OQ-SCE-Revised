@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\VersionController;
+use App\Http\Controllers\SessionController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\AppController;
 use Illuminate\Support\Facades\Route;
@@ -69,6 +70,7 @@ Route::middleware(['auth'])->group(function () {
                             Route::delete('/', 'delete')->name('delete');
                         });
 
+                        //  Versions
                         Route::controller(VersionController::class)
                             ->prefix('versions')
                             ->group(function () {
@@ -76,18 +78,37 @@ Route::middleware(['auth'])->group(function () {
                             Route::get('/', 'index')->name('versions.show');
                             Route::post('/', 'create')->name('versions.create');
 
-                            Route::prefix('/{version}')->name('version.')->group(function () {
+                            Route::prefix('/{version}')->group(function () {
 
-                                Route::get('/', 'show')->name('show');
-                                Route::put('/', 'update')->name('update');
-                                Route::delete('/', 'delete')->name('delete');
-                                Route::post('/simulate', 'simulate')->name('simulate');
+                                Route::name('version.')->group(function () {
+                                    Route::get('/', 'show')->name('show');
+                                    Route::put('/', 'update')->name('update');
+                                    Route::delete('/', 'delete')->name('delete');
+                                    Route::post('/repair', 'repair')->name('repair');
+                                    Route::post('/start-simulation', 'startSimulation')->name('start-simulation');
+                                    Route::post('/{session}/stop-simulation', 'stopSimulation')->name('stop-simulation');
+                                });
 
-                                Route::post('/repair', 'repair')->name('repair');
+                                //  Sessions
+                                Route::controller(SessionController::class)
+                                    ->prefix('sessions')
+                                    ->group(function () {
+
+                                    Route::get('/', 'index')->name('sessions.show');
+
+                                    Route::prefix('/{session}')->name('session.')->group(function () {
+
+                                        Route::get('/', 'show')->name('show');
+                                        Route::delete('/', 'delete')->name('delete');
+
+                                    });
+
+                                });
 
                             });
 
                         });
+
                     });
 
                 });

@@ -21,7 +21,7 @@ class CreateProjectsTable extends Migration
             $table->string('name', 30);
 
             /*  Delete Information  */
-            $table->char('delete_code', 6)->nullable();
+            $table->char('confirmation_code', 6)->nullable();
 
             /*  Timestamps  */
             $table->timestamps();

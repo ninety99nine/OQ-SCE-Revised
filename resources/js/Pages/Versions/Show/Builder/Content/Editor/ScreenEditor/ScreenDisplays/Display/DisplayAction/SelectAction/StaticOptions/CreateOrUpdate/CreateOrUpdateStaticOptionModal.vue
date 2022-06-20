@@ -213,12 +213,6 @@
 
                 }
 
-                console.log( this.mode == 'update' );
-                console.log( totalExactMatchesByInput );
-                console.log( this.staticOption.input.code_editor_mode == false );
-                console.log( this.staticOption.input.text !== this.form.input.text );
-                console.log(this.useVersionBuilder.searchStaticOptionsByInput(this.staticOptions, this.form.input, true));
-
                 if( this.form.hasErrors === false ) {
 
                     let staticOption = this.form.data();

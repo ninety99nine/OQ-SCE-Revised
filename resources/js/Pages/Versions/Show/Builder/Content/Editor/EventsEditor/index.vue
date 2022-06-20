@@ -12,6 +12,14 @@
                 <!-- Note -->
                 <span v-if="note" class="text-xs text-gray-400 ml-2"> &#8212; {{ note }}</span>
 
+                <!-- Info Text -->
+                <InfoPopover v-if="info" :info="info" class="ml-2"></InfoPopover>
+
+                <!-- Info Slot -->
+                <InfoPopover v-else-if="$slots.info" class="ml-2">
+                    <slot name="info"></slot>
+                </InfoPopover>
+
             </div>
 
             <Transition name="fade">
@@ -105,6 +113,7 @@
 
 import EventMenus from "./EventMenus.vue";
 import SlideUpDown from "vue3-slide-up-down";
+import InfoPopover from '@components/Popover/InfoPopover';
 import { useVersionBuilder } from "@stores/VersionBuilder";
 import SuccessBadge from "@components/Badges/SuccessBadge";
 import DefaultSearchBar from "@components/SearchBar/DefaultSearchBar";
@@ -116,6 +125,7 @@ export default {
         events: Object,
         title: String,
         note: String,
+        info: String,
         highlight: {
             type: Boolean,
             default: true
@@ -125,7 +135,7 @@ export default {
             default: true
         },
     },
-    components: { EventMenus, SlideUpDown, SuccessBadge, DefaultSearchBar, CreateOrUpdateEventModal, SwitchAndCodeEditor },
+    components: { EventMenus, SlideUpDown, InfoPopover, SuccessBadge, DefaultSearchBar, CreateOrUpdateEventModal, SwitchAndCodeEditor },
     data() {
         return {
             searchTerm: '',

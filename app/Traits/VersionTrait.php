@@ -192,6 +192,18 @@ trait VersionTrait
                     'timeout_message' => 'TIMEOUT: You have exceeded your time limit.',
                 ],
             ],
+            'log_settings' => [
+                'simulator' => [
+                    'save_logs' => 'never'  //  never, always, on_fail, on_success
+                ],
+                'mobile' => [
+                    'save_logs' => 'never'  //  never, always, on_fail, on_success
+                ],
+                'duration' => [
+                    'number' => 1,
+                    'type' => 'days'
+                ],
+            ],
             'sms_connection' => [
                 'username' => [
                     'text' => '',
@@ -222,8 +234,740 @@ trait VersionTrait
                     'code_editor_text' => '',
                     'code_editor_mode' => false
                 ],
+            ],
+            'appwrite_connection' => [
+                'endpoint' => [
+                    'text' => '',
+                    'code_editor_text' => '',
+                    'code_editor_mode' => false
+                ],
+                'project_id' => [
+                    'text' => '',
+                    'code_editor_text' => '',
+                    'code_editor_mode' => false
+                ],
+                'api_key' => [
+                    'text' => '',
+                    'code_editor_text' => '',
+                    'code_editor_mode' => false
+                ],
             ]
         ];
     }
 
+    public function repairBuilder($builder = null)
+    {
+        if( $builder === null ) {
+
+            //  Get the version builder
+            $builder = $this->builder;
+
+        }
+
+        //  Get the version builder template
+        $builderTemplate = $this->getBuilderTemplate();
+
+        //  This fixes the builder events
+        $fixEvents = function($events) use ( &$fixEvents ) {
+
+            foreach($events as $x => $event) {
+
+                //  Fix issues related to the "CRUD API" event handler
+                if ($event['type'] == 'CRUD API') {
+
+                    //  (1) ENABLE CODE EDITOR MODE FOR THE RESPONSE STATUS HANDLE ATTRIBUTES
+
+                    //  Get the response status handles
+                    $response_status_handles = $events[$x]['event_data']['response']['manual']['response_status_handles'] ?? [];
+
+                    //  Foreach status handle
+                    foreach($response_status_handles as $y => $responseStatusHandle) {
+
+                        //  Get the response status handle attributes
+                        $attributes = $responseStatusHandle['attributes'];
+
+                        //  Foreach status attribute
+                        foreach ($attributes as $z => $attribute) {
+
+                            //  If the attribute does not has a name
+                            if( empty($attribute['name']) ) {
+
+                                //  Remove it
+                                unset($events[$x]['event_data']['response']['manual']['response_status_handles'][$y]['attributes'][$z]);
+
+                            //  If the variable does not support code editor mode
+                            }elseif( !isset($attribute['value']['code_editor_mode']) ) {
+
+                                //  Enable code editor support
+                                $events[$x]['event_data']['response']['manual']['response_status_handles'][$y]['attributes'][$z]['value'] = [
+                                    'text' => $attribute['value'],  //  Set the old value as the text value
+                                    'code_editor_text' => '',
+                                    'code_editor_mode' => false
+                                ];
+
+                            }
+
+                        }
+
+                    }
+
+                    //  (2) Remove the name field (its pointless)
+                    if( isset($events[$x]['event_data']['name']) ) {
+
+                        unset($events[$x]['event_data']['name']);
+
+                    }
+
+                    //  (3) Remove the trigger field (its pointless)
+                    if( isset($events[$x]['event_data']['trigger']) ) {
+
+                        unset($events[$x]['event_data']['trigger']);
+
+                    }
+
+                    //  (4) Set the cache field
+                    if( !isset($events[$x]['event_data']['cache']) ) {
+
+                        $events[$x]['event_data']['cache'] = [
+                            'name' => '',
+                            'enabled' => false,
+                            'duration' => [
+                                'number' => 1,
+                                'type' => 'days'
+                            ]
+                        ];
+
+                    }
+
+                }
+
+                //  Fix issues related to the "Manage User Account" event handler
+                if ($event['type'] == 'Manage User Account') {
+
+                    //  Rename the event type
+                    $events[$x]['type'] = 'Database';
+
+                    //  If the action is set to "check_existence"
+                    if( $events[$x]['event_data']['action'] === 'check_existence' ) {
+
+                        //  Set the action to "read"
+                        $events[$x]['event_data']['action'] = 'read';
+
+                    }
+
+                    //  Add database variable function
+                    $addVariable = function($name, $value, $defaultValue = null) {
+                        return [
+                            'name' => $name,
+                            'value' => is_array($value) ? $value : [
+                                'text' => $value,
+                                'code_editor_text' => '',
+                                'code_editor_mode' => false
+                            ],
+                            'on_empty' => [
+                                'active' => is_array($defaultValue) ? true : false,
+                                'value' => is_array($defaultValue) ? $defaultValue : [
+                                    'text' => '',
+                                    'code_editor_text' => '',
+                                    'code_editor_mode' => false
+                                ],
+                            ],
+                        ];
+
+                    };
+
+                    //  Get the additional fields
+                    $additional_fields = $events[$x]['event_data']['additional_fields'] ?? [];
+
+                    //  Foreach additional field
+                    foreach($additional_fields as $y => $additionalField) {
+
+                        //  If we are still using the old structure, lets rebuild to the new structure
+                        if( isset($additionalField['key']) ) {
+
+                            $name = $additionalField['key'];
+                            $value = $additionalField['value'];
+                            $defaultValue = $additionalField['on_empty_value']['default']['custom'];
+                            $selectedType = $additionalField['on_empty_value']['default']['selected_type'];
+
+                            if($selectedType == 'null') {
+
+                                $defaultValue['code_editor_mode'] = true;
+                                $defaultValue['code_editor_text'] = '<?php return null; ?>';
+
+                            }else if($selectedType == 'true') {
+
+                                $defaultValue['code_editor_mode'] = true;
+                                $defaultValue['code_editor_text'] = '<?php return true; ?>';
+
+                            }else if($selectedType == 'false') {
+
+                                $defaultValue['code_editor_mode'] = true;
+                                $defaultValue['code_editor_text'] = '<?php return false; ?>';
+
+                            }else if($selectedType == 'empty_array') {
+
+                                $defaultValue['code_editor_mode'] = true;
+                                $defaultValue['code_editor_text'] = '<?php return []; ?>';
+
+                            }
+
+                            $events[$x]['event_data']['additional_fields'][$y] = $addVariable($name, $value, $defaultValue);
+
+                        }
+
+                    }
+
+                    //  (1) Remove the first name field
+                    if( isset($events[$x]['event_data']['first_name']) ) {
+
+                        if( !empty($events[$x]['event_data']['first_name']) ) {
+
+                            if( $events[$x]['event_data']['first_name']['code_editor_mode'] == true ) {
+
+                                //  Set as metadata variable (as replacement)
+                                $events[$x]['event_data']['additional_fields'][] = $addVariable('first_name', $events[$x]['event_data']['first_name']['code_editor_text']);
+
+                            }else{
+
+                                //  Set as metadata variable (as replacement)
+                                $events[$x]['event_data']['additional_fields'][] = $addVariable('first_name', $events[$x]['event_data']['first_name']['text']);
+
+                            }
+
+                        }
+
+                        unset($events[$x]['event_data']['first_name']);
+
+                    }
+
+                    //  (2) Remove the last name field
+                    if( isset($events[$x]['event_data']['last_name']) ) {
+
+                        if( !empty($events[$x]['event_data']['last_name']) ) {
+
+                            if( $events[$x]['event_data']['last_name']['code_editor_mode'] == true ) {
+
+                                //  Set as metadata variable (as replacement)
+                                $events[$x]['event_data']['additional_fields'][] = $addVariable('last_name', $events[$x]['event_data']['last_name']['code_editor_text']);
+
+                            }else{
+
+                                //  Set as metadata variable (as replacement)
+                                $events[$x]['event_data']['additional_fields'][] = $addVariable('last_name', $events[$x]['event_data']['last_name']['text']);
+
+                            }
+
+                        }
+
+                        unset($events[$x]['event_data']['last_name']);
+                    }
+
+                    //  (3) Remove the mobile number field
+                    if( isset($events[$x]['event_data']['mobile_number']) ) {
+
+                        unset($events[$x]['event_data']['mobile_number']);
+
+                    }
+
+                    //  (4) Rename the "database_entry_reference_name" field to "reference_name"
+                    if( isset($events[$x]['event_data']['database_entry_reference_name']) ) {
+
+                        $events[$x]['event_data']['reference_name'] = $events[$x]['event_data']['database_entry_reference_name'];
+
+                        unset($events[$x]['event_data']['database_entry_reference_name']);
+
+                    }
+
+                    //  (5) Replace the "user_account_reference_name" name field with the "reference_name" name field
+                    if( isset($events[$x]['event_data']['user_account_reference_name']) ) {
+
+                        $events[$x]['event_data']['reference_name'] = $events[$x]['event_data']['user_account_reference_name'];
+
+                        unset($events[$x]['event_data']['user_account_reference_name']);
+
+                    }
+
+                    //  (6) Replace the "has_account_reference_name" name field with the "existence_reference_name" name field
+                    if( isset($events[$x]['event_data']['has_account_reference_name']) ) {
+
+                        $events[$x]['event_data']['existence_reference_name'] = $events[$x]['event_data']['has_account_reference_name'];
+
+                        unset($events[$x]['event_data']['has_account_reference_name']);
+
+                    }
+
+                    //  (7) Add the "update_approach" field
+                    if( !isset($events[$x]['event_data']['update_approach']) ) {
+
+                        $events[$x]['event_data']['update_approach'] = 'merge';
+
+                    }
+
+                }
+
+                //  Fix issues related to the "Database" event handler
+                if ($event['type'] == 'Database') {
+
+                    //  Get the additional fields
+                    $additional_fields = $events[$x]['event_data']['additional_fields'] ?? [];
+
+                    //  Foreach additional field
+                    foreach($additional_fields as $y => $additionalField) {
+
+                        //  If we do not have the "active" property, then set it
+                        if( !isset($additionalField['on_empty']['active']) ) {
+
+                            $events[$x]['event_data']['additional_fields'][$y]['on_empty']['active'] = true;
+
+                        }
+
+                    }
+
+                }
+
+                //  Fix issues related to the "Event Collection" event handler
+                if( $event['type'] ==  'Event Collection') {
+
+                    //  If the "conditional" key does not exist on the event data
+                    if( !isset($events[$x]['event_data']['events']['conditional']) ) {
+
+                        //  Set the "conditional" key
+                        $events[$x]['event_data']['events']['conditional'] = [
+                            'code' => null,
+                            'active' => false
+                        ];
+
+                    }
+
+                    //  If the "collection" key does not exist on the event data
+                    if( !isset($events[$x]['event_data']['events']['collection']) ) {
+
+                        //  Set the "collection" key with the list of events as the initial value
+                        $events[$x]['event_data']['events']['collection'] = $events[$x]['event_data']['events'];
+
+                        unset($events[$x]['event_data']['events']);
+
+                    }
+
+                    //  Fix the nested events of the collection
+                    $events[$x]['event_data']['events']['collection'] = $fixEvents($events[$x]['event_data']['events']['collection']);
+
+                }
+
+                //  Check if the event supports comments
+                if( !isset($events[$x]['comment']) ) {
+
+                    //  Enable comment support
+                    $events[$x]['comment'] = '';
+
+                }
+            }
+
+            return $events;
+        };
+
+        //  Set any missing values using the builder template
+        foreach($builderTemplate as $propertyName => $property_value){
+
+            //  If the property does not exist
+            if( !isset($builder[$propertyName]) ){
+
+                //  Set the property and default value
+                $builder[$propertyName] = $builderTemplate[$propertyName];
+
+            }
+
+            if( empty($builder['sms_connection']['username']['text']) ){
+
+                $builder['sms_connection'] = $builderTemplate['sms_connection'];
+
+            }
+
+            if( empty($builder['airtime_billing_connection']['client_id']['text']) ){
+
+                $builder['airtime_billing_connection'] = $builderTemplate['airtime_billing_connection'];
+
+            }
+
+            if( $propertyName === 'global_events' ) {
+
+                //  If the global events are nested inside a key called "collection"
+                if( isset($builder['global_events']['collection']) ) {
+
+                    //  Extract the nested events one level up
+                    $builder['global_events'] = $builder['global_events']['collection'];
+
+                }
+
+                //  Fix specific event related issues
+                $builder['global_events'] = $fixEvents($builder['global_events']);
+
+            }
+
+            if( $propertyName === 'application_events' ) {
+
+                //  Restructure "on_start" and "on_close"
+                foreach(['on_start', 'on_close'] as $eventName) {
+
+                    $code = function() use ($builder, $eventName) {
+
+                        if( isset($builder['application_events'][$eventName]['conditional']['code']) &&
+                            is_string($builder['application_events'][$eventName]['conditional']['code']) ) {
+
+                            return $builder['application_events'][$eventName]['conditional']['code'];
+
+                        }else{
+
+                            return null;
+
+                        }
+
+                    };
+
+                    $active = function() use ($builder, $eventName) {
+
+                        if( isset($builder['application_events'][$eventName]['conditional']['active']) &&
+                            is_bool($builder['application_events'][$eventName]['conditional']['active']) ) {
+
+                            return $builder['application_events'][$eventName]['conditional']['active'];
+
+                        }else{
+
+                            return false;
+
+                        }
+
+                    };
+
+                    $collection = function() use ($builder, $eventName) {
+
+                        if( isset($builder['application_events'][$eventName]['collection']) ) {
+
+                            return $builder['application_events'][$eventName]['collection'];
+
+                        }elseif( isset($builder['application_events'][$eventName]) ) {
+
+                            return $builder['application_events'][$eventName];
+
+                        }else{
+
+                            return [];
+
+                        }
+
+                    };
+
+                    //  Set the new structure for the Global Events
+                    $builder['application_events'][$eventName] = [
+
+                        'conditional' => [
+
+                            'code' => $code(),
+                            'active' => $active(),
+
+                        ],
+                        'collection' => $collection()
+
+                    ];
+
+                    //  Fix specific event related issues
+                    $builder['application_events'][$eventName]['collection'] = $fixEvents($builder['application_events'][$eventName]['collection']);
+
+                }
+
+            }
+
+            if( $propertyName === 'global_variables' ) {
+
+                foreach($builder['global_variables'] as $gv_key => $global_variable) {
+
+                    //  Unset properties added by the Iview table component
+                    unset($builder['global_variables'][$gv_key]['_index']);
+                    unset($builder['global_variables'][$gv_key]['_rowKey']);
+
+                    if( $builder['global_variables'][$gv_key]['type'] == 'String' ) {
+
+                        //  Convert the type from "String" to "string" as lowercase
+                        $builder['global_variables'][$gv_key]['type'] = 'string';
+
+                    }
+
+                    if( $builder['global_variables'][$gv_key]['type'] == 'Integer' ) {
+
+                        //  Convert the type from "Integer" to "integer" as lowercase
+                        $builder['global_variables'][$gv_key]['type'] = 'integer';
+
+                        //  Convert the value key of "number" to "integer"
+                        $builder['global_variables'][$gv_key]['value']['integer'] = $builder['global_variables'][$gv_key]['value']['number'];
+
+                        //  Remove the deprecated "number" key name
+                        unset($builder['global_variables'][$gv_key]['value']['number']);
+
+                    }
+
+                    if( $builder['global_variables'][$gv_key]['type'] == 'Boolean' ) {
+
+                        //  Convert the type from "Boolean" to "boolean" as lowercase
+                        $builder['global_variables'][$gv_key]['type'] = 'boolean';
+
+                    }
+
+                    if( $builder['global_variables'][$gv_key]['type'] == 'Null' ) {
+
+                        //  Convert the type from "Null" to "null" as lowercase
+                        $builder['global_variables'][$gv_key]['type'] = 'null';
+
+                    }
+
+                    if( $builder['global_variables'][$gv_key]['type'] == 'Custom' ) {
+
+                        //  Convert the type from "Custom" to "code" as lowercase
+                        $builder['global_variables'][$gv_key]['type'] = 'code';
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        //  Foreach version screen
+        foreach ($builder['screens'] as $s_key => $screen) {
+
+            /*****************
+             *  SCREENS      *
+             ****************/
+
+            if( isset($builder['screens'][$s_key]['requirements']) ){
+                unset($builder['screens'][$s_key]['requirements']);
+            }
+
+            //  Remove the repeat events which contain "before_repeat" and "after_repeat" (Deprecated)
+            unset($builder['screens'][$s_key]['repeat']['events']);
+
+            //  Restructure "on_enter", "on_response" and "on_leave"
+            foreach(['on_enter', 'on_response', 'on_leave'] as $eventName) {
+
+                $code = function() use ($builder, $s_key, $eventName) {
+
+                    if( isset($builder['screens'][$s_key]['events'][$eventName]['conditional']['code']) &&
+                        is_string($builder['screens'][$s_key]['events'][$eventName]['conditional']['code']) ) {
+
+                        return $builder['screens'][$s_key]['events'][$eventName]['conditional']['code'];
+
+                    }else{
+
+                        return null;
+
+                    }
+
+                };
+
+                $active = function() use ($builder, $s_key, $eventName) {
+
+                    if( isset($builder['screens'][$s_key]['events'][$eventName]['conditional']['active']) &&
+                        is_bool($builder['screens'][$s_key]['events'][$eventName]['conditional']['active']) ) {
+
+                        return $builder['screens'][$s_key]['events'][$eventName]['conditional']['active'];
+
+                    }else{
+
+                        return false;
+
+                    }
+
+                };
+
+                $collection = function() use ($builder, $s_key, $eventName) {
+
+                    if( isset($builder['screens'][$s_key]['events'][$eventName]['collection']) ) {
+
+                        return $builder['screens'][$s_key]['events'][$eventName]['collection'];
+
+                    }elseif( isset($builder['screens'][$s_key]['events'][$eventName]) ) {
+
+                        return $builder['screens'][$s_key]['events'][$eventName];
+
+                    }else{
+
+                        return [];
+
+                    }
+
+                };
+
+                //  Set the new structure
+                $builder['screens'][$s_key]['events'][$eventName] = [
+
+                    'conditional' => [
+                        'code' => $code(),
+                        'active' => $active(),
+                    ],
+                    'collection' => $collection()
+
+                ];
+
+                //  Fix specific event related issues
+                $builder['screens'][$s_key]['events'][$eventName]['collection'] = $fixEvents($builder['screens'][$s_key]['events'][$eventName]['collection']);
+
+            }
+
+            //  Remove the marker "name" key
+            foreach($builder['screens'][$s_key]['markers'] as $m_key => $marker) {
+
+                //  If the marker still uses the name key
+                if( isset($builder['screens'][$s_key]['markers'][$m_key]['name']) ){
+
+                    /**
+                     *  Flatten the value to simply include the value without the name key.
+                     *
+                     *  BEFORE: markers = [['name' => 'marker1'], ['name' => 'marker2'], ... ]
+                     *
+                     *  AFTER:  markers = ['marker1', 'marker2', ... ]
+                     */
+                    $builder['screens'][$s_key]['markers'][$m_key] = $builder['screens'][$s_key]['markers'][$m_key]['name'];
+
+                }
+
+            }
+
+            foreach ($builder['screens'][$s_key]['displays'] as $d_key => $display) {
+
+                //  If the display uses the old "description" property instead of the new "instruction" property
+                if( isset($display['content']['description']) ) {
+
+                    //  Rename from "description" to "instruction"
+                    $builder['screens'][$s_key]['displays'][$d_key]['content']['instruction'] = $display['content']['description'];
+
+                    unset($builder['screens'][$s_key]['displays'][$d_key]['content']['description']);
+
+                }
+
+                /*****************
+                 *  DISPLAYS     *
+                 ****************/
+
+                //  Restructure "on_enter" (previously called "before_reply"), "on_response" (previously called "after_reply") and "on_leave" (recently introduced)
+                foreach(['on_enter' => 'before_reply', 'on_response' => 'after_reply', 'on_leave' => ''] as $newEventName => $oldEventName) {
+
+                    $code = function() use ($builder, $s_key, $d_key, $newEventName) {
+
+                        if( isset($builder['screens'][$s_key]['displays'][$d_key]['content']['events'][$newEventName]['conditional']['code']) &&
+                            is_string($builder['screens'][$s_key]['displays'][$d_key]['content']['events'][$newEventName]['conditional']['code']) ) {
+
+                            return $builder['screens'][$s_key]['displays'][$d_key]['content']['events'][$newEventName]['conditional']['code'];
+
+                        }else{
+
+                            return null;
+
+                        }
+
+                    };
+
+                    $active = function() use ($builder, $s_key, $d_key, $newEventName) {
+
+                        if( isset($builder['screens'][$s_key]['displays'][$d_key]['content']['events'][$newEventName]['conditional']['active']) &&
+                            is_bool($builder['screens'][$s_key]['displays'][$d_key]['content']['events'][$newEventName]['conditional']['active']) ) {
+
+                            return $builder['screens'][$s_key]['displays'][$d_key]['content']['events'][$newEventName]['conditional']['active'];
+
+                        }else{
+
+                            return false;
+
+                        }
+
+                    };
+
+                    $collection = function() use ($builder, $s_key, $d_key, $newEventName, $oldEventName) {
+
+                        if( isset($builder['screens'][$s_key]['displays'][$d_key]['content']['events'][$newEventName]['collection']) ) {
+
+                            return $builder['screens'][$s_key]['displays'][$d_key]['content']['events'][$newEventName]['collection'];
+
+                        }elseif( isset($builder['screens'][$s_key]['displays'][$d_key]['content']['events'][$newEventName]) ) {
+
+                            return $builder['screens'][$s_key]['displays'][$d_key]['content']['events'][$newEventName];
+
+                        }elseif( isset($builder['screens'][$s_key]['displays'][$d_key]['content']['events'][$oldEventName]) ) {
+
+                            return $builder['screens'][$s_key]['displays'][$d_key]['content']['events'][$oldEventName];
+
+                        }else{
+
+                            return [];
+
+                        }
+
+                    };
+
+                    $builder['screens'][$s_key]['displays'][$d_key]['content']['events'][$newEventName] = [
+
+                        'conditional' => [
+
+                            'code' => $code(),
+                            'active' => $active(),
+
+                        ],
+                        'collection' => $collection()
+
+                    ];
+
+                    if( !empty($oldEventName) ) {
+
+                        //  Remove "before_reply" and "after_reply" (Deprecated), but the "on_leave" remains the unchanged
+                        unset($builder['screens'][$s_key]['displays'][$d_key]['content']['events'][$oldEventName]);
+
+                    }
+
+                    //  Fix specific event related issues
+                    $builder['screens'][$s_key]['displays'][$d_key]['content']['events'][$newEventName]['collection'] = $fixEvents($builder['screens'][$s_key]['displays'][$d_key]['content']['events'][$newEventName]['collection']);
+
+                }
+
+                //  Set the pagination (use_global_pagination) if not already set
+                if( !isset( $builder['screens'][$s_key]['displays'][$d_key]['content']['pagination']['use_global_pagination'] ) ){
+
+                    $builder['screens'][$s_key]['displays'][$d_key]['content']['pagination']['use_global_pagination'] = true;
+
+                }
+
+                //  Set the (display markers) if not already set
+                if( !isset($builder['screens'][$s_key]['displays'][$d_key]['content']['markers']) ){
+
+                    $builder['screens'][$s_key]['displays'][$d_key]['content']['markers'] = [];
+
+                }
+
+                //  Remove the marker "name" key
+                foreach($builder['screens'][$s_key]['displays'][$d_key]['content']['markers'] as $m_key => $marker) {
+
+                    //  If the marker still uses the name key
+                    if( isset($builder['screens'][$s_key]['displays'][$d_key]['content']['markers'][$m_key]['name']) ){
+
+                        /**
+                         *  Flatten the value to simply include the value without the name key.
+                         *
+                         *  BEFORE: markers = [['name' => 'marker1'], ['name' => 'marker2'], ... ]
+                         *
+                         *  AFTER:  markers = ['marker1', 'marker2', ... ]
+                         */
+                        $builder['screens'][$s_key]['displays'][$d_key]['content']['markers'][$m_key] = $builder['screens'][$s_key]['displays'][$d_key]['content']['markers'][$m_key]['name'];
+
+                    }
+
+                }
+
+            }
+
+
+        }
+
+        //  Return the updated version builder
+        return $builder;
+
+    }
 }

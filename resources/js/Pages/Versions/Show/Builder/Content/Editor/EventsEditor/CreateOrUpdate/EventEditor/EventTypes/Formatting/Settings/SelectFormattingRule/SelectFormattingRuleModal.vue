@@ -251,7 +251,7 @@
                         value: '',
                         name: 'Custom Code',
                         type: 'custom_code',
-                        comment: 'Formats the target value using custom code for increased flexibility'
+                        comment: 'Formats the target value using customized code for increased flexibility'
                     }
                 ],
                 hasResults: true,

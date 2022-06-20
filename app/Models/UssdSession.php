@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -16,11 +17,13 @@ class UssdSession extends Model
      */
     protected $casts = [
         'session_execution_times' => 'array',
+        'inputs_and_outputs' => 'array',
+        'logs_expire_at' => 'datetime',
         'allow_timeout' => 'boolean',
         'reply_records' => 'array',
         'fatal_error' => 'boolean',
         'test' => 'boolean',
-        'logs' => 'array'
+        'logs' => 'array',
     ];
 
     /**
@@ -41,14 +44,23 @@ class UssdSession extends Model
 
         /*  Session Information  */
         'session_id', 'service_code', 'type', 'msisdn', 'request_type',
-        'text', 'reply_records', 'logs', 'test', 'fatal_error', 'fatal_error_msg',
-        'allow_timeout', 'timeout_at', 'total_session_duration',
+        'text', 'reply_records', 'inputs_and_outputs', 'logs', 'logs_expire_at', 'test',
+        'fatal_error', 'fatal_error_msg', 'allow_timeout', 'timeout_at', 'total_session_duration',
         'session_execution_times',
 
         /*  Ownership Information  */
-        'app_id', 'version_id'
+        'app_id', 'version_id', 'user_id'
 
     ];
+
+    /**
+     *  Scope: Search by msisdn
+     */
+    public function scopeSearch($query, $search)
+    {
+        return empty($search) ? $query : $query->where('msisdn', 'like', '%'.$search.'%')
+                                                ->orWhere('session_id', $search);
+    }
 
     /**
      *  Returns the query with select columns excluded.
@@ -70,57 +82,81 @@ class UssdSession extends Model
     /* ATTRIBUTES */
 
     protected $appends = [
-        'has_timed_out', 'status'
+        'has_timed_out', 'request_type_status', 'success_status', 'mobile_number', 'total_duration',
+        'origin', 'total_inputs_and_outputs'
     ];
+
+    /*
+     *  Returns origin
+     */
+    public function getOriginAttribute()
+    {
+        return $this->test == 1 ? 'Simulator' : 'Mobile';
+    }
+
+    /*
+     *  Returns total replies
+     */
+    public function getMobileNumberAttribute()
+    {
+        return preg_replace("/^267/", "$1", $this->msisdn);
+    }
+
+    /*
+     *  Returns total replies
+     */
+    public function getTotalInputsAndOutputsAttribute()
+    {
+        return collect($this->inputs_and_outputs)->count();
+    }
+
+    /*
+     *  Returns total duration
+     */
+    public function getTotalDurationAttribute()
+    {
+        return $this->created_at->longAbsoluteDiffForHumans($this->updated_at);
+    }
 
     /*
      *  Returns true or false if the session has timed out or expired
      */
     public function gethasTimedOutAttribute()
     {
-        //  If the test uses a time limit
-        if ($this->allow_timeout) {
-            //  Get the session timeout date and time (as a timestamp)
-            $timeout_at = $this->timeout_at->getTimestamp();
+        //  Get the session timeout date and time (as a timestamp)
+        $timeout_at = $this->timeout_at->getTimestamp();
 
-            //  Get the current date and time (as a timestamp)
-            $now = \Carbon\Carbon::now()->getTimestamp();
+        //  Get the current date and time (as a timestamp)
+        $now = \Carbon\Carbon::now()->getTimestamp();
 
-            //  Compare to see if the session timeout date and time has been exceeded
-            $result = ($now > $timeout_at) ? true : false;
+        //  Compare to see if the session timeout date and time has been exceeded
+        $result = ($now > $timeout_at) ? true : false;
 
-            //  Return final result
-            return $result;
-        }
-
-        //  Otherwise return false
-        return false;
+        //  Return final result
+        return $result;
     }
 
-    public function getStatusAttribute()
+    public function getRequestTypeStatusAttribute()
     {
-        //  If the test session failed
-        if( $this->fatal_error ){
+        if( $this->request_type == '1' ) {
 
-            $name = 'Fail';
-            $desc = 'The session failed due to an error';
+            $name = 'Started';
+            $desc = 'The session was just recently started';
 
-        //  If the session allows timeouts and the session has timed-out
-        }elseif( (!$this->test && $this->has_timed_out) ||
-                    ( $this->test && $this->allow_timeout && $this->has_timed_out) ){
+        }elseif( $this->request_type == '2' ) {
+
+            $name = 'Running';
+            $desc = 'The session is still curently running';
+
+        }elseif( $this->request_type == '3' ) {
+
+            $name = 'Ended';
+            $desc = 'The session ended';
+
+        }elseif( $this->request_type == '4' ) {
 
             $name = 'Timeout';
-            $desc = 'The session has timed out';
-
-        }elseif( $this->request_type == '3' ){
-
-            $name = 'Closed';
-            $desc = 'The session has been closed';
-
-        }elseif( $this->request_type == '2' || $this->request_type == '1' ){
-
-            $name = 'Active';
-            $desc = 'The session is still active';
+            $desc = 'The session timed out';
 
         }
 
@@ -130,11 +166,30 @@ class UssdSession extends Model
 
         ];
 
-        if($this->fatal_error){
+        return $response;
+    }
 
-            $response['error_msg'] = $this->fatal_error_msg;
+    public function getSuccessStatusAttribute()
+    {
+        //  If the test session failed
+        if( $this->fatal_error ){
+
+            $name = 'Fail';
+            $desc = 'The session was prematurely ended due to an error';
+
+        //  If the test session failed
+        }else{
+
+            $name = 'Success';
+            $desc = 'The session was gracefully ended';
 
         }
+
+        $response =  [
+            'name' => $name,
+            'description' => $desc,
+
+        ];
 
         return $response;
     }

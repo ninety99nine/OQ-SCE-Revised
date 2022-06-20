@@ -14,6 +14,9 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
             </svg>
+            <svg v-else-if="title == 'AppWrite Connection'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+            </svg>
             <svg v-else-if="title == 'Airtime Billing Connection'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -244,6 +247,60 @@
                             text: ' for more information'
                         },
                     ]
+                }else if( this.title == 'AppWrite Connection' ) {
+                    return [
+                        {
+                            text: 'Login to your '
+                        },
+                        {
+                            highlight: 'AppWrite dashboard',
+                        },
+                        {
+                            text: ', then navigate to '
+                        },
+                        {
+                            highlight: 'Settings',
+                        },
+                        {
+                            text: ' to acquire the '
+                        },
+                        {
+                            highlight: 'Project ID',
+                        },
+                        {
+                            text: ' and the '
+                        },
+                        {
+                            highlight: 'Api Endpoint.',
+                        },
+                        {
+                            break: 2
+                        },
+                        {
+                            text: 'Navigate to the '
+                        },
+                        {
+                            highlight: 'API keys',
+                        },
+                        {
+                            text: ' menu to add a new API Key.'
+                        },
+                        {
+                            break: 2
+                        },
+                        {
+                            text: 'Refer to the '
+                        },
+                        {
+                            link: {
+                                text: 'AppWrite Docs',
+                                href: 'https://appwrite.io/docs'
+                            },
+                        },
+                        {
+                            text: ' to learn more.'
+                        }
+                    ]
                 }else if( this.title == 'Sms Connection' ) {
                     return [
                         {
@@ -302,6 +359,18 @@
                         },
                         {
                             text: ' to set the default colors for highlighting related events'
+                        }
+                    ]
+                }else if( this.title == 'Log Settings' ) {
+                    return [
+                        {
+                            text: 'Use '
+                        },
+                        {
+                            highlight: 'Log Settings',
+                        },
+                        {
+                            text: ' to determine when to save the session logs'
                         }
                     ]
                 }

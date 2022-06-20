@@ -8,7 +8,7 @@
         :primaryAction="createEvent"
         :defaultAction="cancelCreateEvent"
         :width="mode == 'create' ? 'w-2/5' : 'w-1/2'"
-        :primaryText="mode == 'update' ? 'Update Event' : ''">
+        :primaryText="['clone', 'update'].includes(mode) ? modeInCaps + ' Event' : ''">
 
         <!-- Modal Title -->
         <template v-slot:title>{{ modeInCaps + ' Event' }}</template>

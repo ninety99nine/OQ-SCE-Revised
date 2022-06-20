@@ -46,6 +46,17 @@
                         ]
                     },
                     {
+                        type: "Third-Party Integration",
+                        children: [
+                            {
+                                type: "Firebase Connection"
+                            },
+                            {
+                                type: "AppWrite Connection"
+                            }
+                        ]
+                    },
+                    {
                         type: "Validation"
                     },
                     {

@@ -66,15 +66,31 @@
         </div>
 
         <SlideUpDown v-model="active" :duration="300">
+
             <div class="flex justify-between p-4">
 
                 <!-- Comments -->
-                <span class="text-xs mr-4">{{ event.comment ? event.comment : 'No comments' }}</span>
+                <span class="flex-1 text-xs mr-4">{{ event.comment ? event.comment : 'No comments' }}</span>
 
                 <!-- Color Picker -->
                 <DefaultColorPicker v-model="event.hexColor"></DefaultColorPicker>
 
             </div>
+
+            <!-- Event Collection (List events) -->
+            <template v-if="event.type == 'Event Collection'">
+
+                <CollectionSettings :event="event" class="mx-4 mb-4"></CollectionSettings>
+
+            </template>
+
+            <!-- AppWrite Connection (List events) -->
+            <template v-if="event.type == 'AppWrite Connection'">
+
+                <AppWriteSettings :event="event" class="mx-4 mb-4"></AppWriteSettings>
+
+            </template>
+
         </SlideUpDown>
 
     </div>
@@ -93,10 +109,12 @@
     import InfoPopover from '@components/Popover/InfoPopover';
     import DefaultColorPicker from '@components/ColorPicker/DefaultColorPicker';
     import CreateOrUpdateEventModal from './CreateOrUpdate/CreateOrUpdateEventModal';
+    import CollectionSettings from './CreateOrUpdate/EventEditor/EventTypes/Collection/Settings';
+    import AppWriteSettings from './CreateOrUpdate/EventEditor/EventTypes/ThirdPartyIntegration/AppWrite/Settings';
 
     export default {
         props: ['events', 'event', 'index'],
-        components: { SuccessBadge, PrimaryBadge, WarningBadge, DeleteEventModal, CopyToClipboard, CreateOrUpdateEventModal, InfoPopover, SlideUpDown, EventIcon, DefaultColorPicker },
+        components: { SuccessBadge, PrimaryBadge, WarningBadge, DeleteEventModal, CopyToClipboard, CreateOrUpdateEventModal, InfoPopover, SlideUpDown, EventIcon, DefaultColorPicker, CollectionSettings, AppWriteSettings },
         data(){
             return {
                 active: false,

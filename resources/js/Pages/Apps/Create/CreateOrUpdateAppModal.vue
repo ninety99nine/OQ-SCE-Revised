@@ -116,7 +116,7 @@
                 }else if(this.app && this.mode == 'Delete') {
 
                     return useForm({
-                        delete_code: ''
+                        confirmation_code: ''
                     });
 
                 //  If we are creating

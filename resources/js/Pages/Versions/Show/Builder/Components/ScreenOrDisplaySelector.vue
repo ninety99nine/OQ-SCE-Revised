@@ -29,13 +29,13 @@ export default {
     },
     data(){
         return {
-            options: [],
             selectedValues: [],
             useVersionBuilder: useVersionBuilder()
         }
     },
-    methods: {
-        getOptions() {
+    computed: {
+
+        options() {
 
             var options = [];
 
@@ -78,6 +78,8 @@ export default {
             return options;
 
         },
+    },
+    methods: {
         setSelectedScreenOrDisplay(id) {
 
             if( id ) {
@@ -99,7 +101,6 @@ export default {
         }
     },
     created() {
-        this.options = this.getOptions();
         this.setSelectedScreenOrDisplay(this.modelValue.text);
     }
 }

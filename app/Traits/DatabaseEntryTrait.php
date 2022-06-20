@@ -16,7 +16,7 @@ trait DatabaseEntryTrait
         //  If this is a test account
         if( $test_mode ){
 
-            $user_id = auth('api')->user()->id;
+            $user_id = auth()->user()->id;
 
             //  CACHE_DATABASE_ENTRY_26772123456_profile_1_2 = [ ... ]
             return $this->getBaseCacheName().'_'.$msisdn.'_'.$name.'_'.$user_id.'_'.$app_id;
@@ -37,7 +37,7 @@ trait DatabaseEntryTrait
         //  If this is a test account
         if( $test_mode ){
 
-            $user_id = auth('api')->user()->id;
+            $user_id = auth()->user()->id;
 
             //  Filter test database entries
             $database_entry = $database_entry
@@ -67,7 +67,7 @@ trait DatabaseEntryTrait
             $database_entry->metadata = json_decode($database_entry->metadata, true);
 
             //  Cache the database entry e.g CACHE_DATABASE_ENTRY_1_2 = [ ... ] (Valid for only 30 minutes)
-            Cache::put($this->getCacheName($msisdn, $name, $test_mode, $app_id), Carbon::now()->addMinutes(30));
+            Cache::put($this->getCacheName($msisdn, $name, $test_mode, $app_id), $database_entry, Carbon::now()->addMinutes(30));
 
         }
 

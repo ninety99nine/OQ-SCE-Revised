@@ -30,7 +30,7 @@ class CreateAppsTable extends Migration
             $table->unsignedInteger('project_id')->nullable();
 
             /*  Delete Information  */
-            $table->char('delete_code', 6)->nullable();
+            $table->char('confirmation_code', 6)->nullable();
 
             /*  Timestamps  */
             $table->timestamps();

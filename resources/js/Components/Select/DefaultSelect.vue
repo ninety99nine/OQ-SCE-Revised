@@ -1,7 +1,7 @@
 <template>
     <div>
 
-        <div class="flex items-center mb-2">
+        <div v-if="label || note || $slots.info" class="flex items-center mb-2">
 
             <!-- Label -->
             <label v-if="label" :for="label" :class="['block text-'+size+' font-medium text-gray-900', { 'mr-2' : info }]">{{ label }}</label>

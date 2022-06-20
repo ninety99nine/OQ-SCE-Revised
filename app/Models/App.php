@@ -26,7 +26,7 @@ class App extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'description', 'online', 'offline_message', 'delete_code', 'active_version_id', 'project_id'
+        'name', 'description', 'online', 'offline_message', 'confirmation_code', 'active_version_id', 'project_id'
     ];
 
     /**
@@ -58,7 +58,7 @@ class App extends Model
      */
     public function versionsWithoutBuilder()
     {
-        return $this->versions()->select('id', 'number', 'description', 'features', 'app_id', 'delete_code', 'created_at', 'updated_at');
+        return $this->versions()->select('id', 'number', 'description', 'features', 'app_id', 'confirmation_code', 'created_at', 'updated_at');
     }
 
     /*
@@ -91,6 +91,22 @@ class App extends Model
     public function liveSessions()
     {
         return $this->sessions()->where('test', 0);
+    }
+
+    /*
+     *  Returns the session notification
+     */
+    public function sessionNotifications()
+    {
+        return $this->hasMany(SessionNotification::class);
+    }
+
+    /*
+     *  Returns the global variables
+     */
+    public function globalVariables()
+    {
+        return $this->hasMany(GlobalVariable::class);
     }
 
     /*
@@ -127,8 +143,28 @@ class App extends Model
             //  before delete() method call this
             static::deleting(function ($app) {
 
-                //  Delete versions
-                $app->versions()->delete();
+                //  Delete shortcode
+                $app->shortCode()->delete();
+
+                //  Delete sessions
+                $app->sessions()->delete();
+
+                //  Delete global variables
+                $app->globalVariables()->delete();
+
+                //  Delete database entries
+                $app->databaseEntries()->delete();
+
+                //  Delete session notifications
+                $app->sessionNotifications()->delete();
+
+                //  Foreach app version
+                foreach($app->versions as $version) {
+
+                    //  Delete the version
+                    $version->delete();
+
+                }
 
                 // do the rest of the cleanup...
             });

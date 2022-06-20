@@ -16,6 +16,15 @@ use App\Services\Sms\SmsBuilder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
+//  AppWrite Support
+use \Appwrite\AppwriteException;
+use \Appwrite\Client as AppWriteClient;
+use \Appwrite\Services\Users as AppWriteUsers;
+use \Appwrite\Services\Teams as AppwriteTeams;
+use Appwrite\Services\Storage as AppwriteStorage;
+use \Appwrite\Services\Database as AppwriteDatabase;
+use \Appwrite\Services\Functions as AppwriteFunctions;
+
 class UssdService
 {
     public $app;
@@ -43,12 +52,14 @@ class UssdService
     public $linked_screen;
     public $mobile_number;
     public $linked_display;
+    public $sessionResponse;
     public $display_actions;
     public $display_content;
     public $existing_session;
     public $version_id = null;
     public $reply_records = [];
     public $api_response = null;
+    public $user_response = null;
     public $fatal_error = false;
     public $summarized_logs = [];
     public $chained_screens = [];
@@ -313,14 +324,19 @@ class UssdService
 
             /**
              *  Generate a unique session id, then update the current
-             *  session id with the generated session id
+             *  session id with the generated session id. We used to
+             *  generate the id as follows:
+             *
+             *  $this->session_id = uniqid('test_').'_'.(Carbon::now())->getTimestamp();
+             *
+             *  However i prefer using the Laravel UUID method
              */
-            $this->session_id = uniqid('test_').'_'.(Carbon::now())->getTimestamp();
+            $this->session_id = Str::uuid()->toString();
 
         }
 
         //  Handle the current session
-        $sessionResponse = $this->handleSession();
+        $this->sessionResponse = $this->handleSession();
 
         /** This will render as: $this->createNewSession()
          *  while being called within a try/catch handler.
@@ -332,7 +348,7 @@ class UssdService
             return $createResponse;
         }
 
-        return $sessionResponse;
+        return $this->sessionResponse;
     }
 
     /** Get the USSD service code embedded within the USSD message
@@ -613,7 +629,7 @@ class UssdService
         }
 
         //  Use the rest of the values as the message e.g 3*4*5
-        $this->msg = $this->text;
+        $this->user_response = $this->text;
 
     }
 
@@ -863,6 +879,9 @@ class UssdService
                  */
                 $this->addReplyRecord($this->msg, 'user', true);
 
+                //  Capture this msg as the user response
+                $this->user_response = $this->msg;
+
             }
         }
 
@@ -871,11 +890,15 @@ class UssdService
 
         //  If the existing session has timeout
         if ($this->existing_session->has_timed_out) {
+
             //  Handle timeout
-            $response = $this->handleTimeout();
+            $this->sessionResponse = $this->handleTimeout();
+
         } else {
+
             //  Handle the current session
-            $response = $this->handleSession();
+            $this->sessionResponse = $this->handleSession();
+
         }
 
         if ($this->is_revisting_session == false) {
@@ -895,7 +918,7 @@ class UssdService
         //  Reset "is_revisting_session" to false
         $this->is_revisting_session = false;
 
-        return $response;
+        return $this->sessionResponse;
     }
 
     /** Create a new USSD session
@@ -917,12 +940,29 @@ class UssdService
             $this->session_execution_times = [
                 [
                     'time' => $session_execution_time,
-                    'recorded_at' => (Carbon::now())->format('Y-m-d H:i:s'),
+                    'recorded_at' => now(),
                 ],
+            ];
+
+            /*
+             *  Get the response message for display to the user e.g
+             *
+             *  Extract "Welcome, Enter Username" from "CON Welcome, Enter Username"
+             *  Extract "Payment Successful" from "END Payment Successful"
+             */
+            $output = $this->getResponseMsg($this->sessionResponse);
+
+            //  Capture the session input
+            $inputs_and_outputs = [
+                [
+                    'input' => $this->msg,
+                    'output' => $output
+                ]
             ];
 
             $data = [
                 'text' => $this->text,
+                'inputs_and_outputs' => json_encode($inputs_and_outputs),
                 'reply_records' => json_encode($this->reply_records),
                 'type' => $this->ussd_service_code_type,
                 'msisdn' => $this->msisdn,
@@ -934,18 +974,19 @@ class UssdService
                 'fatal_error' => $this->fatal_error,
                 'fatal_error_msg' => $this->fatal_error_msg,
                 'session_execution_times' => json_encode($this->session_execution_times),
-                'created_at' => (Carbon::now())->format('Y-m-d H:i:s'),
-                'updated_at' => (Carbon::now())->format('Y-m-d H:i:s'),
+                'created_at' => now(),
+                'updated_at' => now(),
                 'timeout_at' => (Carbon::now())->addSeconds($this->timeout_limit_in_seconds)->format('Y-m-d H:i:s'),
                 'app_id' => $this->app->id,
                 'version_id' => $this->version->id,
+                'user_id' => auth()->user() ? auth()->user()->id : null
             ];
 
             //  Overide the default details with any custom data
             $data = array_merge($data, $overide_data);
 
-            //  If we have any fatal errors set the summarized logs otherwise nothing
-            Arr::set($data, 'logs', $this->fatal_error ? json_encode($this->summarized_logs) : null);
+            //  Set the session log information
+            $data = $this->setSessionLogsAndLogExpiry($data);
 
             //  Create the new session record
             $this->new_session = DB::table('ussd_sessions')->insert($data);
@@ -978,10 +1019,11 @@ class UssdService
                 'fatal_error' => $this->fatal_error,
                 'fatal_error_msg' => $this->fatal_error_msg,
                 'reply_records' => json_encode($this->reply_records),
-                'updated_at' => (Carbon::now())->format('Y-m-d H:i:s'),
+                'updated_at' => now(),
                 'timeout_at' => (Carbon::now())->addSeconds($this->timeout_limit_in_seconds)->format('Y-m-d H:i:s'),
                 'app_id' => $this->app->id,
                 'version_id' => $this->version->id,
+                'user_id' => auth()->user() ? auth()->user()->id : null
             ];
         }
 
@@ -991,8 +1033,8 @@ class UssdService
         //  Set the total session duration
         Arr::set($data, 'total_session_duration', $total_session_duration);
 
-        //  If we have any fatal errors set the detailed logs otherwise use the summarized logs
-        Arr::set($data, 'logs', $this->fatal_error ? $this->summarized_logs : null);
+        //  Set the session log information
+        $data = $this->setSessionLogsAndLogExpiry($data);
 
         //  Get the difference in seconds between the start and end request time
         $session_execution_time = $this->calculateSessionExecutionTime();
@@ -1003,11 +1045,121 @@ class UssdService
         //  Add the new session execution time
         array_push($this->session_execution_times, [
             'time' => $session_execution_time,
-            'recorded_at' => (Carbon::now())->format('Y-m-d H:i:s'),
+            'recorded_at' => now(),
         ]);
 
         //  Set the user response duration's
         Arr::set($data, 'session_execution_times', $this->session_execution_times);
+
+        /*
+         *  Get the response message for display to the user e.g
+         *
+         *  Extract "Welcome, Enter Username" from "CON Welcome, Enter Username"
+         *  Extract "Payment Successful" from "END Payment Successful"
+         */
+        $output = $this->getResponseMsg($this->sessionResponse);
+
+        /**
+         *  When using the "Revisit Event", the inputs and outputs are handled slightly differently.
+         *  The "Revisit Event" usually sets:
+         *
+         *  $this->msg = '';
+         *
+         *  Which means that the input is made empty, however the input is already captured by the
+         *  handleRevisit() through the updateExistingSessionDatabaseRecord() while the output is
+         *  still not captured since "$this->sessionResponse" has not yet received the response.
+         *  Remember that the handleRevisit() re-runs the handleExistingSession() as a
+         *  recursive call that must then return a response. After that response is
+         *  returned on the recursive chain back to the last can we then set the
+         *  "$this->sessionResponse" to the final result returned.
+         *
+         *  The "inputs_and_outputs" look like this normally.
+         *
+         *  [
+         *      [
+         *          'input' => '*123#',
+         *          'output' => 'Welcome to Company X. Enter 1 to continue'
+         *      ],
+         *      [
+         *          'input' => '1',
+         *          'output' => 'Great, now enter 2 to continue'
+         *      ],
+         *      [
+         *          'input' => '',
+         *          'output' => 'This is the end, thank you.'
+         *      ]
+         *  ]
+         *
+         *  Just a chain of user inputs and the corresponding outputs.
+         *  However whenever we have a revisit screnerio we can have
+         *  a situation such as this:
+         *
+         *  [
+         *      [
+         *          'input' => '*123#',
+         *          'output' => 'Welcome to Company X. Enter 1 to continue'
+         *      ],
+         *      [
+         *          'input' => '1',
+         *          'output' => 'Great, now enter 2 to trigger a home revisit'
+         *      ],
+         *      [
+         *          'input' => '2',
+         *          'output' => null
+         *      ],
+         *      [
+         *          'input' => '',
+         *          'output' => 'Welcome to Company X. Enter 1 to continue'
+         *      ]
+         *  ]
+         *
+         *  The revisit causes the input to be captured on one entry and the
+         *  output to be captured on the next entry. In this case we fix
+         *  the above to the following result:
+         *
+         *  [
+         *      [
+         *          'input' => '*123#',
+         *          'output' => 'Welcome to Company X. Enter 1 to continue'
+         *      ],
+         *      [
+         *          'input' => '1',
+         *          'output' => 'Great, now enter 2 to trigger a home revisit'
+         *      ],
+         *      [
+         *          'input' => '2',
+         *          'output' => 'Welcome to Company X. Enter 1 to continue'
+         *      ]
+         *  ]
+         *
+         *  We simply avoid making another entry, but set the ouput on the
+         *  entry with the input thereby resulting in one entry with both
+         *  the input and output.
+         */
+        $lastIndex = count($this->existing_session->inputs_and_outputs) - 1;
+
+        // If the last entries output is empty (Lets update the output appropriately)
+        if( $lastIndex >= 0 && empty($this->existing_session->inputs_and_outputs[$lastIndex]['output']) ) {
+
+            $inputs_and_outputs = $this->existing_session->inputs_and_outputs;
+
+            //  Update the output on the existing entry
+            $inputs_and_outputs[$lastIndex]['output'] = $output;
+
+        }else{
+
+            //  Set a new input and output entry
+            $inputs_and_outputs = array_merge($this->existing_session->inputs_and_outputs, [
+                [
+                    'input' => $this->msg,
+                    'output' => $output
+                ]
+            ]);
+
+        }
+
+        //  Set the user response duration's
+        Arr::set($data, 'inputs_and_outputs', json_encode($inputs_and_outputs));
 
         //  Update the session record that matches the given Session Id
         $updateResponse = DB::table('ussd_sessions')->where('id', $this->existing_session->id)->update($data);
@@ -1025,6 +1177,68 @@ class UssdService
         }
 
         return $updateResponse;
+    }
+
+    public function setSessionLogsAndLogExpiry($data)
+    {
+        //  Get the mobile log saving approach (never, always, on_fail, on_success)
+        $mobileSaveApproach = $this->version->builder['log_settings']['mobile']['save_logs'];
+
+        //  Get the simulator log saving approach (never, always, on_fail, on_success)
+        $simulatorSaveApproach = $this->version->builder['log_settings']['simulator']['save_logs'];
+
+        //  Get the save approach (never, always, on_fail, on_success)
+        $saveApproach = $this->test_mode ? $simulatorSaveApproach : $mobileSaveApproach;
+
+        //  Check if we can save logs on this session
+        if( $saveApproach == 'always' || ($saveApproach == 'on_fail' && $this->fatal_error == true) || ($saveApproach == 'on_success' && $this->fatal_error == false) ) {
+
+            //  Set the summarized logs
+            Arr::set($data, 'logs', json_encode($this->summarized_logs));
+
+            //  Calculate the log expiry date
+            $expiryDate = now();
+            $durationNumber = $this->version->builder['log_settings']['duration']['number'] ?? 1;
+            $durationType = $this->version->builder['log_settings']['duration']['type'] ?? 'days';
+
+            if( $durationNumber >= 1 ) {
+
+                if( $durationType == 'years' ){
+
+                    $expiryDate = $expiryDate->addYears( $durationNumber );
+
+                }elseif( $durationType == 'months' ){
+
+                    $expiryDate = $expiryDate->addMonths( $durationNumber );
+
+                }elseif( $durationType == 'weeks' ){
+
+                    $expiryDate = $expiryDate->addWeeks( $durationNumber );
+
+                }elseif( $durationType == 'days' ){
+
+                    $expiryDate = $expiryDate->addDays( $durationNumber );
+
+                }elseif( $durationType == 'hours' ){
+
+                    $expiryDate = $expiryDate->addHours( $durationNumber );
+
+                }elseif( $durationType == 'minutes' ){
+
+                    $expiryDate = $expiryDate->addMinutes( $durationNumber );
+
+                }
+
+            }
+
+            //  Set the summarized logs expiry date
+            Arr::set($data, 'logs_expire_at', $expiryDate);
+
+        }
+
+        //  Return the data
+        return $data;
+
     }
 
     public function calculateSessionExecutionTime()
@@ -1140,15 +1354,14 @@ class UssdService
     public function handleTimeout()
     {
         //  Set the timeout message
-        $this->msg = $this->version->builder['simulator']['settings']['timeout_message'];
+        $timeout_msg = $this->version->builder['simulator']['settings']['timeout_message'];
 
         //  If the timeout message was not provided
-        if (empty($this->msg)) {
-            //  Get the default timeout message found in "UssdSessionTraits" within "UssdSession"
-            $default_timeout_msg = (new UssdSession())->default_timeout_message;
+        if (empty($timeout_msg)) {
 
-            //  Set the timeout message
-            $this->msg = $default_timeout_msg;
+            //  Get the default timeout message found in "UssdSessionTraits" within "UssdSession"
+            $timeout_msg = (new UssdSession())->default_timeout_message;
+
         }
 
         //  Get the session timeout date and time
@@ -1157,7 +1370,7 @@ class UssdService
         //  Set a warning that the session timed out
         $this->logWarning('Session timed out after '.$this->timeout_limit_in_seconds.' seconds. The session timed out at exactly '.$timeout_date_time);
 
-        $response = $this->showTimeoutScreen($this->msg);
+        $response = $this->showTimeoutScreen($timeout_msg);
 
         //  Build and return the final response
         return $response;
@@ -1169,13 +1382,6 @@ class UssdService
      */
     public function buildResponse($response)
     {
-        /* Get the response message for display to the user e.g
-         *
-         *  Extract "Welcome, Enter Username" from "CON Welcome, Enter Username"
-         *  Extract "Payment Successful" from "END Payment Successful"
-         */
-        $this->msg = $this->getResponseMsg($response);
-
         //  If we have a reponse set by a screen/display Event
         if( $this->event_request_type != null ){
 
@@ -1207,6 +1413,14 @@ class UssdService
 
         }
 
+        /*
+         *  Get the response message for display to the user e.g
+         *
+         *  Extract "Welcome, Enter Username" from "CON Welcome, Enter Username"
+         *  Extract "Payment Successful" from "END Payment Successful"
+         */
+        $message = $this->getResponseMsg($response);
+
         //  Build the response payload
         $response = [
             'session_id' => $this->session_id,
@@ -1214,13 +1428,13 @@ class UssdService
             'request_type' => $this->request_type,
             'msisdn' => $this->msisdn,
             'text' => $this->text,
-            'msg' => $this->msg,
+            'msg' => $message,
             'stats' => [],
-            'logs' => [],
+            'logs' => []
         ];
 
         //  If we are on test mode
-        if ($this->test_mode) {
+        if ( $this->test_mode ) {
 
             //  Set the response statistics
             $response['stats'] = [
@@ -1229,6 +1443,7 @@ class UssdService
 
             //  If we have the builder
             if ($this->version && is_array($this->version->builder)) {
+
                 //  Set an info log of the ussd properties
                 $this->logInfo(
                     'USSD Properties: '.
@@ -1243,14 +1458,21 @@ class UssdService
                     '</div>'
                 );
 
-                if ($this->version->builder['simulator']['debugger']['return_summarized_logs']) {
-                    //  Set the summarized logs on the response payload
-                    $response['logs'] = $this->summarized_logs;
-                } else {
-                    //  Set the logs on the response payload
-                    $response['logs'] = $this->logs;
+                //  Include the logs if required
+                if ($this->version->builder['simulator']['debugger']['return_logs']) {
+
+                    if ($this->version->builder['simulator']['debugger']['return_summarized_logs']) {
+                        //  Set the summarized logs on the response payload
+                        $response['logs'] = $this->summarized_logs;
+                    } else {
+                        //  Set the logs on the response payload
+                        $response['logs'] = $this->logs;
+                    }
+
                 }
+
             }
+
         }
 
         return $response;
@@ -1289,7 +1511,10 @@ class UssdService
         $this->manageGoBackRequests();
 
         //  Start the process of building the USSD Application
-        return $this->startBuildingUssd();
+        $output = $this->startBuildingUssd();
+
+        //  Return the output
+        return $output;
     }
 
     /*  Scan and remove any responses the user indicated to omit. This is to help
@@ -2053,7 +2278,7 @@ class UssdService
             'service_code' => $this->service_code,
             'user_responses' => $this->getUserResponses(),
             'reply_records' => $this->reply_records,
-            'user_response' => $this->msg,
+            'user_response' => $this->user_response,
             'app' => [
                 'name' => $this->app->name,
                 'description' => $this->app->description,
@@ -5417,7 +5642,7 @@ class UssdService
     public function getScreenByMarker($marker = null)
     {
         //  If the marker provided is in Array format
-        if ( !is_null($marker)) {
+        if ( !empty($marker)) {
 
             return collect($this->chained_screens)->filter(function($screen) use ($marker) {
 
@@ -5432,13 +5657,22 @@ class UssdService
         }
     }
 
+    /**
+     *  This method checks if a screen exists by searching based on
+     *  the screen marker provided.
+     */
+    public function hasScreenByMarker($marker = null)
+    {
+        return !empty($this->getScreenByMarker($marker)) ? true : false;
+    }
+
     /** This method returns a display if it exists by searching based on
      *  the display marker provided.
      */
     public function getDisplayByMarker($marker = null)
     {
         //  If the marker provided is in Array format
-        if ( !is_null($marker)) {
+        if ( !empty($marker)) {
 
             return collect($this->chained_displays)->filter(function($display) use ($marker) {
 
@@ -5451,6 +5685,15 @@ class UssdService
             })->first();
 
         }
+    }
+
+    /**
+     *  This method checks if a display exists by searching based on
+     *  the display marker provided.
+     */
+    public function hasDisplayByMarker($marker = null)
+    {
+        return !empty($this->getDisplayByMarker($marker)) ? true : false;
     }
 
     public function handleNavigation($type)
@@ -5882,6 +6125,11 @@ class UssdService
                     //  Get the active state value
                     $activeState = $this->processActiveState($event['active']);
 
+                    //  If we have a screen to show return the response otherwise continue
+                    if ($this->shouldDisplayScreen($activeState)) {
+                        return $activeState;
+                    }
+
                     //  If we should run the next events if this event is active
                     if($event['run_next_events']['selected_type'] === 'if_active' && $activeState === true){
 
@@ -5898,11 +6146,11 @@ class UssdService
                         //  Get the active state value of the "run_next_events"
                         $activeState = $this->processActiveState($event['run_next_events']);
 
-                    }
+                        //  If we have a screen to show return the response otherwise continue
+                        if ($this->shouldDisplayScreen($activeState)) {
+                            return $activeState;
+                        }
 
-                    //  If we have a screen to show return the response otherwise continue
-                    if ($this->shouldDisplayScreen($activeState)) {
-                        return $activeState;
                     }
 
                     //  If the pagination is active
@@ -5953,6 +6201,11 @@ class UssdService
                 //  Set an info log that we are preparing to handle the given event
                 $this->logInfo('Display: '.$this->wrapAsPrimaryHtml($this->display['name']).' preparing to handle the '.$this->wrapAsSuccessHtml($event['name']).' event');
 
+            }else {
+
+                //  Set an info log that we are preparing to handle the given event
+                $this->logInfo('Preparing to handle the '.$this->wrapAsSuccessHtml($event['name']).' event');
+
             }
 
             //  Get the current event
@@ -5990,8 +6243,11 @@ class UssdService
                 $response = $this->handle_Terminate_Session_Event();
             } elseif ($event['type'] == 'Database') {
                 $response = $this->handle_Database_Event();
+            } elseif ($event['type'] == 'AppWrite Connection') {
+                $response = $this->handle_AppWriteConnection_Event();
             }else{
-                dd(json_encode($this->event));
+                dd('HEY! This event does not exist, must be deprecated');
+                //  dd(json_encode($this->event));
             }
 
             //  Get the time after processing the request
@@ -6984,6 +7240,150 @@ class UssdService
 
     }
 
+
+    /**
+     *  This method connects to the AppWrite service
+     */
+    public function handle_AppWriteConnection_Event()
+    {
+        if ($this->event) {
+
+            $code = $this->event['event_data']['code'];
+
+            $referenceName = $this->event['event_data']['reference_name'];
+
+            $onRequestSuccessEvents = $this->event['event_data']['events']['on_request_success']['collection'];
+            $onRequestFailEvents = $this->event['event_data']['events']['on_request_fail']['collection'];
+
+            /***************************
+             * Set Endpoint            *
+             **************************/
+            $outputResponse = $this->convertValueStructureIntoDynamicData($this->version->builder['appwrite_connection']['endpoint']);
+
+            //  If we have a screen to show return the response otherwise continue
+            if ($this->shouldDisplayScreen($outputResponse)) {
+                return $outputResponse;
+            }
+
+            $endpoint = $outputResponse;
+
+            if(empty($endpoint)) $this->logWarning('The Appwrite endpoint must be provided to send the sms');
+
+            /***************************
+             * Set Project ID          *
+             **************************/
+            $outputResponse = $this->convertValueStructureIntoDynamicData($this->version->builder['appwrite_connection']['project_id']);
+
+            //  If we have a screen to show return the response otherwise continue
+            if ($this->shouldDisplayScreen($outputResponse)) {
+                return $outputResponse;
+            }
+
+            $projectId = $outputResponse;
+
+            if(empty($projectId)) $this->logWarning('The Appwrite project id must be provided to send the sms');
+
+            /***************************
+             * Set API Key             *
+             **************************/
+            $outputResponse = $this->convertValueStructureIntoDynamicData($this->version->builder['appwrite_connection']['api_key']);
+
+            //  If we have a screen to show return the response otherwise continue
+            if ($this->shouldDisplayScreen($outputResponse)) {
+                return $outputResponse;
+            }
+
+            $apiKey = $outputResponse;
+
+            if(empty($apiKey)) $this->logWarning('The Appwrite API Key must be provided to send the sms');
+
+            if( !empty($endpoint) && !empty($projectId) && !empty($apiKey) ){
+
+                $client = new AppWriteClient();
+
+                $client->setEndpoint($endpoint)     // Your API Endpoint
+                        ->setProject($projectId)    // Your project ID
+                        ->setKey($apiKey);          // Your API key
+
+                //  Set the AppWrite services as dynamic properties
+                $this->setProperty('appWriteUsers', new AppWriteUsers($client), false);
+                $this->setProperty('appWriteTeams', new AppwriteTeams($client), false);
+                $this->setProperty('appWriteStorage', new AppwriteStorage($client), false);
+                $this->setProperty('appWriteDatabase', new AppwriteDatabase($client), false);
+                $this->setProperty('appWriteFunctions', new AppwriteFunctions($client), false);
+
+                try {
+
+                    //  Process the PHP Code to consume the AppWrite service above
+                    $outputResponse = $this->processPHPCode("$code");
+
+                    //  If we have a screen to show return the response otherwise continue
+                    if ($this->shouldDisplayScreen($outputResponse)) {
+                        return $outputResponse;
+                    }
+
+                    //  If the output reference name is provided
+                    if( !empty($referenceName) ) {
+
+                        //  Capture the output into the reference name provided
+                        $this->setProperty($referenceName, $outputResponse);
+
+                    }
+
+                    //  If we have on success events
+                    if( count($onRequestSuccessEvents) ) {
+
+                        //  Set an info log that the current event has on success events
+                        $this->logInfo($this->wrapAsPrimaryHtml('AppWrite event has ('.$this->wrapAsSuccessHtml(count($onRequestSuccessEvents)).') on request success events'));
+
+                        //  Start handling the given events
+                        return $this->handleEvents($onRequestSuccessEvents);
+
+                    }
+
+                } catch (AppwriteException $e) {
+
+                    //  Handle the AppwriteException
+                    $this->logWarning('AppWrite request failed');
+                    $this->logError('Message: ' . $e->getMessage());
+                    $this->logError('Type: ' . $e->getType());
+                    $this->logError('Code: ' . $e->getCode());
+
+                    //  If the output reference name is provided
+                    if( !empty($referenceName) ) {
+
+                        //  Capture the error output into the reference name provided
+                        $this->setProperty($referenceName, $e);
+
+                    }
+
+                    //  If we have on fail events
+                    if( count($onRequestFailEvents) ) {
+
+                        //  Set an info log that the current event has on fail events
+                        $this->logInfo($this->wrapAsPrimaryHtml('AppWrite event has ('.$this->wrapAsSuccessHtml(count($onRequestFailEvents)).') on request fail events'));
+
+                        //  Start handling the given events
+                        return $this->handleEvents($onRequestFailEvents);
+
+                    }else{
+
+                        //  Show the technical difficulties error screen to notify the user of the issue
+                        return $this->showTechnicalDifficultiesErrorScreen();
+
+                    }
+
+                }
+
+            }else{
+
+                $this->logWarning('The Appwrite connection was aborted due to missing values');
+
+            }
+
+        }
+    }
+
     /**
      *  This method bills the subscriber on their main artime balance
      */
@@ -7403,7 +7803,7 @@ class UssdService
                 $access_token = $apiCallResponse['access_token'];
 
                 //  Capture expiry date and convert to carbon datetime
-                $expires_in = \Carbon\Carbon::now()->addSeconds($apiCallResponse['expires_in']);
+                $expires_in = now()->addSeconds($apiCallResponse['expires_in']);
 
                 //  Save the airtime billing access token on a new access token from the database
                 if( empty($access_token_from_db) == true && isset($access_token) && isset($expires_in) ){
@@ -8182,8 +8582,8 @@ class UssdService
                       'purchaseCategoryCode' => (isset($purchase_category_code) && !empty($purchase_category_code)) ? $purchase_category_code : null,
                     ],
                   ],
-                  'clientCorrelator' => 'clientCorrelator-'.\Carbon\Carbon::now(),  //	'unique-technical-id',
-                  'referenceCode' => 'referenceCode-'.\Carbon\Carbon::now(),        //	'Service_provider_payment_reference',
+                  'clientCorrelator' => 'clientCorrelator-'.now(),  //	'unique-technical-id',
+                  'referenceCode' => 'referenceCode-'.now(),        //	'Service_provider_payment_reference',
                   'transactionOperationStatus' => 'Charged',
                 ],
               ];
@@ -9862,7 +10262,12 @@ class UssdService
             $code = $this->event['event_data']['code'];
 
             //  Process the PHP Code
-            $this->processPHPCode("$code");
+            $outputResponse = $this->processPHPCode("$code");
+
+            //  If we have a screen to show return the response otherwise continue
+            if ($this->shouldDisplayScreen($outputResponse)) {
+                return $outputResponse;
+            }
         }
     }
 
@@ -10383,25 +10788,36 @@ class UssdService
                     //  Get the provided marker
                     $marker = $this->event['event_data']['revisit_type']['marked_revisit']['selected_marker'];
 
+                    if( empty($marker) ) {
+
+                        $this->logWarning('Provide a marker to locate a screen or display to revisit');
+
+                    }
+
                     //  Get the screen matching the given link
                     $screen = $this->getScreenByMarker($marker);
 
                     //  Get the screen matching the given link
                     $display = $this->getDisplayByMarker($marker);
 
+                    //  If the display to revisit was found
+                    if ($display) {
+
+                        $this->logInfo($this->wrapAsPrimaryHtml($this->screen['name']).' is attempting to revisit following display: '.$this->wrapAsPrimaryHtml($display['name']));
+
+                        return $this->handleScreenRevisit($display, 'display', $automatic_replies_text);
+
                     //  If the screen to revisit was found
-                    if ($screen) {
+                    } elseif ($screen) {
 
                         $this->logInfo($this->wrapAsPrimaryHtml($this->screen['name']).' is attempting to revisit the following screen: '.$this->wrapAsPrimaryHtml($screen['name']));
 
                         return $this->handleScreenRevisit($screen, 'screen', $automatic_replies_text);
 
-                    //  If the display to revisit was found
-                    } elseif ($display) {
+                    }else{
 
-                        $this->logInfo($this->wrapAsPrimaryHtml($this->screen['name']).' is attempting to revisit following display: '.$this->wrapAsPrimaryHtml($display['name']));
+                        $this->logWarning('The marker '.$this->wrapAsPrimaryHtml($marker).' does not exist, therefore we cannot revisit any screen or display');
 
-                        return $this->handleScreenRevisit($display, 'display', $automatic_replies_text);
                     }
 
                 }
@@ -10610,12 +11026,6 @@ class UssdService
          *  ...e.t.c
         */
 
-        //  Reset the level
-        $this->level = 1;
-
-        //  Reset the user reply message
-        $this->msg = '';
-
         /** If this is a new session, then it means we don't have the any existing session
          *  which means that "$this->existing_session" is not set to anything. Since this
          *  is a new session we must force the creation of a new session record so that
@@ -10623,6 +11033,7 @@ class UssdService
          *  complete our Revisit Event.
          */
         if ($this->request_type == '1') {
+
             /** Create new session
              *
              *  This will render as: $this->createNewSession()
@@ -10634,14 +11045,23 @@ class UssdService
             if ($this->shouldDisplayScreen($createResponse)) {
                 return $createResponse;
             }
+
         } elseif ($this->request_type == '2') {
+
             /** Update existing session
              *
              *  This will render as: $this->updateExistingSessionDatabaseRecord()
              *  while being called within a try/catch handler.
              */
             $updateResponse = $this->tryCatch('updateExistingSessionDatabaseRecord');
+
         }
+
+        //  Reset the level
+        $this->level = 1;
+
+        //  Reset the user reply message
+        $this->msg = '';
 
         //  Empty the existing reply records (Again)
         $this->emptyReplyRecords();
@@ -10649,7 +11069,8 @@ class UssdService
         //  Fetch the existing session record from the database by force
         $this->existing_session = $this->getExistingSessionFromDatabase($force = true);
 
-        /* Make a indication that we are revisting. Its important to note that when we are revisiting,
+        /*
+         *  Make a indication that we are revisting. Its important to note that when we are revisiting,
          *  we are actually re-handling the session again from scratch using the handleExistingSession()
          *  method which will build the App from the ground up. The problem we have is that whenever we
          *  have Events that are fired in order to reset some Global Variables we keep overiding these
@@ -10682,7 +11103,6 @@ class UssdService
          *  Event" since the values of the old session overide any potentially updated values. We can use the
          *  "is_revisting_session" variable to help us not to reload any Global Variables from the last session
          *  but target the current session Global Variables so that this way we never lose any of our changes.
-         *
          */
         $this->is_revisting_session = true;
 
@@ -10767,8 +11187,8 @@ class UssdService
                     'msisdn' => $this->msisdn,
                     'test' => $this->test_mode,
                     'app_id' => $this->app->id,
-                    'created_at' => (Carbon::now())->format('Y-m-d H:i:s'),
-                    'updated_at' => (Carbon::now())->format('Y-m-d H:i:s'),
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]
             );
 
@@ -10787,7 +11207,7 @@ class UssdService
              ***********************/
 
             //  Get the events from the event collection
-            $events = $this->event['event_data']['collection'];
+            $events = $this->event['event_data']['events']['collection'];
 
             //  Start handling the given events
             return $this->handleEvents($events);
@@ -10868,7 +11288,7 @@ class UssdService
             }
 
             //  If the database entry must be created or updated
-            if( in_array(['create', 'update', 'create_or_update', 'read_or_create'], $action) ) {
+            if( in_array($action, ['create', 'update', 'create_or_update', 'read_or_create']) ) {
 
                 /****************************
                  * BUILD ADDITIONAL FIELDS  *
@@ -10886,7 +11306,7 @@ class UssdService
                      * BUILD VALUE    *
                      ******************/
 
-                    $reference_name = $field['name'];
+                    $name = $field['name'];
                     $value = $field['value'];
 
                     //  Convert the "field value" into its associated dynamic value
@@ -10925,7 +11345,7 @@ class UssdService
                     }
 
                     //  Add current processed value to the the processed values array
-                    $processed_fields[$reference_name] = $value;
+                    $processed_fields[$name] = $value;
 
                 }
 
@@ -10936,7 +11356,7 @@ class UssdService
                     'app_id' => $this->app->id,
                     'test' => $this->test_mode,
                     'metadata' => $processed_fields,
-                    'user_id' => auth('api')->user() ? auth('api')->user()->id : null
+                    'user_id' => auth()->user() ? auth()->user()->id : null
                 ];
 
                 //  If the database entry must be created
@@ -10958,7 +11378,7 @@ class UssdService
                         }
 
                         //  Get the database entry (Latest instance - After create)
-                        $database_entry = $this->getUssdDatabaseEntry($reference_name);
+                        $database_entry = $this->getUssdDatabaseEntry($reference_name, true);
 
                     }else{
 
@@ -11021,7 +11441,7 @@ class UssdService
                         }
 
                         //  Get the database entry (Latest instance - After update)
-                        $database_entry = $this->getUssdDatabaseEntry($reference_name);
+                        $database_entry = $this->getUssdDatabaseEntry($reference_name, true);
 
                     }else{
 
@@ -11075,7 +11495,9 @@ class UssdService
             }
 
             //  Extract the database entry metadata if it exists
-            $metadata = !empty($database_entry) ? json_decode($database_entry['metadata'], true) : null;
+            $metadata = !empty($database_entry) ? $database_entry->metadata : null;
+
+            $this->logError('reference_name: ' .$reference_name);
 
             //  Store the reference name and value
             $this->setProperty($reference_name, $metadata);
@@ -11089,8 +11511,8 @@ class UssdService
         $data['metadata'] = json_encode($data['metadata']);
 
         //  Set the dates
-        $data['created_at'] = (Carbon::now())->format('Y-m-d H:i:s');
-        $data['updated_at'] = (Carbon::now())->format('Y-m-d H:i:s');
+        $data['created_at'] = now();
+        $data['updated_at'] = now();
 
         //  Create new database entry
         $database_entry = DB::table('database_entries')->insert($data);
@@ -11112,7 +11534,7 @@ class UssdService
         $data['metadata'] = json_encode($data['metadata']);
 
         //  Set the dates
-        $data['updated_at'] = (Carbon::now())->format('Y-m-d H:i:s');
+        $data['updated_at'] = now();
 
         //  Update existing database entry
         $database_entry_updated = DB::table('database_entries')->where('id', $database_entry->id)->update($data);
@@ -11128,15 +11550,29 @@ class UssdService
         }
     }
 
-    public function getUssdDatabaseEntry($name)
+    public function getUssdDatabaseEntry($name, $viaQuery = false)
     {
-        //  Get the database entry matching the given mobile number, app id and mode
-        return Cache::get((new DatabaseEntry())->getCacheName($this->msisdn, $name, $this->test_mode, $this->app->id), function () use ($name) {
+        if( $viaQuery ) {
 
-            //  We failed to retrieve from the cache, therefore perform a query
-            return (new DatabaseEntry())->findAndCache($this->msisdn, $name, $this->test_mode, $this->app->id);
+            //  Perform a query
+            return $this->getUssdDatabaseEntryViaQuery($name);
 
-        });
+        }else{
+
+            //  Get the database entry matching the given mobile number, app id and mode
+            return Cache::get((new DatabaseEntry())->getCacheName($this->msisdn, $name, $this->test_mode, $this->app->id), function () use ($name) {
+
+                //  We failed to retrieve from the cache, therefore perform a query
+                return $this->getUssdDatabaseEntryViaQuery($name);
+
+            });
+
+        }
+    }
+
+    public function getUssdDatabaseEntryViaQuery($name)
+    {
+        return (new DatabaseEntry())->findAndCache($this->msisdn, $name, $this->test_mode, $this->app->id);
     }
 
     /** This method converts a given value into a mathcing dynamic property. First it checks if
@@ -11464,16 +11900,11 @@ class UssdService
                      *
                      *  ... e.t.c
                      */
-
-                    //  Check if the value is some kind of object that is not a callable function
-                    if (is_object($value) && !($value instanceof \Closure)) {
-                        ${$key} = $this->convertObjectToArray($value);
-                    } else {
-                        ${$key} = $value;
-                    }
+                    ${$key} = $value;
 
                     //  Set an info log for the created variable and its dynamic data value
                     if ($log_dynamic_data) {
+
                         //  Get the value type wrapped in html tags
                         $dataType = $this->wrapAsSuccessHtml($this->getDataType($value));
 
@@ -11483,6 +11914,7 @@ class UssdService
                             'data_type' => $dataType,           //  String
                             'value' => json_encode($value),     //  John
                         ]);
+
                     }
                 }
             }
@@ -11509,12 +11941,22 @@ class UssdService
 
             //  Execute PHP Code
             return eval($code);
-        } catch (\Throwable $e) {
+
+        } catch (AppwriteException $e) {
+
+            //  Throw the AppwriteException
+            throw($e);
+
+        }  catch (\Throwable $e) {
+
             //  Handle try catch error
             return $this->handleTryCatchError($e);
+
         } catch (\Exception $e) {
+
             //  Handle try catch error
             return $this->handleTryCatchError($e);
+
         }
     }
 
@@ -11526,24 +11968,6 @@ class UssdService
         $code = trim(preg_replace("/<\?php|\?>/i", '', $code));
 
         return $code;
-    }
-
-    /** Convert the given value into a valid JSON Object if the value is a
-     *  non empty Array, otherwise return the original value.
-     */
-    public function convertToJsonObject($data = null)
-    {
-        // If the data is of type [Array]
-        if (is_array($data)) {
-            // If the [Array] has data
-            if (!empty($data)) {
-                //  Convert the data into a JSON Object and return
-                return json_decode(json_encode($data));
-            }
-        }
-
-        //  Return the data as is
-        return $data;
     }
 
     /** Convert the given Object into a valid Array if its a
@@ -11577,9 +12001,14 @@ class UssdService
                 $code = $active_state['code'];
 
                 //  Process the PHP Code
-                $result = $this->processPHPCode("$code");
+                $outputResponse = $this->processPHPCode("$code");
 
-                if ($result === true) {
+                //  If we have a screen to show return the response otherwise continue
+                if ($this->shouldDisplayScreen($outputResponse)) {
+                    return $outputResponse;
+                }
+
+                if ($outputResponse === true) {
                     return true;
                 } else {
                     return false;
@@ -11779,7 +12208,7 @@ class UssdService
     /** This method is used to handle errors caught during try-catch screnerios.
      *  It logs the error, indicates that an error occured and returns null.
      */
-    public function handleTryCatchError($error, $load_display = true)
+    public function handleTryCatchError($error)
     {
         //  Record fatal error
         $this->fatal_error = true;
@@ -11790,10 +12219,8 @@ class UssdService
         //  Set an error log
         $this->logError('Error:  '.$error->getMessage());
 
-        if ($load_display) {
-            //  Show the technical difficulties error screen to notify the user of the issue
-            return $this->showTechnicalDifficultiesErrorScreen();
-        }
+        //  Show the technical difficulties error screen to notify the user of the issue
+        return $this->showTechnicalDifficultiesErrorScreen();
     }
 
     /**********************
@@ -11829,12 +12256,17 @@ class UssdService
     public function addLog($data)
     {
         //  Include the logs if required
-        if ($this->version->builder['simulator']['debugger']['return_logs']) {
+        if ($this->test_mode && $this->version->builder['simulator']['debugger']['return_logs']) {
 
             //  Set additional information
             $data['level'] = $this->level ?? null;
             $data['screen'] = $this->screen['name'] ?? null;
             $data['display'] = $this->display['name'] ?? null;
+
+            //  If the description is an Array, convert to Json Object
+            if(gettype($data['description']) === 'array') {
+                $data['description'] = json_encode($data['description']);
+            }
 
             //  If we want to return summarized logs
             if( $this->version->builder['simulator']['debugger']['return_summarized_logs'] ){

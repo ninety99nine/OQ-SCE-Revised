@@ -26,7 +26,7 @@
                     <div v-if="project.created_at" class="flex justify-between">
                         <div class="flex items-center">
                             <span class="text-gray-400 text-xs mr-1 italic">Created &#8212; </span>
-                            <span class="text-gray-500 text-xs">{{ moment(project.created_at, 'YYYY-MM-DD HH:mm:ss').fromNow() }}</span>
+                            <span class="text-gray-500 text-xs">{{ moment(project.created_at).fromNow() }}</span>
                         </div>
                     </div>
                 </div>

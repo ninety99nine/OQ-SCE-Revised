@@ -9,7 +9,7 @@
 
         <!-- Last Update -->
         <td scope="row" class="px-6 py-4 text-xs text-gray-500">
-            <span>{{ moment(version.updated_at, 'YYYY-MM-DD HH:mm:ss').fromNow() }}</span>
+            <span>{{ moment(version.updated_at).fromNow() }}</span>
         </td>
 
         <!-- Description -->

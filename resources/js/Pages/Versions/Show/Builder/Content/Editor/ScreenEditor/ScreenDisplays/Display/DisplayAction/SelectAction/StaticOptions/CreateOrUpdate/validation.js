@@ -12,6 +12,22 @@ export default {
 
         }
 
+        if( form.event_data.url.code_editor_mode == true && ['', null].includes(form.event_data.cache.name) ) {
+
+            form.setError('cache_name', 'The cache name is required');
+
+        }
+
+        if( form.event_data.cache.enabled == true && ['', null].includes(form.event_data.cache.duration.number) ) {
+
+            form.setError('cache_duration_number', 'The cache duration is required');
+
+        }else if( form.event_data.url.code_editor_mode == true && ['', null].includes(form.event_data.cache.duration.type) ) {
+
+            form.setError('cache_duration_type', 'The cache duration is required');
+
+        }
+
         if( form.event_data.query_params.length > 0 ) {
 
             for (let index = 0; index < form.event_data.query_params.length; index++) {

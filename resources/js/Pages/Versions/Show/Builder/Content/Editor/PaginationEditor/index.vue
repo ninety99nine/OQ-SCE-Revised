@@ -97,7 +97,7 @@
             <TextOrCodeEditor v-model="pagination.trailing_end" label="Trailing Characters" placeholder="..." note="Content continuation hint" class="w-1/2 mb-6"></TextOrCodeEditor>
 
             <DefaultSwitch v-model="pagination.break_line_before_trail" :note="( pagination.break_line_before_trail ? 'Disable ' : 'Enable') + ' line break before trailing characters'" class="mb-4"></DefaultSwitch>
-            <DefaultSwitch v-model="pagination.break_line_after_trail" :note="( pagination.break_line_after_trail ? 'Disable ' : 'Enable') + ' line break before trailing characters'"></DefaultSwitch>
+            <DefaultSwitch v-model="pagination.break_line_after_trail" :note="( pagination.break_line_after_trail ? 'Disable ' : 'Enable') + ' line break after trailing characters'"></DefaultSwitch>
 
         </template>
 

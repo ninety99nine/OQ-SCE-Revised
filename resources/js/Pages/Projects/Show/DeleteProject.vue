@@ -5,9 +5,9 @@
         <!-- Project name -->
         <h5 class="text-xl font-medium text-gray-900 border-b pb-5 mb-5">Delete Project</h5>
 
-        <p class="text-sm text-gray-500 border-b pb-5 mb-5">Once you delete a project, there is no going back. Please be certain. Enter the delete code <span class="text-gray-800 font-bold">{{ projectPayload.delete_code }}</span> to confirm this action.</p>
+        <p class="text-sm text-gray-500 border-b pb-5 mb-5">Once you delete a project, there is no going back. Please be certain. Enter the confirmation code <span class="text-gray-800 font-bold">{{ projectPayload.confirmation_code }}</span> to confirm this action.</p>
 
-        <DefaultInput v-model="form.delete_code" label="Delete code" placeholder="Enter the delete code" :disabled="form.processing" :error="form.errors.delete_code" class="mb-6"></DefaultInput>
+        <DefaultInput v-model="form.confirmation_code" label="Delete code" placeholder="Enter the confirmation code" :disabled="form.processing" :error="form.errors.confirmation_code" class="mb-6"></DefaultInput>
 
         <div class="flex justify-end">
             <DangerButton :disabled="form.processing" @click="deleteProject()">
@@ -33,7 +33,7 @@
         data() {
             return {
                 form: useForm({
-                    delete_code: ''
+                    confirmation_code: ''
                 }),
                 search: this.route().params.search
             }

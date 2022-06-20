@@ -28,7 +28,7 @@
                         <h1 class="text-sm font-semibold text-gray-800">{{ method.name }}</h1>
                     </div>
 
-                    <!-- Decsription -->
+                    <!-- Description -->
                     <p class="text-xs text-gray-500 group-hover:text-gray-600 mb-2">{{ method.description }}</p>
 
                     <!-- Code Snippet -->
@@ -97,6 +97,18 @@
                         name: 'Check If Responded',
                         code: '$this->hasResponded();',
                         description: 'Check if the user has responded to the current level (screen or display)'
+                    },
+                    {
+                        type: 'String',
+                        name: 'Check Screen Existence By Marker',
+                        code: '$this->hasScreenByMarker(\'Main Menu\');',
+                        description: 'Check if the screen with the given marker name exists'
+                    },
+                    {
+                        type: 'String',
+                        name: 'Check Display Existence By Marker',
+                        code: '$this->hasDisplayByMarker(\'Main Menu\');',
+                        description: 'Check if the display with the given marker name exists'
                     }
                 ],
                 searchIndexes: [],

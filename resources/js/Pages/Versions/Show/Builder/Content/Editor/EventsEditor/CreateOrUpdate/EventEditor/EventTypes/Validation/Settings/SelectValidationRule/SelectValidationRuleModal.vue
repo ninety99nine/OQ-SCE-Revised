@@ -262,7 +262,7 @@
                         name: 'Custom Code',
                         type: 'custom_code',
                         error_msg: 'Custom code validation error',
-                        comment: 'Validate based on custom code e.g return True if valid and False if invalid.'
+                        comment: 'Validate based on customized code e.g return True if valid and False if invalid.'
                     }
                 ],
                 hasResults: true,

@@ -1,17 +1,19 @@
 <template>
+
     <div>
         <label v-if="label" :for="uniqueId" :class="'block mb-2 text-'+size+' font-medium text-gray-900'">{{ label }}</label>
 
-        <div v-if="read_only" v-html="contentWithHtmlTags"></div>
-
-        <div v-else :id="uniqueId" :ref="uniqueId" :class="['editable-content-field bg-gray-50 border border-gray-300', ( disabled ? 'text-gray-400 cursor-not-allowed' : 'text-gray-900') ,'text-'+size+' rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5']" :style="{minHeight: minHeight}"
-            v-html="isEditting ? contentWithoutHtmlTags : contentWithHtmlTags"
-            :placeholder="placeholder" :contenteditable="true" :resize="true"
-            @focus="onFocus($event)" @blur="onBlur($event)">
+        <div v-if="read_only == false" :class="['editable-content-field bg-gray-50 border border-gray-300 rounded-lg relative overflow-hidden', ( disabled ? 'text-gray-400 cursor-not-allowed' : 'text-gray-900')]">
+            <textarea v-model="localModelValue" :name="uniqueId" ref="textarea" :disabled="disabled" :placeholder="placeholder" @focus="onFocus" @blur="onBlur" rows="1" :style="{ minHeight: heightSize }"
+                     :class="[{ 'opacity-0': isEditting == false, 'cursor-not-allowed': disabled }, 'w-full py-2 px-3 rounded-lg relative z-10 border-0 outline-0 bg-gray-50 focus:ring-0 text-xs -mb-2']">
+            </textarea>
+            <div class="absolute z-0 top-0 bottom-0 left-0 right-0 py-2 px-3 text-xs">
+                <span v-html="showPlaceholder ? placeholder : contentWithHtmlTags" :class="['w-full whitespace-pre-wrap break-words', { 'text-gray-500': showPlaceholder }]"></span>
+            </div>
         </div>
+        <span v-else v-html="contentWithHtmlTags" class="w-full whitespace-pre-wrap break-words"></span>
 
         <DefaultError :error="error" class="mt-2"></DefaultError>
-
     </div>
 
 </template>
@@ -22,18 +24,9 @@
     import DefaultError from './../Error/DefaultError';
 
     export default {
-        components: { DefaultError },
         props: {
             modelValue: String,
             label: String,
-            size: {
-                type: String,
-                default: 'xs'
-            },
-            height: {
-                type: String,
-                default: 'xs'
-            },
             disabled: {
                 type: Boolean,
                 default: false
@@ -42,27 +35,39 @@
                 type: Boolean,
                 default: false
             },
+            height: {
+                type: String,
+                default: 'xs'
+            },
             placeholder: String,
             error: {
                 type: String,
                 default: ''
             },
         },
+        components: { DefaultError },
         data(){
             return {
                 isEditting: false,
                 contentWithHtmlTags: null,
-                contentWithoutHtmlTags: null,
+                localModelValue: this.modelValue,
                 uniqueId: uniqueId('text-editor-')
             }
         },
         watch: {
             modelValue(newValue, oldValue) {
-                this.setDynamicContent(newValue);
+                this.localModelValue = newValue;
+                this.setDynamicContent();
+            },
+            localModelValue(newValue, oldValue) {
+                this.$emit('update:modelValue', newValue);
             }
         },
         computed: {
-            minHeight() {
+            showPlaceholder() {
+                return [null, ''].includes(this.localModelValue);
+            },
+            heightSize() {
                 if( this.height == 'lg' ) {
                     return '12em';
                 }else if( this.height == 'md' ) {
@@ -70,72 +75,43 @@
                 }else if( this.height == 'sm' ) {
                     return '4em';
                 }else if( this.height == 'xs' ) {
-                    return '0em';
+                    return '2.9em';
                 }else{
                     return this.height + 'em';
                 }
             }
         },
         methods: {
-            onFocus() {
-                if( this.read_only == false ) {
-                    this.isEditting = true;
-                    this.setDynamicContent(this.$refs[this.uniqueId].innerText);
-                }
+            onFocus(e) {
+                this.isEditting = true;
             },
             onBlur() {
-                if( this.read_only == false ) {
-                    this.isEditting = false;
-                    this.setDynamicContent(this.$refs[this.uniqueId].innerText);
-                    this.$emit('update:modelValue', this.contentWithoutHtmlTags);
-                }
+                this.isEditting = false;
+                this.setDynamicContent();
             },
-            setDynamicContent(text = ''){
+            setDynamicContent(){
 
                 //  Insert dynamic content inside curly braces within span tags with special styles
                 function wrapInHTMLTags(match, offset, string){
 
-                    return '<span class="bg-blue-100 text-blue-900 shadow-sm rounded-md py-1 px-2 mx-1">' + match + '</span>';
+                    return '<span class="bg-blue-100 text-blue-900 shadow-sm rounded-md py-1 px-2">' + match + '</span>';
 
                 }
 
-                //  Replace all matches with nothing (An empty string)
-                function replaceWithNothing(match, offset, string){
-
-                    return '';
-
-                }
-
-                if( text !== null ){
-
-                    //  This pattern searches for any HTML tags e.g <span ...> or </span>
-                    var pattern = /([<][a-zA-Z/!][^>]*[>])/g;
-
-                    //  Replace all HTML tags within the text string with nothing
-                    this.contentWithoutHtmlTags = text.replace(pattern, replaceWithNothing);
+                if( this.localModelValue !== null ){
 
                     //  This pattern searches for anything using curly braces e.g {{ user }}
                     var pattern = /[{]{2}[\s]*[a-zA-Z_]{1}[a-zA-Z0-9_\.]{0,}[\s]*[}]{2}/g;
 
                     //  Wrap text with curly braces in HTML tags
-                    this.contentWithHtmlTags = text.replace(pattern, wrapInHTMLTags);
+                    this.contentWithHtmlTags = this.localModelValue.replace(pattern, wrapInHTMLTags);
 
                 }
-
-                //  Set the formatted text as the content
-                this.content = text;
 
             }
         },
         created(){
-
-            this.setDynamicContent(this.modelValue);
-
-        },
-        beforeUnmount() {
-
-            this.onBlur();
-
+            this.setDynamicContent();
         }
     }
 </script>

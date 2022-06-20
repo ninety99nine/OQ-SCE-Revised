@@ -25,18 +25,21 @@ class CreateUssdSessionsTable extends Migration
             $table->string('request_type')->default(1);
             $table->string('text')->nullable();
             $table->mediumText('reply_records')->nullable();
+            $table->mediumText('inputs_and_outputs')->nullable();
             $table->mediumText('logs')->nullable();
+            $table->timestamp('logs_expire_at')->nullable();
             $table->boolean('fatal_error')->nullable()->default(false);
             $table->string('fatal_error_msg', 500)->nullable();
             $table->boolean('test')->nullable()->default(false);
             $table->boolean('allow_timeout')->nullable()->default(0);
-            $table->timestampTz('timeout_at')->nullable();
+            $table->timestamp('timeout_at')->nullable();
             $table->unsignedMediumInteger('total_session_duration')->default(0);
             $table->text('session_execution_times')->nullable();
 
             /*  Ownership Information  */
             $table->unsignedInteger('app_id')->nullable();
             $table->unsignedInteger('version_id')->nullable();
+            $table->unsignedInteger('user_id')->nullable();
 
             /*  Indexes  */
             $table->index(['session_id', 'test']);

@@ -166,7 +166,7 @@
         computed: {
             error() {
                 return this.form.errors.number || this.form.errors.description ||
-                       this.form.errors.builder || this.form.errors.reset_builder || this.form.errors.delete_code
+                       this.form.errors.builder || this.form.errors.reset_builder || this.form.errors.confirmation_code
             }
         },
         methods: {

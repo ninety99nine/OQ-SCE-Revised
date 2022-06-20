@@ -57,6 +57,12 @@
                 <!-- Database -->
                 <DatabaseEvent v-if="event.type == 'Database'" :selectedTab="selectedTab" :updateTabs="updateTabs" :form="form"></DatabaseEvent>
 
+                <!-- Firebase Connection -->
+                <FirebaseConnectionEvent v-if="event.type == 'Firebase Connection'" :selectedTab="selectedTab" :updateTabs="updateTabs" :form="form"></FirebaseConnectionEvent>
+
+                <!-- AppWrite Connection -->
+                <AppWriteConnectionEvent v-if="event.type == 'AppWrite Connection'" :selectedTab="selectedTab" :updateTabs="updateTabs" :form="form"></AppWriteConnectionEvent>
+
             </div>
 
         </Transition>
@@ -69,6 +75,7 @@
 
     import General from './General';
     import RevisitEvent from './EventTypes/Revisit';
+    import DatabaseEvent from './EventTypes/Database';
     import RedirectEvent from './EventTypes/Redirect';
     import AutoLinkEvent from './EventTypes/AutoLink';
     import SmsApiEvent from './EventTypes/Apis/SmsApi';
@@ -82,15 +89,16 @@
     import SetPropertyEvent from './EventTypes/SetProperty';
     import NotificationEvent from './EventTypes/Notification';
     import OrangeMoneyApiEvent from './EventTypes/Apis/OrangeMoneyApi';
-    import DatabaseEvent from './EventTypes/Database';
     import AirtimeBillingApiEvent from './EventTypes/Apis/AirtimeBillingApi';
+    import AppWriteConnectionEvent from './EventTypes/ThirdPartyIntegration/AppWrite';
+    import FirebaseConnectionEvent from './EventTypes/ThirdPartyIntegration/Firebase';
 
     export default {
         props: ['form', 'event', 'mode'],
         components: {
             General, RevisitEvent, RedirectEvent, AutoLinkEvent, SmsApiEvent, AutoReplyEvent, CollectionEvent, CrudApiEvent,
             DefaultTabs, SetPropertyEvent, NotificationEvent, FormattingEvent, ValidationEvent, CustomCodeEvent,
-            OrangeMoneyApiEvent, DatabaseEvent, AirtimeBillingApiEvent
+            OrangeMoneyApiEvent, DatabaseEvent, AirtimeBillingApiEvent, AppWriteConnectionEvent, FirebaseConnectionEvent
         },
         data() {
             return {

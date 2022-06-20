@@ -71,13 +71,13 @@
                         <p class="text-gray-600 whitespace-pre-wrap mb-4" v-html="ussdResponseMsg"></p>
 
                         <!-- Ussd Reply Input -->
-                        <input type="text" v-model="form.msg" :disabled="loading" ref="ussd_input" class="ussd_input" @keypress.enter="startUssdCall()" @keyup.esc="stopUssdSimulator()" />
+                        <input type="text" v-model="form.msg" :disabled="loading" ref="ussd_input" class="ussd_input" @keypress.enter="startApiSimulationRequest()" @keyup.esc="stopUssdSimulator()" />
 
                         <!-- Cancel / Send / Resend Buttons -->
                         <div class="w-3/4 m-auto flex justify-between mt-4">
                             <button class="text-gray-600 hover:text-red-500 active:text-red-600 cursor-pointer" @click="stopUssdSimulator()">Cancel</button>
                             <span>|</span>
-                            <button class="text-gray-600 hover:text-blue-500 active:text-blue-600 cursor-pointer" @click="startUssdCall()">Send</button>
+                            <button class="text-gray-600 hover:text-blue-500 active:text-blue-600 cursor-pointer" @click="startApiSimulationRequest()">Send</button>
                         </div>
 
                     </div>
@@ -189,11 +189,12 @@
             startUssdServiceSimulator(){
                 if( this.loading == false ) {
                     this.resetUssdSimulator();
-                    this.startUssdCall();
+                    this.startApiSimulationRequest();
                     this.showUssdPopup();
                 }
             },
             stopUssdSimulator(){
+                this.stopApiSimulationRequest();
                 this.resetUssdSimulator();
                 this.cancelUssdCall();
                 this.hideUssdPopup();
@@ -238,9 +239,9 @@
                 });
 
                 //  Recall the Ussd end point
-                this.startUssdCall();
+                this.startApiSimulationRequest();
             },
-            startUssdCall() {
+            startApiSimulationRequest() {
 
                 var self = this;
 
@@ -264,7 +265,7 @@
                  */
                 const axiosSource = axios.CancelToken.source();
 
-                const url = route('version.simulate', { project: this.route().params.project, app: this.route().params.app, version: this.route().params.version });
+                const url = route('version.start-simulation', { project: this.route().params.project, app: this.route().params.app, version: this.route().params.version });
                 this.request = { cancel: axiosSource.cancel };
 
                 axios.post(url, this.form, { cancelToken: axiosSource.token })
@@ -278,10 +279,7 @@
                         self.form.request_type = ussdResponse.request_type;
                         self.form.service_code = ussdResponse.service_code;
 
-                        self.$emit('response', {
-                            loading: this.loading,
-                            logs: ussdResponse.logs
-                        });
+                        self.$emit('response', ussdResponse);
 
                         //  If the requestType = 2 it means we want to continue the current session
                         if( self.form.request_type == 2 ){
@@ -370,6 +368,34 @@
 
                     });
             },
+            stopApiSimulationRequest() {
+
+                const url = route('version.stop-simulation', { project: this.route().params.project, app: this.route().params.app, version: this.route().params.version, session: this.form.session_id });
+
+                axios.post(url)
+                    .then((response) => {
+
+                    }).catch((error) => {
+
+                        var message = (error || {}).message ?? 'Sorry, something went wrong';
+
+                        //  Request failed with status code 419 (CSRF token mismatch.)
+                        if( error.response.status === 419 ) {
+
+                            message = 'Please login';
+
+                            //  Proceed to login
+                            this.$inertia.get(route('login.show'));
+
+                        }
+
+                        self.$message({
+                            message: message,
+                            type: 'warning'
+                        });
+
+                    });
+            },
             redirectUssdSimulator( serviceCode ){
 
                 //  Reset the Ussd Simulator
@@ -381,7 +407,7 @@
                 this.form.serviceCode = serviceCode;
 
                 //  Recall the Ussd end point
-                this.startUssdCall();
+                this.startApiSimulationRequest();
 
             },
             showUssdPopup(){
@@ -402,6 +428,11 @@
         },
         created(){
             this.form = this.defaultForm();
+        },
+        beforeUnmount() {
+            if( this.form.session_id ) {
+                this.stopApiSimulationRequest();
+            }
         }
     }
 </script>

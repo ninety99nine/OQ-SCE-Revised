@@ -2,8 +2,8 @@
 
     <template v-if="mode == 'Delete'">
 
-        <p class="text-sm text-gray-500 mb-5">Once you delete this version, there is no going back. Please be certain. Enter the delete code <span class="text-gray-800 font-bold">{{ version.delete_code }}</span> to confirm this action.</p>
-        <DefaultInput v-model="form.delete_code" label="Reset code" placeholder="Enter the reset code" :disabled="form.processing || form.processing" :error="form.errors.delete_code" class="mb-6"></DefaultInput>
+        <p class="text-sm text-gray-500 mb-5">Once you delete this version, there is no going back. Please be certain. Enter the confirmation code <span class="text-gray-800 font-bold">{{ version.confirmation_code }}</span> to confirm this action.</p>
+        <DefaultInput v-model="form.confirmation_code" label="Reset code" placeholder="Enter the reset code" :disabled="form.processing || form.processing" :error="form.errors.confirmation_code" class="mb-6"></DefaultInput>
 
     </template>
 
@@ -16,8 +16,8 @@
         <DefaultSwitch v-model="form.reset_builder" label="Reset" :disabled="form.processing" :error="form.errors.reset_builder" class="mb-6">
             <span v-if="form.reset_builder" class="text-xs text-gray-400 ml-2"> &#8212; This version will be reset</span>
         </DefaultSwitch>
-        <p v-if="form.reset_builder" class="text-sm text-gray-500 border-b pb-5 mb-5">Resetting this version will destroy the version screens, displays, events and settings. Once you reset a version, there is no going back. Enter the reset code <span class="text-gray-800 font-bold">{{ version.delete_code }}</span> to confirm this action.</p>
-        <DefaultInput v-if="form.reset_builder" v-model="form.delete_code" label="Reset code" placeholder="Enter the reset code" :disabled="form.processing || form.processing" :error="form.errors.delete_code" class="mb-6"></DefaultInput>
+        <p v-if="form.reset_builder" class="text-sm text-gray-500 border-b pb-5 mb-5">Resetting this version will destroy the version screens, displays, events and settings. Once you reset a version, there is no going back. Enter the reset code <span class="text-gray-800 font-bold">{{ version.confirmation_code }}</span> to confirm this action.</p>
+        <DefaultInput v-if="form.reset_builder" v-model="form.confirmation_code" label="Reset code" placeholder="Enter the reset code" :disabled="form.processing || form.processing" :error="form.errors.confirmation_code" class="mb-6"></DefaultInput>
     </template>
 
     <template v-if="mode == 'Create' || mode == 'Update'">

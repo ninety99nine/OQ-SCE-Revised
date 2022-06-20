@@ -12,7 +12,7 @@
         </TextOrCodeEditor>
 
         <!-- Message -->
-        <TextOrCodeEditor v-model="form.event_data.message" label="Message" placeholder="Hi {{ first_name }}, your account was created!" :error="form.errors.message" class="mb-6">
+        <TextOrCodeEditor v-model="form.event_data.message" label="Message" placeholder="Hi {{ first_name }}, your account was created!" :error="form.errors.message" te_height="lg" class="mb-6">
             <template #info>
                 <span>
                     This is the notification message
@@ -21,7 +21,7 @@
         </TextOrCodeEditor>
 
         <!-- Continue Text -->
-        <TextOrCodeEditor v-model="form.event_data.continue_text" label="Continue Text" placeholder="Continue" :error="form.errors.continue_text">
+        <TextOrCodeEditor v-model="form.event_data.continue_text" label="Continue Text" placeholder="1. Continue" :error="form.errors.continue_text">
             <template #info>
                 <span>
                     This is the continue text to close the notification

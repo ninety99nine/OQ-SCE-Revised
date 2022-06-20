@@ -1043,6 +1043,14 @@ export const useVersionBuilder = defineStore('version_builder', {
 
                 event = this.get_Custom_Code_Event();
 
+            }else if( type == 'Firebase Connection' ){
+
+                event = this.get_Firebase_Connection_Event();
+
+            }else if( type == 'AppWrite Connection' ){
+
+                event = this.get_AppWrite_Connection_Event();
+
             }else if( type == 'Auto Link' ){
 
                 event = this.get_Auto_Link_Event();
@@ -1112,9 +1120,15 @@ export const useVersionBuilder = defineStore('version_builder', {
                         code_editor_text: '',
                         code_editor_mode: false
                     },
-                    name: 'Get Items',
                     method: 'get',
-                    trigger: 'on-enter',
+                    cache: {
+                        name: '',
+                        enabled: false,
+                        duration: {
+                            number: 1,
+                            type: 'days',    //  seconds, minutes, hours, days, weeks, months, years
+                        }
+                    },
                     query_params: [],
                     form_data: {
                         convert_to_json: true,
@@ -1343,6 +1357,41 @@ export const useVersionBuilder = defineStore('version_builder', {
             }
 
         },
+        get_Firebase_Connection_Event(){
+
+            return {
+                event_data: {
+                    code: ''
+                }
+            }
+
+        },
+        get_AppWrite_Connection_Event(){
+
+            return {
+                event_data: {
+                    reference_name: 'response',
+                    events: {
+                        on_request_success: {
+                            conditional: {
+                                code: null,
+                                active: false
+                            },
+                            collection: []
+                        },
+                        on_request_fail: {
+                            conditional: {
+                                code: null,
+                                active: false
+                            },
+                            collection: []
+                        }
+                    },
+                    code: ''
+                }
+            }
+
+        },
         get_Auto_Link_Event(){
 
             return {
@@ -1478,7 +1527,7 @@ export const useVersionBuilder = defineStore('version_builder', {
                         code_editor_mode: false
                     },
                     continue_text: {
-                        text: 'Continue',
+                        text: '1. Continue',
                         code_editor_text: '',
                         code_editor_mode: false
                     },
@@ -1999,6 +2048,7 @@ export const useVersionBuilder = defineStore('version_builder', {
                     code_editor_mode: false
                 },
                 on_empty: {
+                    active: false,
                     value: {
                         text: '',
                         code_editor_text: '',
