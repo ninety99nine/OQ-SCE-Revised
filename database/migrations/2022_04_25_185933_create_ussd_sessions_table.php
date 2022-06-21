@@ -18,10 +18,10 @@ class CreateUssdSessionsTable extends Migration
             $table->increments('id');
 
             /*  Session Information  */
+            $table->unsignedInteger('ussd_account_id');
             $table->string('session_id')->nullable();
             $table->string('service_code')->nullable();
             $table->string('type')->default('shared');
-            $table->string('msisdn')->nullable();
             $table->string('request_type')->default(1);
             $table->string('text')->nullable();
             $table->mediumText('reply_records')->nullable();
@@ -30,7 +30,6 @@ class CreateUssdSessionsTable extends Migration
             $table->timestamp('logs_expire_at')->nullable();
             $table->boolean('fatal_error')->nullable()->default(false);
             $table->string('fatal_error_msg', 500)->nullable();
-            $table->boolean('test')->nullable()->default(false);
             $table->boolean('allow_timeout')->nullable()->default(0);
             $table->timestamp('timeout_at')->nullable();
             $table->unsignedMediumInteger('total_session_duration')->default(0);
@@ -39,12 +38,9 @@ class CreateUssdSessionsTable extends Migration
             /*  Ownership Information  */
             $table->unsignedInteger('app_id')->nullable();
             $table->unsignedInteger('version_id')->nullable();
-            $table->unsignedInteger('user_id')->nullable();
 
             /*  Indexes  */
-            $table->index(['session_id', 'test']);
-            $table->index(['msisdn', 'test', 'app_id', 'created_at']);
-
+            $table->index(['ussd_account_id']);
 
             /*  Timestamps  */
             $table->timestamps();

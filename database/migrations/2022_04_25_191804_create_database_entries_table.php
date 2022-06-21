@@ -17,18 +17,16 @@ class CreateDatabaseEntriesTable extends Migration
 
             $table->increments('id');
 
-            /* Database Entry Details  */
-            $table->string('msisdn')->nullable();
+            /*  Database Entry Details  */
+            $table->unsignedInteger('ussd_account_id');
             $table->string('name')->nullable();
             $table->text('metadata')->nullable();
-            $table->boolean('test')->nullable()->default(false);
 
             /*  Ownership Information  */
             $table->unsignedInteger('app_id')->nullable();
-            $table->unsignedInteger('user_id')->nullable();
 
             /*  Indexes  */
-            $table->index(['msisdn', 'name', 'test', 'app_id']);
+            $table->index(['ussd_account_id', 'name']);
 
             /*  Timestamps  */
             $table->timestamps();

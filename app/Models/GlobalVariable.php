@@ -15,7 +15,6 @@ class GlobalVariable extends Model
      * @var string
      */
     protected $casts = [
-        'test' => 'boolean',
         'metadata' => 'array',
     ];
 
@@ -27,7 +26,7 @@ class GlobalVariable extends Model
     protected $fillable = [
 
         /*  Global Variable Information  */
-        'msisdn', 'test',
+        'ussd_account_id',
 
         /*  Meta Data  */
         'metadata',

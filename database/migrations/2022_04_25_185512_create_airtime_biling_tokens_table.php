@@ -16,13 +16,13 @@ class CreateAirtimeBilingTokensTable extends Migration
         Schema::create('airtime_biling_tokens', function (Blueprint $table) {
 
             $table->id();
-            $table->string('msisdn');
+            $table->unsignedInteger('ussd_account_id');
             $table->string('access_token');
             $table->timestamp('expiry_date');
             $table->timestamps();
 
             /*  Indexes  */
-            $table->index('msisdn');
+            $table->index(['ussd_account_id']);
 
         });
     }

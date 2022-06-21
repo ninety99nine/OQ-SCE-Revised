@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class UssdSession extends Model
 {
     use HasFactory;
+
+    protected $with = ['account'];
 
     /**
      * The table associated with the model.
@@ -22,7 +24,6 @@ class UssdSession extends Model
         'allow_timeout' => 'boolean',
         'reply_records' => 'array',
         'fatal_error' => 'boolean',
-        'test' => 'boolean',
         'logs' => 'array',
     ];
 
@@ -43,23 +44,61 @@ class UssdSession extends Model
     protected $fillable = [
 
         /*  Session Information  */
-        'session_id', 'service_code', 'type', 'msisdn', 'request_type',
-        'text', 'reply_records', 'inputs_and_outputs', 'logs', 'logs_expire_at', 'test',
+        'ussd_account_id', 'session_id', 'service_code', 'type', 'request_type',
+        'text', 'reply_records', 'inputs_and_outputs', 'logs', 'logs_expire_at',
         'fatal_error', 'fatal_error_msg', 'allow_timeout', 'timeout_at', 'total_session_duration',
         'session_execution_times',
 
         /*  Ownership Information  */
-        'app_id', 'version_id', 'user_id'
+        'app_id', 'version_id'
 
     ];
 
     /**
-     *  Scope: Search by msisdn
+     *  Scope: Search by msisdn or session id
      */
     public function scopeSearch($query, $search)
     {
-        return empty($search) ? $query : $query->where('msisdn', 'like', '%'.$search.'%')
-                                                ->orWhere('session_id', $search);
+        return empty($search)
+            ? $query : $query->whereHas('account', function (Builder $query) use ($search) {
+                $query->search($search);
+            })->orWhere('session_id', $search);
+    }
+
+    /**
+     *  Scope: Test Account
+     */
+    public function scopeTestAccounts($query)
+    {
+        return $query->whereHas('account', function (Builder $query) {
+            $query->testAccounts();
+        });
+    }
+
+    /**
+     *  Scope: Real Account
+     */
+    public function scopeRealAccounts($query)
+    {
+        return $query->whereHas('account', function (Builder $query) {
+            $query->realAccounts();
+        });
+    }
+
+    /**
+     *  Scope: Successful sessions
+     */
+    public function scopeSuccessful($query)
+    {
+        return $query->where('fatal_error', '0');
+    }
+
+    /**
+     *  Scope: Failed sessions
+     */
+    public function scopeFailed($query)
+    {
+        return $query->where('fatal_error', '1');
     }
 
     /**
@@ -79,11 +118,18 @@ class UssdSession extends Model
         return $this->morphTo();
     }
 
+    /*
+     *  Returns ussd account
+     */
+    public function account()
+    {
+        return $this->belongsTo(UssdAccount::class, 'ussd_account_id');
+    }
+
     /* ATTRIBUTES */
 
     protected $appends = [
-        'has_timed_out', 'request_type_status', 'success_status', 'mobile_number', 'total_duration',
-        'origin', 'total_inputs_and_outputs'
+        'origin', 'mobile_number', 'has_timed_out', 'request_type_status', 'success_status', 'total_duration', 'total_inputs_and_outputs'
     ];
 
     /*
@@ -91,7 +137,7 @@ class UssdSession extends Model
      */
     public function getOriginAttribute()
     {
-        return $this->test == 1 ? 'Simulator' : 'Mobile';
+        return $this->account->origin;
     }
 
     /*
@@ -99,7 +145,7 @@ class UssdSession extends Model
      */
     public function getMobileNumberAttribute()
     {
-        return preg_replace("/^267/", "$1", $this->msisdn);
+        return $this->account->mobile_number;
     }
 
     /*

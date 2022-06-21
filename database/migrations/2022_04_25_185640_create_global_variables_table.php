@@ -18,15 +18,14 @@ class CreateGlobalVariablesTable extends Migration
             $table->increments('id');
 
             /*  Global Variable Details  */
-            $table->string('msisdn')->nullable();
-            $table->boolean('test')->nullable()->default(false);
+            $table->unsignedInteger('ussd_account_id');
             $table->text('metadata')->nullable();
 
             /*  Ownership Information  */
             $table->unsignedInteger('app_id')->nullable();
 
             /*  Indexes  */
-            $table->index(['msisdn', 'test', 'app_id']);
+            $table->index(['ussd_account_id']);
 
             /*  Timestamps  */
             $table->timestamps();

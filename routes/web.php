@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\UssdAccountsController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\VersionController;
@@ -9,6 +10,8 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\AppController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -87,6 +90,22 @@ Route::middleware(['auth'])->group(function () {
                                     Route::post('/repair', 'repair')->name('repair');
                                     Route::post('/start-simulation', 'startSimulation')->name('start-simulation');
                                     Route::post('/{session}/stop-simulation', 'stopSimulation')->name('stop-simulation');
+                                });
+
+                                //  Accounts
+                                Route::controller(UssdAccountsController::class)
+                                    ->prefix('accounts')
+                                    ->group(function () {
+
+                                    Route::get('/', 'index')->name('accounts.show');
+
+                                    Route::prefix('/{account}')->name('account.')->group(function () {
+
+                                        Route::get('/', 'show')->name('show');
+                                        Route::delete('/', 'delete')->name('delete');
+
+                                    });
+
                                 });
 
                                 //  Sessions

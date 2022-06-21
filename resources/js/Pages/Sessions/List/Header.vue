@@ -9,11 +9,11 @@
                     <p class="mb-2 text-gray-400">Total Sessions</p>
                     <p :class="[(totalSessions == 0 ? 'text-gray-300' : 'text-blue-500')+' font-semibold text-lg']">{{ totalSessions }}</p>
                 </div>
-                <div class="text-center text-xs m-auto px-6">
+                <div v-if="showingOnSessionsMenu" class="text-center text-xs m-auto px-6">
                     <p class="mb-2 text-gray-400">Mobile</p>
                     <p class="text-gray-300 font-semibold text-lg">{{ totalMobileSessions }}</p>
                 </div>
-                <div class="text-center text-xs m-auto px-6">
+                <div v-if="showingOnSessionsMenu" class="text-center text-xs m-auto px-6">
                     <p class="mb-2 text-gray-400">Simulator</p>
                     <p class="text-gray-300 font-semibold text-lg">{{ totalSimulatorSessions }}</p>
                 </div>
@@ -30,13 +30,13 @@
 
         <div class="flex items-end justify-between mb-6">
 
-            <DefaultSelect v-model="selectedVersion" :options="versionOptions" @change="refreshContent()" label="Filter by version" placeholder="Select version" class="w-60"></DefaultSelect>
+            <DefaultSelect v-model="selectedVersion" :options="versionOptions" @change="refreshContent()" label="Filter by version" placeholder="Select version" class="w-40"></DefaultSelect>
 
-            <DefaultSelect v-model="origin" :options="originOptions" @change="refreshContent()" label="Filter by origin" placeholder="Select origin" class="w-60"></DefaultSelect>
+            <DefaultSelect v-if="showingOnSessionsMenu" v-model="origin" :options="originOptions" @change="refreshContent()" label="Filter by origin" placeholder="Select origin" class="w-40"></DefaultSelect>
 
-            <DefaultSelect v-model="requestType" :options="requestTypeOptions" @change="refreshContent()" label="Filter by request" placeholder="Select request" class="w-60"></DefaultSelect>
+            <DefaultSelect v-model="requestType" :options="requestTypeOptions" @change="refreshContent()" label="Filter by request" placeholder="Select request" class="w-40"></DefaultSelect>
 
-            <DefaultSelect v-model="status" :options="statusOptions" @change="refreshContent()" label="Filter by status" placeholder="Select status" class="w-60"></DefaultSelect>
+            <DefaultSelect v-model="status" :options="statusOptions" @change="refreshContent()" label="Filter by status" placeholder="Select status" class="w-40"></DefaultSelect>
 
             <DefaultSearchBar v-model="search" @onSearch="refreshContent" placeholder="Search sessions" />
 
@@ -52,6 +52,7 @@
     import DefaultSearchBar from "@components/SearchBar/DefaultSearchBar";
 
     export default {
+        props: ['showingOnSessionsMenu'],
         components: { DefaultSelect, DefaultSearchBar },
         data() {
             return {
@@ -139,11 +140,26 @@
         methods: {
             refreshContent() {
 
-                const url = route('sessions.show', {
-                    project: this.route().params.project,
-                    app: this.route().params.app,
-                    version: this.selectedVersion // this.route().params.version
-                });
+                var url;
+
+                if( route().current() === 'sessions.show' ) {
+
+                    url = route(route().current(), {
+                        project: this.route().params.project,
+                        app: this.route().params.app,
+                        version: this.selectedVersion
+                    });
+
+                }else if( route().current() === 'account.show' ) {
+
+                    url = route(route().current(), {
+                        project: this.route().params.project,
+                        account: this.route().params.account,
+                        app: this.route().params.app,
+                        version: this.selectedVersion
+                    });
+
+                }
 
                 const data = {
                     origin: this.origin,

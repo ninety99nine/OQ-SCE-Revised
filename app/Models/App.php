@@ -11,6 +11,8 @@ class App extends Model
 {
     use HasFactory, AppTrait;
 
+    protected $with = ['shortCode'];
+
     /**
      * The table associated with the model.
      *
@@ -91,6 +93,14 @@ class App extends Model
     public function liveSessions()
     {
         return $this->sessions()->where('test', 0);
+    }
+
+    /*
+     *  Returns accounts of this app
+     */
+    public function accounts()
+    {
+        return $this->hasMany(UssdAccount::class);
     }
 
     /*

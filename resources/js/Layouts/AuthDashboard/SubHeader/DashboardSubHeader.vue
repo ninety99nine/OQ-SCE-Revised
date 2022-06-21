@@ -9,14 +9,14 @@
                     <span>Builder</span>
                 </Link>
             </li>
+            <li :class="[selectedAccountsMenu ? 'border-blue-500' : 'border-transparent', 'border-b-2 hover:border-blue-500 hover:bg-blue-50 active:bg-blue-100 text-blue-500']">
+                <Link :href="route('accounts.show', { project: projectId, app: appId, version: versionId })" class="inline-flex items-center text-sm pt-4 pb-4 pr-4 px-4 cursor-pointer">
+                    <span>Accounts</span>
+                </Link>
+            </li>
             <li :class="[selectedSessionsMenu ? 'border-blue-500' : 'border-transparent', 'border-b-2 hover:border-blue-500 hover:bg-blue-50 active:bg-blue-100 text-blue-500']">
                 <Link :href="route('sessions.show', { project: projectId, app: appId, version: versionId })" class="inline-flex items-center text-sm pt-4 pb-4 pr-4 px-4 cursor-pointer">
                     <span>Sessions</span>
-                </Link>
-            </li>
-            <li :class="[selectedAccountsMenu ? 'border-blue-500' : 'border-transparent', 'border-b-2 hover:border-blue-500 hover:bg-blue-50 active:bg-blue-100 text-blue-500']">
-                <Link :href="route('version.show', { project: projectId, app: appId, version: versionId })" class="inline-flex items-center text-sm pt-4 pb-4 pr-4 px-4 cursor-pointer">
-                    <span>Accounts</span>
                 </Link>
             </li>
             <li :class="[selectedNotificationsMenu ? 'border-blue-500' : 'border-transparent', 'border-b-2 hover:border-blue-500 hover:bg-blue-50 active:bg-blue-100 text-blue-500']">
@@ -107,10 +107,12 @@
                 return route().current('version.show', { project: this.projectId, app: this.appId, version: this.versionId });
             },
             checkIfSelectedSessionsMenu() {
-                return route().current('sessions.show', { project: this.projectId, app: this.appId, version: this.versionId });
+                return route().current('sessions.show', { project: this.projectId, app: this.appId, version: this.versionId }) ||
+                       route().current('session.show', { project: this.projectId, app: this.appId, version: this.versionId });
             },
             checkIfSelectedAccountsMenu() {
-                return false;
+                return route().current('accounts.show', { project: this.projectId, app: this.appId, version: this.versionId }) ||
+                       route().current('account.show', { project: this.projectId, app: this.appId, version: this.versionId });
             },
             checkIfSelectedNotificationsMenu() {
                 return false;

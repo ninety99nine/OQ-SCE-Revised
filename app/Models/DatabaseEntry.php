@@ -10,13 +10,14 @@ class DatabaseEntry extends Model
 {
     use DatabaseEntryTrait;
 
+    protected $with = ['account'];
+
     /**
      * The table associated with the model.
      *
      * @var string
      */
     protected $casts = [
-        'test' => 'boolean',
         'metadata' => 'array',
     ];
 
@@ -28,13 +29,13 @@ class DatabaseEntry extends Model
     protected $fillable = [
 
         /*  Global Variable Information  */
-        'msisdn', 'name', 'test',
+        'ussd_account_id', 'name',
 
         /*  Meta Data  */
         'metadata',
 
         /*  Ownership Information  */
-        'app_id', 'user_id'
+        'app_id'
 
     ];
 
@@ -54,6 +55,14 @@ class DatabaseEntry extends Model
     public function scopeRealEntries($query)
     {
         return $query->where('test', 0);
+    }
+
+    /*
+     *  Returns ussd account
+     */
+    public function account()
+    {
+        return $this->belongsTo(UssdAccount::class, 'ussd_account_id');
     }
 
     /*

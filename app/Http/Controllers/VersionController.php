@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\App;
 use Inertia\Inertia;
 use App\Models\Project;
+use App\Models\UssdSession;
 use App\Models\Version;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -12,6 +13,7 @@ use Illuminate\Validation\Rule;
 use App\Services\Ussd\UssdService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Database\Eloquent\Builder;
 
 class VersionController extends Controller
 {
@@ -34,15 +36,6 @@ class VersionController extends Controller
 
         }else{
 
-            /**
-             *  Return the project, app and version information.
-             *  Omit the version builder for faster page load,
-             *  then we can ajax request the version with the
-             *  builder as indicated by the code above.
-             */
-
-            $app->load('shortCode');
-
             //  Show the app version
             return Inertia::render('Versions/Show', [
                 'appPayload' => $app,
@@ -59,14 +52,13 @@ class VersionController extends Controller
         if( ($testMode = request()->input('test_mode')) == true && ($requestType = request()->input('request_type')) == 1) {
 
             //  Close other running sessions
-            DB::table('ussd_sessions')
-                ->whereIn('request_type', ['1', '2'])
-                ->where('user_id', auth()->user()->id)
-                ->update([
+            UssdSession::whereIn('request_type', ['1', '2'])
+                ->whereHas('account', function (Builder $query) {
+                    $query->where('user_id', auth()->user()->id);
+                })->update([
                     'request_type' => '3',   //  End the session
                     'updated_at' => now()
                 ]);
-
 
         }
 

@@ -2131,10 +2131,22 @@ __webpack_require__.r(__webpack_exports__);
         project: this.projectId,
         app: this.appId,
         version: this.versionId
+      }) || route().current('session.show', {
+        project: this.projectId,
+        app: this.appId,
+        version: this.versionId
       });
     },
     checkIfSelectedAccountsMenu: function checkIfSelectedAccountsMenu() {
-      return false;
+      return route().current('accounts.show', {
+        project: this.projectId,
+        app: this.appId,
+        version: this.versionId
+      }) || route().current('account.show', {
+        project: this.projectId,
+        app: this.appId,
+        version: this.versionId
+      });
     },
     checkIfSelectedNotificationsMenu: function checkIfSelectedNotificationsMenu() {
       return false;
@@ -12029,11 +12041,11 @@ var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementV
 /* HOISTED */
 );
 
-var _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Sessions", -1
+var _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Accounts", -1
 /* HOISTED */
 );
 
-var _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Accounts", -1
+var _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Sessions", -1
 /* HOISTED */
 );
 
@@ -12079,9 +12091,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   , ["href"])], 2
   /* CLASS */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", {
-    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([$data.selectedSessionsMenu ? 'border-blue-500' : 'border-transparent', 'border-b-2 hover:border-blue-500 hover:bg-blue-50 active:bg-blue-100 text-blue-500'])
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([$data.selectedAccountsMenu ? 'border-blue-500' : 'border-transparent', 'border-b-2 hover:border-blue-500 hover:bg-blue-50 active:bg-blue-100 text-blue-500'])
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Link, {
-    href: _ctx.route('sessions.show', {
+    href: _ctx.route('accounts.show', {
       project: $data.projectId,
       app: $data.appId,
       version: $data.versionId
@@ -12099,9 +12111,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   , ["href"])], 2
   /* CLASS */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", {
-    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([$data.selectedAccountsMenu ? 'border-blue-500' : 'border-transparent', 'border-b-2 hover:border-blue-500 hover:bg-blue-50 active:bg-blue-100 text-blue-500'])
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([$data.selectedSessionsMenu ? 'border-blue-500' : 'border-transparent', 'border-b-2 hover:border-blue-500 hover:bg-blue-50 active:bg-blue-100 text-blue-500'])
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Link, {
-    href: _ctx.route('version.show', {
+    href: _ctx.route('sessions.show', {
       project: $data.projectId,
       app: $data.appId,
       version: $data.versionId
@@ -32624,6 +32636,132 @@ __webpack_require__.r(__webpack_exports__);
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 var map = {
+	"./Accounts/List": [
+		"./resources/js/Pages/Accounts/List/index.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Accounts_List_index_vue"
+	],
+	"./Accounts/List/": [
+		"./resources/js/Pages/Accounts/List/index.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Accounts_List_index_vue"
+	],
+	"./Accounts/List/BackButton": [
+		"./resources/js/Pages/Accounts/List/BackButton.vue",
+		"resources_js_Pages_Accounts_List_BackButton_vue"
+	],
+	"./Accounts/List/BackButton.vue": [
+		"./resources/js/Pages/Accounts/List/BackButton.vue",
+		"resources_js_Pages_Accounts_List_BackButton_vue"
+	],
+	"./Accounts/List/Header": [
+		"./resources/js/Pages/Accounts/List/Header.vue",
+		"resources_js_Pages_Accounts_List_Header_vue"
+	],
+	"./Accounts/List/Header.vue": [
+		"./resources/js/Pages/Accounts/List/Header.vue",
+		"resources_js_Pages_Accounts_List_Header_vue"
+	],
+	"./Accounts/List/TableRow": [
+		"./resources/js/Pages/Accounts/List/TableRow.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Accounts_List_TableRow_vue"
+	],
+	"./Accounts/List/TableRow.vue": [
+		"./resources/js/Pages/Accounts/List/TableRow.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Accounts_List_TableRow_vue"
+	],
+	"./Accounts/List/index": [
+		"./resources/js/Pages/Accounts/List/index.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Accounts_List_index_vue"
+	],
+	"./Accounts/List/index.vue": [
+		"./resources/js/Pages/Accounts/List/index.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Accounts_List_index_vue"
+	],
+	"./Accounts/Show": [
+		"./resources/js/Pages/Accounts/Show/index.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Accounts_Show_index_vue"
+	],
+	"./Accounts/Show/": [
+		"./resources/js/Pages/Accounts/Show/index.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Accounts_Show_index_vue"
+	],
+	"./Accounts/Show/BackButton": [
+		"./resources/js/Pages/Accounts/Show/BackButton.vue",
+		"resources_js_Pages_Accounts_Show_BackButton_vue"
+	],
+	"./Accounts/Show/BackButton.vue": [
+		"./resources/js/Pages/Accounts/Show/BackButton.vue",
+		"resources_js_Pages_Accounts_Show_BackButton_vue"
+	],
+	"./Accounts/Show/Details": [
+		"./resources/js/Pages/Accounts/Show/Details/index.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Accounts_Show_Details_index_vue"
+	],
+	"./Accounts/Show/Details/": [
+		"./resources/js/Pages/Accounts/Show/Details/index.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Accounts_Show_Details_index_vue"
+	],
+	"./Accounts/Show/Details/index": [
+		"./resources/js/Pages/Accounts/Show/Details/index.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Accounts_Show_Details_index_vue"
+	],
+	"./Accounts/Show/Details/index.vue": [
+		"./resources/js/Pages/Accounts/Show/Details/index.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Accounts_Show_Details_index_vue"
+	],
+	"./Accounts/Show/GlobalVariables": [
+		"./resources/js/Pages/Accounts/Show/GlobalVariables/index.vue",
+		"resources_js_Pages_Accounts_Show_GlobalVariables_index_vue"
+	],
+	"./Accounts/Show/GlobalVariables/": [
+		"./resources/js/Pages/Accounts/Show/GlobalVariables/index.vue",
+		"resources_js_Pages_Accounts_Show_GlobalVariables_index_vue"
+	],
+	"./Accounts/Show/GlobalVariables/index": [
+		"./resources/js/Pages/Accounts/Show/GlobalVariables/index.vue",
+		"resources_js_Pages_Accounts_Show_GlobalVariables_index_vue"
+	],
+	"./Accounts/Show/GlobalVariables/index.vue": [
+		"./resources/js/Pages/Accounts/Show/GlobalVariables/index.vue",
+		"resources_js_Pages_Accounts_Show_GlobalVariables_index_vue"
+	],
+	"./Accounts/Show/Notifications": [
+		"./resources/js/Pages/Accounts/Show/Notifications/index.vue",
+		"resources_js_Pages_Accounts_Show_Notifications_index_vue"
+	],
+	"./Accounts/Show/Notifications/": [
+		"./resources/js/Pages/Accounts/Show/Notifications/index.vue",
+		"resources_js_Pages_Accounts_Show_Notifications_index_vue"
+	],
+	"./Accounts/Show/Notifications/index": [
+		"./resources/js/Pages/Accounts/Show/Notifications/index.vue",
+		"resources_js_Pages_Accounts_Show_Notifications_index_vue"
+	],
+	"./Accounts/Show/Notifications/index.vue": [
+		"./resources/js/Pages/Accounts/Show/Notifications/index.vue",
+		"resources_js_Pages_Accounts_Show_Notifications_index_vue"
+	],
+	"./Accounts/Show/index": [
+		"./resources/js/Pages/Accounts/Show/index.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Accounts_Show_index_vue"
+	],
+	"./Accounts/Show/index.vue": [
+		"./resources/js/Pages/Accounts/Show/index.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Accounts_Show_index_vue"
+	],
 	"./Apps/Create/CreateOrUpdateAppForm": [
 		"./resources/js/Pages/Apps/Create/CreateOrUpdateAppForm.vue",
 		"resources_js_Pages_Apps_Create_CreateOrUpdateAppForm_vue"
@@ -32894,15 +33032,15 @@ var map = {
 		"./resources/js/Pages/Sessions/List/Header.vue",
 		"resources_js_Pages_Sessions_List_Header_vue"
 	],
-	"./Sessions/List/Session/SessionList": [
-		"./resources/js/Pages/Sessions/List/Session/SessionList.vue",
+	"./Sessions/List/TableRow": [
+		"./resources/js/Pages/Sessions/List/TableRow.vue",
 		"/js/vendor",
-		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Sessions_List_Session_SessionList_vue"
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Sessions_List_TableRow_vue"
 	],
-	"./Sessions/List/Session/SessionList.vue": [
-		"./resources/js/Pages/Sessions/List/Session/SessionList.vue",
+	"./Sessions/List/TableRow.vue": [
+		"./resources/js/Pages/Sessions/List/TableRow.vue",
 		"/js/vendor",
-		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Sessions_List_Session_SessionList_vue"
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Sessions_List_TableRow_vue"
 	],
 	"./Sessions/List/index": [
 		"./resources/js/Pages/Sessions/List/index.vue",

@@ -3,17 +3,17 @@
     <tr @click="showSession" class="group border-b cursor-pointer hover:bg-gray-50">
 
         <!-- Mobile Number -->
-        <td scope="row" class="px-6 py-4 text-xs">
+        <td v-if="headers.includes('MSISDN')" scope="row" class="px-6 py-4 text-xs">
             <span>{{ session.mobile_number }}</span>
         </td>
 
         <!-- Origin -->
-        <td scope="row" class="px-6 py-4 text-xs">
-            <span :class="{ 'text-blue-500' : !session.test }">{{ session.origin }}</span>
+        <td v-if="headers.includes('Origin')" scope="row" class="px-6 py-4 text-xs">
+            <span :class="{ 'text-blue-500' : !session.account.test }">{{ session.origin }}</span>
         </td>
 
         <!-- Request Type Status -->
-        <td scope="row" class="px-6 py-4 text-xs">
+        <td v-if="headers.includes('Request')" scope="row" class="px-6 py-4 text-xs">
             <SuccessBadge v-if="session.request_type_status.name === 'Started'">{{ session.request_type_status.name }}</SuccessBadge>
             <PrimaryBadge v-if="session.request_type_status.name === 'Running'">{{ session.request_type_status.name }}</PrimaryBadge>
             <WarningBadge v-if="session.request_type_status.name === 'Timeout'">{{ session.request_type_status.name }}</WarningBadge>
@@ -21,7 +21,7 @@
         </td>
 
         <!-- Success Status -->
-        <td scope="row" class=" px-6 py-4 text-xs">
+        <td v-if="headers.includes('Status')" scope="row" class=" px-6 py-4 text-xs">
             <div :class="['flex', (session.fatal_error ? 'text-red-500' : 'text-green-500')]">
 
                 <!-- Error Status -->
@@ -49,18 +49,18 @@
             </div>
         </td>
 
-        <!-- Replies -->
-        <td scope="row" class="text-center px-6 py-4 text-xs">
+        <!-- Interactions -->
+        <td v-if="headers.includes('Interactions')" scope="row" class="text-center px-6 py-4 text-xs">
             <span>{{ session.total_inputs_and_outputs }}</span>
         </td>
 
         <!-- Duration -->
-        <td scope="row" class="px-6 py-4 text-xs">
+        <td v-if="headers.includes('Duration')" scope="row" class="px-6 py-4 text-xs">
             <span>{{ session.total_duration }}</span>
         </td>
 
         <!-- Created Date -->
-        <td scope="row" class="px-6 py-4 text-xs text-gray-500">
+        <td v-if="headers.includes('Created Date')" scope="row" class="px-6 py-4 text-xs text-gray-500">
             <span>{{ moment(session.created_at).fromNow() }}</span>
         </td>
 
@@ -80,7 +80,8 @@
     export default {
         components: { PrimaryBadge, DefaultBadge, WarningBadge, SuccessBadge, DangerBadge },
         props: {
-            session: Object
+            headers: Array,
+            session: Object,
         },
         data() {
             return {

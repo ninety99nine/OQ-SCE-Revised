@@ -20,6 +20,6 @@ class AirtimeBilingToken extends Model
      * @var array
      */
     protected $fillable = [
-        'msisdn', 'access_token', 'expiry_date'
+        'ussd_account_id', 'access_token', 'expiry_date'
     ];
 }

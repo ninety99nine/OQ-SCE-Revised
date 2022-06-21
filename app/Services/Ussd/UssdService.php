@@ -7,11 +7,12 @@ use Carbon\Carbon;
 use App\Models\App;
 use App\Models\Version;
 use App\Models\ShortCode;
-use App\Models\DatabaseEntry;
+use App\Models\UssdAccount;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use App\Models\UssdSession;
 use Illuminate\Http\Request;
+use App\Models\DatabaseEntry;
 use App\Services\Sms\SmsBuilder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
@@ -58,6 +59,7 @@ class UssdService
     public $existing_session;
     public $version_id = null;
     public $reply_records = [];
+    public $ussd_account = null;
     public $api_response = null;
     public $user_response = null;
     public $fatal_error = false;
@@ -335,6 +337,24 @@ class UssdService
 
         }
 
+        //  Get the ussd account otherwise create a new one
+        if( !($this->ussd_account = $this->getUserAccount()) ) {
+
+            //  Create a new ussd account
+            $this->ussd_account = DB::table('ussd_accounts')->insert([
+                'msisdn' => $this->msisdn,
+                'test' => $this->test_mode,
+                'app_id' => $this->app->id,
+                'user_id' => auth()->user() ? auth()->user()->id : null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            //  Get the ussd account that we just created
+            $this->ussd_account = $this->getUserAccount();
+
+        }
+
         //  Handle the current session
         $this->sessionResponse = $this->handleSession();
 
@@ -351,7 +371,8 @@ class UssdService
         return $this->sessionResponse;
     }
 
-    /** Get the USSD service code embedded within the USSD message
+    /**
+     * Get the USSD service code embedded within the USSD message
      */
     public function getServiceCodeFromMessage()
     {
@@ -633,6 +654,17 @@ class UssdService
 
     }
 
+    public function getUserAccount()
+    {
+        //  Get the database entry matching the given mobile number, mode and app id
+        return Cache::get((new UssdAccount())->getCacheName($this->msisdn, $this->test_mode, $this->app->id), function () {
+
+            //  We failed to retrieve from the cache, therefore perform a query
+            return (new UssdAccount())->findAndCache($this->msisdn, $this->test_mode, $this->app->id);
+
+        });
+    }
+
     /**
      *  Use the USSD Service Code to set the app version
      */
@@ -820,6 +852,13 @@ class UssdService
             return $setVersionResponse;
         }
 
+        if( empty($this->ussd_account) ) {
+
+            //  Get the ussd account that we just created
+            $this->ussd_account = $this->getUserAccount();
+
+        }
+
         //  Foreach existing session reply record
         foreach ($this->existing_session->reply_records as $key => $reply_record) {
             /*************************************
@@ -965,12 +1004,11 @@ class UssdService
                 'inputs_and_outputs' => json_encode($inputs_and_outputs),
                 'reply_records' => json_encode($this->reply_records),
                 'type' => $this->ussd_service_code_type,
-                'msisdn' => $this->msisdn,
+                'ussd_account_id' => $this->ussd_account->id,
                 'session_id' => $this->session_id,
                 'allow_timeout' => $allow_timeout,
                 'service_code' => $this->service_code,
                 'request_type' => $this->request_type,
-                'test' => $this->test_mode,
                 'fatal_error' => $this->fatal_error,
                 'fatal_error_msg' => $this->fatal_error_msg,
                 'session_execution_times' => json_encode($this->session_execution_times),
@@ -978,8 +1016,7 @@ class UssdService
                 'updated_at' => now(),
                 'timeout_at' => (Carbon::now())->addSeconds($this->timeout_limit_in_seconds)->format('Y-m-d H:i:s'),
                 'app_id' => $this->app->id,
-                'version_id' => $this->version->id,
-                'user_id' => auth()->user() ? auth()->user()->id : null
+                'version_id' => $this->version->id
             ];
 
             //  Overide the default details with any custom data
@@ -1022,8 +1059,7 @@ class UssdService
                 'updated_at' => now(),
                 'timeout_at' => (Carbon::now())->addSeconds($this->timeout_limit_in_seconds)->format('Y-m-d H:i:s'),
                 'app_id' => $this->app->id,
-                'version_id' => $this->version->id,
-                'user_id' => auth()->user() ? auth()->user()->id : null
+                'version_id' => $this->version->id
             ];
         }
 
@@ -1279,12 +1315,11 @@ class UssdService
              */
             return DB::table('global_variables')->updateOrInsert(
                 //  Conditions to find the record to update (If it exists)
-                ['msisdn' => $this->msisdn, 'test' => $this->test_mode, 'app_id' => $this->app->id],
+                ['ussd_account_id' => $this->ussd_account->id],
                 //  Columns to update
                 [
-                    'msisdn' => $this->msisdn,
-                    'test' => $this->test_mode,
                     'app_id' => $this->app->id,
+                    'ussd_account_id' => $this->ussd_account->id,
                     'metadata' => json_encode($this->global_variables_to_save),
                 ]
             );
@@ -1338,9 +1373,7 @@ class UssdService
              *  --------------------------------------------------------------------------------
              */
 
-            return UssdSession::where('session_id', $this->session_id)
-                                    ->where('test', $this->test_mode)
-                                    ->exclude(['logs'])->first();
+            return UssdSession::where('session_id', $this->session_id)->exclude(['logs'])->first();
         }
 
         //  If we have an existing session already set
@@ -2044,9 +2077,7 @@ class UssdService
              *  3. The Global Variables record must belong to this app.
              */
             $global_variables_record = DB::table('global_variables')->where([
-                'msisdn' => $this->msisdn,
-                'test' => $this->test_mode,
-                'app_id' => $this->app->id,
+                'ussd_account_id' => $this->ussd_account->id,
             ])->latest()->first();
 
             /** Note that the "$global_variables_record" is in the form of stdClass. This
@@ -2215,18 +2246,14 @@ class UssdService
     public function getNotifications()
     {
         return DB::table('session_notifications')->where([
-            'msisdn' => $this->msisdn,
-            'test' => $this->test_mode,
-            'app_id' => $this->app->id,
+            'ussd_account_id' => $this->ussd_account->id,
         ])->latest()->get();
     }
 
     public function getShowingNotification()
     {
         return DB::table('session_notifications')->where([
-            'msisdn' => $this->msisdn,
-            'test' => $this->test_mode,
-            'app_id' => $this->app->id,
+            'ussd_account_id' => $this->ussd_account->id,
             'showing_notification' => true
         ])->latest()->first();
     }
@@ -11182,11 +11209,10 @@ class UssdService
 
                 //  Update/Create using the following information
                 [
+                    'ussd_account_id' => $this->ussd_account->id,
                     'session_id' => $this->session_id,
-                    'message' => $message,
-                    'msisdn' => $this->msisdn,
-                    'test' => $this->test_mode,
                     'app_id' => $this->app->id,
+                    'message' => $message,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]
@@ -11352,11 +11378,9 @@ class UssdService
                 //  Set the database entry data
                 $data = [
                     'name' => $reference_name,
-                    'msisdn' => $this->msisdn,
                     'app_id' => $this->app->id,
-                    'test' => $this->test_mode,
                     'metadata' => $processed_fields,
-                    'user_id' => auth()->user() ? auth()->user()->id : null
+                    'ussd_account_id' => $this->ussd_account->id,
                 ];
 
                 //  If the database entry must be created
@@ -11560,7 +11584,7 @@ class UssdService
         }else{
 
             //  Get the database entry matching the given mobile number, app id and mode
-            return Cache::get((new DatabaseEntry())->getCacheName($this->msisdn, $name, $this->test_mode, $this->app->id), function () use ($name) {
+            return Cache::get((new DatabaseEntry())->getCacheName($this->ussd_account->id, $name), function () use ($name) {
 
                 //  We failed to retrieve from the cache, therefore perform a query
                 return $this->getUssdDatabaseEntryViaQuery($name);
@@ -11572,7 +11596,7 @@ class UssdService
 
     public function getUssdDatabaseEntryViaQuery($name)
     {
-        return (new DatabaseEntry())->findAndCache($this->msisdn, $name, $this->test_mode, $this->app->id);
+        return (new DatabaseEntry())->findAndCache($this->ussd_account->id, $name);
     }
 
     /** This method converts a given value into a mathcing dynamic property. First it checks if

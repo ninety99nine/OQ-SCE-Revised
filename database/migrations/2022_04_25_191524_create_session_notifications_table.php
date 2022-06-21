@@ -18,9 +18,8 @@ class CreateSessionNotificationsTable extends Migration
             $table->increments('id');
 
             /*  Session Notifications Details  */
+            $table->unsignedInteger('ussd_account_id');
             $table->string('session_id')->nullable();
-            $table->string('msisdn')->nullable();
-            $table->boolean('test')->nullable()->default(false);
             $table->string('type')->nullable();
             $table->text('message')->nullable();
             $table->text('metadata')->nullable();
@@ -31,7 +30,7 @@ class CreateSessionNotificationsTable extends Migration
 
             /*  Indexes  */
             $table->index(['session_id']);
-            $table->index(['msisdn', 'test', 'app_id']);
+            $table->index(['ussd_account_id']);
 
             /*  Timestamps  */
             $table->timestamps();

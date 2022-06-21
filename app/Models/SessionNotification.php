@@ -9,13 +9,14 @@ class SessionNotification extends Model
 {
     use HasFactory;
 
+    protected $with = ['account'];
+
     /**
      * The table associated with the model.
      *
      * @var string
      */
     protected $casts = [
-        'test' => 'boolean',
         'metadata' => 'array',
         'showing_notification' => 'boolean',
     ];
@@ -28,7 +29,8 @@ class SessionNotification extends Model
     protected $fillable = [
 
         /*  Session Notification Details  */
-        'msisdn', 'test', 'type', 'name', 'message', 'continue_text', 'showing_notification',
+        'ussd_account_id', 'session_id', 'type', 'name', 'message',
+        'continue_text', 'showing_notification',
 
         /*  Meta Data  */
         'metadata',
@@ -37,4 +39,12 @@ class SessionNotification extends Model
         'app_id'
 
     ];
+
+    /*
+     *  Returns ussd account
+     */
+    public function account()
+    {
+        return $this->belongsTo(UssdAccount::class, 'ussd_account_id');
+    }
 }

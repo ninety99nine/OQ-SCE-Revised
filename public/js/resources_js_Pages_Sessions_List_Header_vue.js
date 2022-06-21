@@ -16,6 +16,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  props: ['showingOnSessionsMenu'],
   components: {
     DefaultSelect: _components_Select_DefaultSelect__WEBPACK_IMPORTED_MODULE_0__["default"],
     DefaultSearchBar: _components_SearchBar_DefaultSearchBar__WEBPACK_IMPORTED_MODULE_1__["default"]
@@ -84,12 +85,23 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     refreshContent: function refreshContent() {
-      var url = route('sessions.show', {
-        project: this.route().params.project,
-        app: this.route().params.app,
-        version: this.selectedVersion // this.route().params.version
+      var url;
 
-      });
+      if (route().current() === 'sessions.show') {
+        url = route(route().current(), {
+          project: this.route().params.project,
+          app: this.route().params.app,
+          version: this.selectedVersion
+        });
+      } else if (route().current() === 'account.show') {
+        url = route(route().current(), {
+          project: this.route().params.project,
+          account: this.route().params.account,
+          app: this.route().params.app,
+          version: this.selectedVersion
+        });
+      }
+
       var data = {
         origin: this.origin,
         status: this.status,
@@ -157,6 +169,7 @@ var _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementV
 );
 
 var _hoisted_6 = {
+  key: 0,
   "class": "text-center text-xs m-auto px-6"
 };
 
@@ -170,6 +183,7 @@ var _hoisted_8 = {
   "class": "text-gray-300 font-semibold text-lg"
 };
 var _hoisted_9 = {
+  key: 1,
   "class": "text-center text-xs m-auto px-6"
 };
 
@@ -214,11 +228,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([($data.totalSessions == 0 ? 'text-gray-300' : 'text-blue-500') + ' font-semibold text-lg'])
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.totalSessions), 3
   /* TEXT, CLASS */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [_hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.totalMobileSessions), 1
+  )]), $props.showingOnSessionsMenu ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_6, [_hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.totalMobileSessions), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [_hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_11, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.totalSimulatorSessions), 1
+  )])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.showingOnSessionsMenu ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_9, [_hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_11, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.totalSimulatorSessions), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [_hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+  )])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [_hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([($data.totalFailSessions == 0 ? 'text-gray-300' : 'text-red-500') + ' font-semibold text-lg'])
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.totalFailSessions), 3
   /* TEXT, CLASS */
@@ -237,10 +251,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     label: "Filter by version",
     placeholder: "Select version",
-    "class": "w-60"
+    "class": "w-40"
   }, null, 8
   /* PROPS */
-  , ["modelValue", "options"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_DefaultSelect, {
+  , ["modelValue", "options"]), $props.showingOnSessionsMenu ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_DefaultSelect, {
+    key: 0,
     modelValue: $data.origin,
     "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
       return $data.origin = $event;
@@ -251,10 +266,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     label: "Filter by origin",
     placeholder: "Select origin",
-    "class": "w-60"
+    "class": "w-40"
   }, null, 8
   /* PROPS */
-  , ["modelValue", "options"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_DefaultSelect, {
+  , ["modelValue", "options"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_DefaultSelect, {
     modelValue: $data.requestType,
     "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
       return $data.requestType = $event;
@@ -265,7 +280,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     label: "Filter by request",
     placeholder: "Select request",
-    "class": "w-60"
+    "class": "w-40"
   }, null, 8
   /* PROPS */
   , ["modelValue", "options"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_DefaultSelect, {
@@ -279,7 +294,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     label: "Filter by status",
     placeholder: "Select status",
-    "class": "w-60"
+    "class": "w-40"
   }, null, 8
   /* PROPS */
   , ["modelValue", "options"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_DefaultSearchBar, {
