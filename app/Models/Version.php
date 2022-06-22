@@ -48,11 +48,35 @@ class Version extends Model
     }
 
     /*
-     *  Returns the sessions
+     *  Returns sessions
      */
     public function sessions()
     {
         return $this->hasMany(UssdSession::class);
+    }
+
+    /*
+     *  Returns session notifications
+     */
+    public function sessionNotifications()
+    {
+        return $this->hasMany(SessionNotification::class);
+    }
+
+    /*
+     *  Returns global variables
+     */
+    public function globalVariables()
+    {
+        return $this->hasMany(GlobalVariable::class);
+    }
+
+    /*
+     *  Returns database entries
+     */
+    public function databaseEntries()
+    {
+        return $this->hasMany(DatabaseEntry::class);
     }
 
 }

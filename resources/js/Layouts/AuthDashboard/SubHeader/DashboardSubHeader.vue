@@ -20,7 +20,7 @@
                 </Link>
             </li>
             <li :class="[selectedNotificationsMenu ? 'border-blue-500' : 'border-transparent', 'border-b-2 hover:border-blue-500 hover:bg-blue-50 active:bg-blue-100 text-blue-500']">
-                <Link :href="route('version.show', { project: projectId, app: appId, version: versionId })" class="inline-flex items-center text-sm pt-4 pb-4 pr-4 px-4 cursor-pointer">
+                <Link :href="route('notifications.show', { project: projectId, app: appId, version: versionId })" class="inline-flex items-center text-sm pt-4 pb-4 pr-4 px-4 cursor-pointer">
                     <span>Notifications</span>
                 </Link>
             </li>
@@ -112,15 +112,19 @@
             },
             checkIfSelectedAccountsMenu() {
                 return route().current('accounts.show', { project: this.projectId, app: this.appId, version: this.versionId }) ||
-                       route().current('account.show', { project: this.projectId, app: this.appId, version: this.versionId });
+                       route().current('account.sessions.show', { project: this.projectId, app: this.appId, version: this.versionId }) ||
+                       route().current('account.notifications.show', { project: this.projectId, app: this.appId, version: this.versionId }) ||
+                       route().current('account.database.entries.show', { project: this.projectId, app: this.appId, version: this.versionId });
             },
             checkIfSelectedNotificationsMenu() {
-                return false;
-            },
-            checkIfSelectedGlobalVariablesMenu() {
-                return false;
+                return route().current('notifications.show', { project: this.projectId, app: this.appId, version: this.versionId }) ||
+                       route().current('notification.show', { project: this.projectId, app: this.appId, version: this.versionId });
             },
             checkIfSelectedDatabaseEntriesMenu() {
+                return route().current('database.entries.show', { project: this.projectId, app: this.appId, version: this.versionId }) ||
+                       route().current('database.entry.show', { project: this.projectId, app: this.appId, version: this.versionId });
+            },
+            checkIfSelectedGlobalVariablesMenu() {
                 return false;
             }
         },

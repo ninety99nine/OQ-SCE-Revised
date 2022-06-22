@@ -24,9 +24,10 @@
                 <div class="bg-white rounded-md shadow-md hover:shadow-lg p-8">
 
                     <!-- Tab Content -->
-                    <AccountSessions v-if="selectedTab == 1" />
-                    <AccountNotifications v-else-if="selectedTab == 2" />
-                    <AccountGlobalVariables v-else-if="selectedTab == 3" />
+                    <AccountSessions v-if="selectedTab == 'account.sessions.show'" />
+                    <AccountNotifications v-else-if="selectedTab == 'account.notifications.show'" />
+                    <AccountDatabaseEntries v-else-if="selectedTab == 'account.database.entries.show'" />
+                    <AccountGlobalVariables v-else-if="selectedTab == 'account.global.variables.show'" />
 
                 </div>
 
@@ -42,11 +43,12 @@
 
     import BackButton from "./BackButton";
     import AccountDetails from "./Details";
-    import AccountSessions from '@pages/Sessions/List';
     import { Head } from '@inertiajs/inertia-vue3';
-    import AccountNotifications from "./Notifications";
+    import AccountSessions from '@pages/Sessions/List';
     import AccountGlobalVariables from "./GlobalVariables";
     import DefaultTabs from '@components/Tabs/DefaultTabs';
+    import AccountNotifications from '@pages/Notifications/List';
+    import AccountDatabaseEntries from '@pages/DatabaseEntries/List';
 
     export default {
         props: {
@@ -54,25 +56,55 @@
             versionPayload: Object,
             accountPayload: Object,
         },
-        components: { Head, BackButton, AccountDetails, AccountSessions, AccountNotifications, AccountGlobalVariables, DefaultTabs },
+        components: { Head, BackButton, AccountDetails, AccountSessions, AccountNotifications, AccountGlobalVariables, AccountDatabaseEntries, DefaultTabs },
         data() {
             return {
                 tabs: [
                     {
                         label: 'Sessions',
-                        value: 1
+                        value: 'account.sessions.show'
                     },
                     {
                         label: 'Notifications',
-                        value: 2
+                        value: 'account.notifications.show'
+                    },
+                    {
+                        label: 'Database Entries',
+                        value: 'account.database.entries.show'
                     },
                     {
                         label: 'Global Variables',
-                        value: 3
+                        value: 'account.global.variables.show'
                     }
                 ],
-                selectedTab: 1,
-                refreshContentInterval: null
+                refreshContentInterval: null,
+            }
+        },
+        computed: {
+            selectedTab: {
+                get() {
+                    return route().current();
+                },
+                set(routeName) {
+
+                    if( route().current() === routeName ) return;
+
+                    const url = route(routeName, {
+                        project: this.route().params.project,
+                        version: this.route().params.version,
+                        account: this.route().params.account,
+                        app: this.route().params.app,
+                    });
+
+                    const options = {
+                        preserveScroll: true,
+                        preserveState: false,
+                        replace: true
+                    };
+
+                    this.$inertia.get(url, {}, options);
+
+                }
             }
         }
     };

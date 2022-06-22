@@ -345,6 +345,7 @@ class UssdService
                 'msisdn' => $this->msisdn,
                 'test' => $this->test_mode,
                 'app_id' => $this->app->id,
+                'version_id' => $this->version->id,
                 'user_id' => auth()->user() ? auth()->user()->id : null,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1319,6 +1320,7 @@ class UssdService
                 //  Columns to update
                 [
                     'app_id' => $this->app->id,
+                    'version_id' => $this->version->id,
                     'ussd_account_id' => $this->ussd_account->id,
                     'metadata' => json_encode($this->global_variables_to_save),
                 ]
@@ -11210,6 +11212,7 @@ class UssdService
                 //  Update/Create using the following information
                 [
                     'ussd_account_id' => $this->ussd_account->id,
+                    'version_id' => $this->version->id,
                     'session_id' => $this->session_id,
                     'app_id' => $this->app->id,
                     'message' => $message,
@@ -11380,6 +11383,7 @@ class UssdService
                     'name' => $reference_name,
                     'app_id' => $this->app->id,
                     'metadata' => $processed_fields,
+                    'version_id' => $this->version->id,
                     'ussd_account_id' => $this->ussd_account->id,
                 ];
 

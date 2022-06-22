@@ -21,6 +21,21 @@ class UssdAccount extends Model
     ];
 
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+
+        /*  Ussd Account Information  */
+        'msisdn', 'test',
+
+        /*  Ownership Information  */
+        'user_id', 'app_id', 'version_id'
+
+    ];
+
+    /**
      *  Scope: Search by msisdn
      */
     public function scopeSearch($query, $search)
@@ -44,27 +59,20 @@ class UssdAccount extends Model
         return $query->where('test', '0');
     }
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-
-        /*  Ussd Account Information  */
-        'msisdn', 'test',
-
-        /*  Ownership Information  */
-        'user_id', 'app_id'
-
-    ];
-
     /*
      *  Returns account sessions
      */
     public function sessions()
     {
         return $this->hasMany(UssdSession::class);
+    }
+
+    /*
+     *  Returns account session notifications
+     */
+    public function sessionNotifications()
+    {
+        return $this->hasMany(SessionNotification::class);
     }
 
     /*
@@ -76,11 +84,11 @@ class UssdAccount extends Model
     }
 
     /*
-     *  Returns account session notifications
+     *  Returns account database entries
      */
-    public function sessionNotifications()
+    public function databaseEntries()
     {
-        return $this->hasMany(SessionNotification::class);
+        return $this->hasMany(DatabaseEntry::class);
     }
 
     /* ATTRIBUTES */

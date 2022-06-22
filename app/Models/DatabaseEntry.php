@@ -35,9 +35,17 @@ class DatabaseEntry extends Model
         'metadata',
 
         /*  Ownership Information  */
-        'app_id'
+        'app_id', 'version_id'
 
     ];
+
+    /**
+     *  Scope: Search by name
+     */
+    public function scopeSearch($query, $search)
+    {
+        return empty($search) ? $query : $query->where('name', 'like', '%'.$search.'%');
+    }
 
     /*
      *  Scope:

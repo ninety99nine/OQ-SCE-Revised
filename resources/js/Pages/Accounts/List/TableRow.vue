@@ -57,7 +57,7 @@
         },
         methods: {
             showAccount() {
-                this.$inertia.get(route('account.show', { project: this.route().params.project, app: this.route().params.app, version: this.route().params.version, account: this.account.id }));
+                this.$inertia.get(route('account.sessions.show', { project: this.route().params.project, app: this.route().params.app, version: this.route().params.version, account: this.account.id }));
             }
         }
     };

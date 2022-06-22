@@ -2142,19 +2142,43 @@ __webpack_require__.r(__webpack_exports__);
         project: this.projectId,
         app: this.appId,
         version: this.versionId
-      }) || route().current('account.show', {
+      }) || route().current('account.sessions.show', {
+        project: this.projectId,
+        app: this.appId,
+        version: this.versionId
+      }) || route().current('account.notifications.show', {
+        project: this.projectId,
+        app: this.appId,
+        version: this.versionId
+      }) || route().current('account.database.entries.show', {
         project: this.projectId,
         app: this.appId,
         version: this.versionId
       });
     },
     checkIfSelectedNotificationsMenu: function checkIfSelectedNotificationsMenu() {
-      return false;
-    },
-    checkIfSelectedGlobalVariablesMenu: function checkIfSelectedGlobalVariablesMenu() {
-      return false;
+      return route().current('notifications.show', {
+        project: this.projectId,
+        app: this.appId,
+        version: this.versionId
+      }) || route().current('notification.show', {
+        project: this.projectId,
+        app: this.appId,
+        version: this.versionId
+      });
     },
     checkIfSelectedDatabaseEntriesMenu: function checkIfSelectedDatabaseEntriesMenu() {
+      return route().current('database.entries.show', {
+        project: this.projectId,
+        app: this.appId,
+        version: this.versionId
+      }) || route().current('database.entry.show', {
+        project: this.projectId,
+        app: this.appId,
+        version: this.versionId
+      });
+    },
+    checkIfSelectedGlobalVariablesMenu: function checkIfSelectedGlobalVariablesMenu() {
       return false;
     }
   },
@@ -12133,7 +12157,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([$data.selectedNotificationsMenu ? 'border-blue-500' : 'border-transparent', 'border-b-2 hover:border-blue-500 hover:bg-blue-50 active:bg-blue-100 text-blue-500'])
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Link, {
-    href: _ctx.route('version.show', {
+    href: _ctx.route('notifications.show', {
       project: $data.projectId,
       app: $data.appId,
       version: $data.versionId
@@ -32736,22 +32760,6 @@ var map = {
 		"./resources/js/Pages/Accounts/Show/GlobalVariables/index.vue",
 		"resources_js_Pages_Accounts_Show_GlobalVariables_index_vue"
 	],
-	"./Accounts/Show/Notifications": [
-		"./resources/js/Pages/Accounts/Show/Notifications/index.vue",
-		"resources_js_Pages_Accounts_Show_Notifications_index_vue"
-	],
-	"./Accounts/Show/Notifications/": [
-		"./resources/js/Pages/Accounts/Show/Notifications/index.vue",
-		"resources_js_Pages_Accounts_Show_Notifications_index_vue"
-	],
-	"./Accounts/Show/Notifications/index": [
-		"./resources/js/Pages/Accounts/Show/Notifications/index.vue",
-		"resources_js_Pages_Accounts_Show_Notifications_index_vue"
-	],
-	"./Accounts/Show/Notifications/index.vue": [
-		"./resources/js/Pages/Accounts/Show/Notifications/index.vue",
-		"resources_js_Pages_Accounts_Show_Notifications_index_vue"
-	],
 	"./Accounts/Show/index": [
 		"./resources/js/Pages/Accounts/Show/index.vue",
 		"/js/vendor",
@@ -32883,6 +32891,98 @@ var map = {
 	"./Auth/Register/Show.vue": [
 		"./resources/js/Pages/Auth/Register/Show.vue",
 		"resources_js_Pages_Auth_Register_Show_vue"
+	],
+	"./DatabaseEntries/List": [
+		"./resources/js/Pages/DatabaseEntries/List/index.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_DatabaseEntries_List_index_vue"
+	],
+	"./DatabaseEntries/List/": [
+		"./resources/js/Pages/DatabaseEntries/List/index.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_DatabaseEntries_List_index_vue"
+	],
+	"./DatabaseEntries/List/BackButton": [
+		"./resources/js/Pages/DatabaseEntries/List/BackButton.vue",
+		"resources_js_Pages_DatabaseEntries_List_BackButton_vue"
+	],
+	"./DatabaseEntries/List/BackButton.vue": [
+		"./resources/js/Pages/DatabaseEntries/List/BackButton.vue",
+		"resources_js_Pages_DatabaseEntries_List_BackButton_vue"
+	],
+	"./DatabaseEntries/List/Header": [
+		"./resources/js/Pages/DatabaseEntries/List/Header.vue",
+		"resources_js_Pages_DatabaseEntries_List_Header_vue"
+	],
+	"./DatabaseEntries/List/Header.vue": [
+		"./resources/js/Pages/DatabaseEntries/List/Header.vue",
+		"resources_js_Pages_DatabaseEntries_List_Header_vue"
+	],
+	"./DatabaseEntries/List/TableRow": [
+		"./resources/js/Pages/DatabaseEntries/List/TableRow.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_DatabaseEntries_List_TableRow_vue"
+	],
+	"./DatabaseEntries/List/TableRow.vue": [
+		"./resources/js/Pages/DatabaseEntries/List/TableRow.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_DatabaseEntries_List_TableRow_vue"
+	],
+	"./DatabaseEntries/List/index": [
+		"./resources/js/Pages/DatabaseEntries/List/index.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_DatabaseEntries_List_index_vue"
+	],
+	"./DatabaseEntries/List/index.vue": [
+		"./resources/js/Pages/DatabaseEntries/List/index.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_DatabaseEntries_List_index_vue"
+	],
+	"./Notifications/List": [
+		"./resources/js/Pages/Notifications/List/index.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Notifications_List_index_vue"
+	],
+	"./Notifications/List/": [
+		"./resources/js/Pages/Notifications/List/index.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Notifications_List_index_vue"
+	],
+	"./Notifications/List/BackButton": [
+		"./resources/js/Pages/Notifications/List/BackButton.vue",
+		"resources_js_Pages_Notifications_List_BackButton_vue"
+	],
+	"./Notifications/List/BackButton.vue": [
+		"./resources/js/Pages/Notifications/List/BackButton.vue",
+		"resources_js_Pages_Notifications_List_BackButton_vue"
+	],
+	"./Notifications/List/Header": [
+		"./resources/js/Pages/Notifications/List/Header.vue",
+		"resources_js_Pages_Notifications_List_Header_vue"
+	],
+	"./Notifications/List/Header.vue": [
+		"./resources/js/Pages/Notifications/List/Header.vue",
+		"resources_js_Pages_Notifications_List_Header_vue"
+	],
+	"./Notifications/List/TableRow": [
+		"./resources/js/Pages/Notifications/List/TableRow.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Notifications_List_TableRow_vue"
+	],
+	"./Notifications/List/TableRow.vue": [
+		"./resources/js/Pages/Notifications/List/TableRow.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Notifications_List_TableRow_vue"
+	],
+	"./Notifications/List/index": [
+		"./resources/js/Pages/Notifications/List/index.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Notifications_List_index_vue"
+	],
+	"./Notifications/List/index.vue": [
+		"./resources/js/Pages/Notifications/List/index.vue",
+		"/js/vendor",
+		"node_modules_moment_locale_sync_recursive_-resources_js_Pages_Notifications_List_index_vue"
 	],
 	"./Projects/Create/CreateProjectForm": [
 		"./resources/js/Pages/Projects/Create/CreateProjectForm.vue"

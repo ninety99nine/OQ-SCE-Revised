@@ -27,6 +27,7 @@ class CreateSessionNotificationsTable extends Migration
 
             /*  Ownership Information  */
             $table->unsignedInteger('app_id')->nullable();
+            $table->unsignedInteger('version_id')->nullable();
 
             /*  Indexes  */
             $table->index(['session_id']);

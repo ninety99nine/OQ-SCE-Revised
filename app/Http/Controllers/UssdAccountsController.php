@@ -8,6 +8,8 @@ use App\Models\Version;
 use App\Models\Project;
 use App\Models\UssdAccount;
 use App\Services\Session\SessionService;
+use App\Services\Session\DatabaseEntryService;
+use App\Services\Session\SessionNotificationService;
 
 class UssdAccountsController extends Controller
 {
@@ -61,24 +63,34 @@ class UssdAccountsController extends Controller
         //  Get the account
         $account = UssdAccount::withCount(['sessions', 'sessionNotifications', 'globalVariables'])->findOrFail(request()->account);
 
-        if (/* $request->routeIs('admin.*') */ true) {
+        if ( request()->routeIs('account.sessions.show') ) {
 
             //  Get the session service response
-            $sessionServiceResponse = (new SessionService())->getSessions();
+            $serviceResponse = (new SessionService())->getSessions();
 
-            //  Version options
-            $versionOptions = $app->versions()->select('id', 'number')->get();
+        }else if ( request()->routeIs('account.notifications.show') ) {
 
-            //  Set the props
-            $props = array_merge([
-                'appPayload' => $app,
-                'projectPayload' => $project,
-                'accountPayload' => $account,
-                'versionOptions' => $versionOptions,
-                'versionPayload' => $version->makeHidden('builder'),
-            ], $sessionServiceResponse);
+            //  Get the notification service response
+            $serviceResponse = (new SessionNotificationService())->getNotifications();
+
+        }else if ( request()->routeIs('account.database.entries.show') ) {
+
+            //  Get the database entries service response
+            $serviceResponse = (new DatabaseEntryService())->getDatabaseEntries();
 
         }
+
+        //  Version options
+        $versionOptions = $app->versions()->select('id', 'number')->get();
+
+        //  Set the props
+        $props = array_merge([
+            'appPayload' => $app,
+            'projectPayload' => $project,
+            'accountPayload' => $account,
+            'versionOptions' => $versionOptions,
+            'versionPayload' => $version->makeHidden('builder'),
+        ], $serviceResponse);
 
         //  Show the user accounts
         return Inertia::render('Accounts/Show', $props);

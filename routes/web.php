@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\UssdAccountsController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\LoginController;
@@ -10,7 +11,6 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\AppController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-
 
 
 /*
@@ -101,9 +101,10 @@ Route::middleware(['auth'])->group(function () {
 
                                     Route::prefix('/{account}')->name('account.')->group(function () {
 
-                                        Route::get('/', 'show')->name('show');
+                                        Route::get('/sessions', 'show')->name('sessions.show');
+                                        Route::get('/notifications', 'show')->name('notifications.show');
+                                        Route::get('/database-entries', 'show')->name('database.entries.show');
                                         Route::delete('/', 'delete')->name('delete');
-
                                     });
 
                                 });
@@ -116,6 +117,22 @@ Route::middleware(['auth'])->group(function () {
                                     Route::get('/', 'index')->name('sessions.show');
 
                                     Route::prefix('/{session}')->name('session.')->group(function () {
+
+                                        Route::get('/', 'show')->name('show');
+                                        Route::delete('/', 'delete')->name('delete');
+
+                                    });
+
+                                });
+
+                                //  Notifications
+                                Route::controller(NotificationController::class)
+                                    ->prefix('notifications')
+                                    ->group(function () {
+
+                                    Route::get('/', 'index')->name('notifications.show');
+
+                                    Route::prefix('/{notification}')->name('notification.')->group(function () {
 
                                         Route::get('/', 'show')->name('show');
                                         Route::delete('/', 'delete')->name('delete');

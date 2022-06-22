@@ -24,6 +24,7 @@ class CreateUssdAccountsTable extends Migration
             /*  Ownership Information  */
             $table->unsignedInteger('user_id')->nullable();
             $table->unsignedInteger('app_id')->nullable();
+            $table->unsignedInteger('version_id')->nullable();
 
             /*  Indexes  */
             $table->index(['msisdn', 'test', 'app_id', 'user_id']);

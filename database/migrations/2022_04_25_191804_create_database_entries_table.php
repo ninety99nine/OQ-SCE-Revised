@@ -24,6 +24,7 @@ class CreateDatabaseEntriesTable extends Migration
 
             /*  Ownership Information  */
             $table->unsignedInteger('app_id')->nullable();
+            $table->unsignedInteger('version_id')->nullable();
 
             /*  Indexes  */
             $table->index(['ussd_account_id', 'name']);

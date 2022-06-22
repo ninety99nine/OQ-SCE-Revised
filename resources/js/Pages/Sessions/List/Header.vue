@@ -9,11 +9,11 @@
                     <p class="mb-2 text-gray-400">Total Sessions</p>
                     <p :class="[(totalSessions == 0 ? 'text-gray-300' : 'text-blue-500')+' font-semibold text-lg']">{{ totalSessions }}</p>
                 </div>
-                <div v-if="showingOnSessionsMenu" class="text-center text-xs m-auto px-6">
+                <div v-if="showingOnMainMenu" class="text-center text-xs m-auto px-6">
                     <p class="mb-2 text-gray-400">Mobile</p>
                     <p class="text-gray-300 font-semibold text-lg">{{ totalMobileSessions }}</p>
                 </div>
-                <div v-if="showingOnSessionsMenu" class="text-center text-xs m-auto px-6">
+                <div v-if="showingOnMainMenu" class="text-center text-xs m-auto px-6">
                     <p class="mb-2 text-gray-400">Simulator</p>
                     <p class="text-gray-300 font-semibold text-lg">{{ totalSimulatorSessions }}</p>
                 </div>
@@ -32,7 +32,7 @@
 
             <DefaultSelect v-model="selectedVersion" :options="versionOptions" @change="refreshContent()" label="Filter by version" placeholder="Select version" class="w-40"></DefaultSelect>
 
-            <DefaultSelect v-if="showingOnSessionsMenu" v-model="origin" :options="originOptions" @change="refreshContent()" label="Filter by origin" placeholder="Select origin" class="w-40"></DefaultSelect>
+            <DefaultSelect v-if="showingOnMainMenu" v-model="origin" :options="originOptions" @change="refreshContent()" label="Filter by origin" placeholder="Select origin" class="w-40"></DefaultSelect>
 
             <DefaultSelect v-model="requestType" :options="requestTypeOptions" @change="refreshContent()" label="Filter by request" placeholder="Select request" class="w-40"></DefaultSelect>
 
@@ -52,7 +52,7 @@
     import DefaultSearchBar from "@components/SearchBar/DefaultSearchBar";
 
     export default {
-        props: ['showingOnSessionsMenu'],
+        props: ['showingOnMainMenu'],
         components: { DefaultSelect, DefaultSearchBar },
         data() {
             return {
@@ -150,7 +150,7 @@
                         version: this.selectedVersion
                     });
 
-                }else if( route().current() === 'account.show' ) {
+                }else if( route().current() === 'account.sessions.show' ) {
 
                     url = route(route().current(), {
                         project: this.route().params.project,

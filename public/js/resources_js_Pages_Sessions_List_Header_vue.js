@@ -16,7 +16,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  props: ['showingOnSessionsMenu'],
+  props: ['showingOnMainMenu'],
   components: {
     DefaultSelect: _components_Select_DefaultSelect__WEBPACK_IMPORTED_MODULE_0__["default"],
     DefaultSearchBar: _components_SearchBar_DefaultSearchBar__WEBPACK_IMPORTED_MODULE_1__["default"]
@@ -93,7 +93,7 @@ __webpack_require__.r(__webpack_exports__);
           app: this.route().params.app,
           version: this.selectedVersion
         });
-      } else if (route().current() === 'account.show') {
+      } else if (route().current() === 'account.sessions.show') {
         url = route(route().current(), {
           project: this.route().params.project,
           account: this.route().params.account,
@@ -228,9 +228,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([($data.totalSessions == 0 ? 'text-gray-300' : 'text-blue-500') + ' font-semibold text-lg'])
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.totalSessions), 3
   /* TEXT, CLASS */
-  )]), $props.showingOnSessionsMenu ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_6, [_hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.totalMobileSessions), 1
+  )]), $props.showingOnMainMenu ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_6, [_hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.totalMobileSessions), 1
   /* TEXT */
-  )])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.showingOnSessionsMenu ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_9, [_hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_11, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.totalSimulatorSessions), 1
+  )])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.showingOnMainMenu ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_9, [_hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_11, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.totalSimulatorSessions), 1
   /* TEXT */
   )])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [_hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([($data.totalFailSessions == 0 ? 'text-gray-300' : 'text-red-500') + ' font-semibold text-lg'])
@@ -254,7 +254,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "w-40"
   }, null, 8
   /* PROPS */
-  , ["modelValue", "options"]), $props.showingOnSessionsMenu ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_DefaultSelect, {
+  , ["modelValue", "options"]), $props.showingOnMainMenu ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_DefaultSelect, {
     key: 0,
     modelValue: $data.origin,
     "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {

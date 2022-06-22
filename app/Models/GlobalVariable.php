@@ -32,7 +32,7 @@ class GlobalVariable extends Model
         'metadata',
 
         /*  Ownership Information  */
-        'app_id'
+        'app_id', 'version_id'
     ];
 
 }

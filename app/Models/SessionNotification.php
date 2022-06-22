@@ -36,9 +36,17 @@ class SessionNotification extends Model
         'metadata',
 
         /*  Ownership Information  */
-        'app_id'
+        'app_id', 'version_id'
 
     ];
+
+    /**
+     *  Scope: Search by message
+     */
+    public function scopeSearch($query, $search)
+    {
+        return empty($search) ? $query : $query->where('message', 'like', '%'.$search.'%');
+    }
 
     /*
      *  Returns ussd account

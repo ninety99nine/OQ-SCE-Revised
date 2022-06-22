@@ -1,8 +1,8 @@
 <template>
 
-    <div :class="{ 'pt-8 px-16 mt-4' : showingOnSessionsMenu }">
+    <div :class="{ 'pt-8 px-16 mt-4' : showingOnMainMenu }">
 
-        <template v-if="showingOnSessionsMenu">
+        <template v-if="showingOnMainMenu">
 
             <Head :title="appPayload.name + ' - Version ' + versionPayload.number" />
 
@@ -15,10 +15,10 @@
 
         </template>
 
-        <div :class="{ 'p-8 bg-white rounded-md shadow-md hover:shadow-lg' : showingOnSessionsMenu }">
+        <div :class="{ 'p-8 bg-white rounded-md shadow-md hover:shadow-lg' : showingOnMainMenu }">
 
             <!-- App Header -->
-            <Header :showingOnSessionsMenu="showingOnSessionsMenu" />
+            <Header :showingOnMainMenu="showingOnMainMenu" />
 
             <div class="shadow-md">
 
@@ -29,7 +29,7 @@
                             <!-- Table Header Columns Names -->
                             <th v-for="(header, index) in headers" :key="index" scope="col"
                                 :class="['px-6 py-3',
-                                    { 'whitespace-nowrap' : header == 'Created Date' },
+                                    { 'whitespace-nowrap text-right' : header == 'Created Date' },
                                     { 'text-center' : (header == 'Interactions') }
                                 ]">
                                 <span>{{ header }}</span>
@@ -81,7 +81,7 @@
                 appPayload: this.$page.props.appPayload,
                 versionPayload: this.$page.props.versionPayload,
                 sessionsPayload: this.$page.props.sessionsPayload,
-                showingOnSessionsMenu: this.checkIfShowingOnSessionsMenu()
+                showingOnMainMenu: this.checkIfShowingOnMainMenu()
             }
         },
         watch:{
@@ -98,7 +98,7 @@
                 //  If the sessions are viewed from the account menu, then we need to show the following
                 var headers = ['Request', 'Status', 'Interactions', 'Duration', 'Created Date'];
 
-                if( route().current('sessions.show', { project: this.route().params.project, app: this.route().params.app, version: this.route().params.version }) ) {
+                if( this.showingOnMainMenu ) {
 
                     //  If the sessions are viewed from the sessions menu, then we need to add the following
                     headers.unshift('MSISDN', 'Origin');
@@ -108,7 +108,7 @@
                 return headers;
 
             },
-            checkIfShowingOnSessionsMenu() {
+            checkIfShowingOnMainMenu() {
                 return route().current() === 'sessions.show';
             }
         }

@@ -2,9 +2,6 @@
 
 namespace App\Services\Session;
 
-use App\Models\App;
-use App\Models\Version;
-use App\Models\Project;
 use App\Models\UssdAccount;
 
 class SessionService

@@ -111,6 +111,7 @@
         components: { DefaultInput, DangerButton, PrimaryButton, Loader, Loader },
         data() {
             return {
+                project: this.$page.props.projectPayload,
                 version: this.$page.props.versionPayload,
                 useVersionBuilder: useVersionBuilder(),
                 app: this.$page.props.appPayload,
@@ -119,7 +120,7 @@
                 initialReplies: '',
                 loading: false,
                 request: null,
-                form: null,
+                form: null
             }
         },
         computed: {
@@ -265,7 +266,7 @@
                  */
                 const axiosSource = axios.CancelToken.source();
 
-                const url = route('version.start-simulation', { project: this.route().params.project, app: this.route().params.app, version: this.route().params.version });
+                const url = route('version.start-simulation', { project: this.project.id, app: this.app.id, version: this.version.id });
                 this.request = { cancel: axiosSource.cancel };
 
                 axios.post(url, this.form, { cancelToken: axiosSource.token })
@@ -370,7 +371,7 @@
             },
             stopApiSimulationRequest() {
 
-                const url = route('version.stop-simulation', { project: this.route().params.project, app: this.route().params.app, version: this.route().params.version, session: this.form.session_id });
+                const url = route('version.stop-simulation', { project: this.project.id, app: this.app.id, version: this.version.id, session: this.form.session_id });
 
                 axios.post(url)
                     .then((response) => {

@@ -5031,6 +5031,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   }, "Loader", _components_Loader_Loader_vue__WEBPACK_IMPORTED_MODULE_1__["default"]),
   data: function data() {
     return {
+      project: this.$page.props.projectPayload,
       version: this.$page.props.versionPayload,
       useVersionBuilder: (0,_stores_VersionBuilder__WEBPACK_IMPORTED_MODULE_3__.useVersionBuilder)(),
       app: this.$page.props.appPayload,
@@ -5166,9 +5167,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
       var axiosSource = axios__WEBPACK_IMPORTED_MODULE_0___default().CancelToken.source();
       var url = route('version.start-simulation', {
-        project: this.route().params.project,
-        app: this.route().params.app,
-        version: this.route().params.version
+        project: this.project.id,
+        app: this.app.id,
+        version: this.version.id
       });
       this.request = {
         cancel: axiosSource.cancel
@@ -5252,9 +5253,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var _this2 = this;
 
       var url = route('version.stop-simulation', {
-        project: this.route().params.project,
-        app: this.route().params.app,
-        version: this.route().params.version,
+        project: this.project.id,
+        app: this.app.id,
+        version: this.version.id,
         session: this.form.session_id
       });
       axios__WEBPACK_IMPORTED_MODULE_0___default().post(url).then(function (response) {})["catch"](function (error) {
