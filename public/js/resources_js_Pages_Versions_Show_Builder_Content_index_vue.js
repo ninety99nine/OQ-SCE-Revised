@@ -4460,11 +4460,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
        */
 
       var axiosSource = axios__WEBPACK_IMPORTED_MODULE_0___default().CancelToken.source();
-      var url = route('version.start-simulation', {
-        project: this.project.id,
-        app: this.app.id,
-        version: this.version.id
-      });
+      var url = route('launch-ussd');
       this.request = {
         cancel: axiosSource.cancel
       };
@@ -4546,10 +4542,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     stopApiSimulationRequest: function stopApiSimulationRequest() {
       var _this2 = this;
 
-      var url = route('version.stop-simulation', {
-        project: this.project.id,
-        app: this.app.id,
-        version: this.version.id,
+      var url = route('stop-ussd', {
         session: this.form.session_id
       });
       axios__WEBPACK_IMPORTED_MODULE_0___default().post(url).then(function (response) {})["catch"](function (error) {

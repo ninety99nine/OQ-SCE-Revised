@@ -5,13 +5,12 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\UssdAccountsController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\SimulationController;
 use App\Http\Controllers\VersionController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\AppController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
 
 /*
 |--------------------------------------------------------------------------
@@ -88,8 +87,6 @@ Route::middleware(['auth'])->group(function () {
                                     Route::put('/', 'update')->name('update');
                                     Route::delete('/', 'delete')->name('delete');
                                     Route::post('/repair', 'repair')->name('repair');
-                                    Route::post('/start-simulation', 'startSimulation')->name('start-simulation');
-                                    Route::post('/{session}/stop-simulation', 'stopSimulation')->name('stop-simulation');
                                 });
 
                                 //  Accounts
@@ -100,7 +97,6 @@ Route::middleware(['auth'])->group(function () {
                                     Route::get('/', 'index')->name('accounts.show');
 
                                     Route::prefix('/{account}')->name('account.')->group(function () {
-
                                         Route::get('/sessions', 'show')->name('sessions.show');
                                         Route::get('/notifications', 'show')->name('notifications.show');
                                         Route::get('/database-entries', 'show')->name('database.entries.show');
@@ -154,3 +150,13 @@ Route::middleware(['auth'])->group(function () {
         });
 
 });
+
+Route::post('/launch/ussd', [SimulationController::class, 'launchUssd'])->name('launch-ussd');
+Route::post('/{session}/stop/ussd', [SimulationController::class, 'stopUssd'])->name('stop-ussd');
+
+/**
+ *  DELETE THIS AND POINT ALL USSD SHORTCODES TO THE ROUTE ABOVE. THE ROUTE BELOW IS DEPRECATED.
+ *  WE NOW USE THE "/launch/ussd" route instead of the "/api/ussd/builder" which was used by the
+ *  legacy Service Creation Environment.
+ */
+Route::post('/api/ussd/builder', [SimulationController::class, 'launchUssd'])->name('launch-ussd');

@@ -5,15 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\App;
 use Inertia\Inertia;
 use App\Models\Project;
-use App\Models\UssdSession;
 use App\Models\Version;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
-use App\Services\Ussd\UssdService;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Database\Eloquent\Builder;
 
 class VersionController extends Controller
 {
@@ -41,38 +36,6 @@ class VersionController extends Controller
                 'appPayload' => $app,
                 'projectPayload' => $project,
                 'versionPayload' => $version->makeHidden('builder')
-            ]);
-
-        }
-    }
-
-    public function startSimulation(Project $project, App $app, Version $version, Request $request)
-    {
-        //  If we are starting a new test session
-        if( ($testMode = request()->input('test_mode')) == true && ($requestType = request()->input('request_type')) == 1) {
-
-            //  Close other running sessions
-            UssdSession::whereIn('request_type', ['1', '2'])
-                ->whereHas('account', function (Builder $query) {
-                    $query->where('user_id', auth()->user()->id);
-                })->update([
-                    'request_type' => '3',   //  End the session
-                    'updated_at' => now()
-                ]);
-
-        }
-
-        return (new UssdService($request))->setup();
-    }
-
-    public function stopSimulation(Project $project, App $app, Version $version, Request $request)
-    {
-        if( $sessionId = request()->session ) {
-
-            //  Close current running session
-            DB::table('ussd_sessions')->where('session_id', $sessionId)->update([
-                'request_type' => '3',   //  End the session
-                'updated_at' => now()
             ]);
 
         }
