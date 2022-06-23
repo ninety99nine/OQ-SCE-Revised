@@ -123,7 +123,7 @@ class UssdService
          *
          *  <ussd>
          *      <msisdn>M</msisdn>
-         *      <session_id>S</session_id>
+         *      <sessionid>S</sessionid>
          *      <type>T</type>
          *      <msg>MSG</msg>
          *  </ussd>
@@ -270,7 +270,7 @@ class UssdService
             $this->mobile_number = preg_replace("/^267/", "$1", $this->msisdn);
 
             //  Set the "Session ID"
-            $this->session_id = $jsonArray['session_id'];
+            $this->session_id = $jsonArray['sessionid'];
 
             //  Set the "Request Type"
             $this->request_type = $jsonArray['type'];
