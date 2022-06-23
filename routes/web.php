@@ -159,4 +159,4 @@ Route::post('/{session}/stop/ussd', [SimulationController::class, 'stopUssd'])->
  *  WE NOW USE THE "/launch/ussd" route instead of the "/api/ussd/builder" which was used by the
  *  legacy Service Creation Environment.
  */
-Route::post('/api/ussd/builder', [SimulationController::class, 'launchUssd'])->name('launch-ussd');
+Route::post('/api/ussd/builder', [SimulationController::class, 'launchUssd'])->name('legacy-launch-ussd');
