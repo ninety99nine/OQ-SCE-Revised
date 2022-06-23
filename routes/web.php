@@ -5,7 +5,6 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\UssdAccountsController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\SimulationController;
 use App\Http\Controllers\VersionController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\ProjectController;
@@ -150,13 +149,3 @@ Route::middleware(['auth'])->group(function () {
         });
 
 });
-
-Route::post('/launch/ussd', [SimulationController::class, 'launchUssd'])->name('launch-ussd');
-Route::post('/{session}/stop/ussd', [SimulationController::class, 'stopUssd'])->name('stop-ussd');
-
-/**
- *  DELETE THIS AND POINT ALL USSD SHORTCODES TO THE ROUTE ABOVE. THE ROUTE BELOW IS DEPRECATED.
- *  WE NOW USE THE "/launch/ussd" route instead of the "/api/ussd/builder" which was used by the
- *  legacy Service Creation Environment.
- */
-Route::post('/api/ussd/builder', [SimulationController::class, 'launchUssd'])->name('legacy-launch-ussd');

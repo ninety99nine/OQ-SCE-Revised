@@ -788,13 +788,11 @@ class UssdService
         //  If we are on live mode
         } else {
 
-            $memory_usage = memory_get_peak_usage() / (1024*1024);
-
             //  Restructure the response payload for XML conversion
             $data = [
                 'ussd' => [
                     'type' => $this->response['request_type'],
-                    'msg' => htmlentities($this->response['msg'].': memory = ' . $memory_usage),
+                    'msg' => htmlentities($this->response['msg']),
                 ],
             ];
 
@@ -804,6 +802,10 @@ class UssdService
             //  Set the response headers
             $headers = ['Accept-Charset' => 'utf-8'];
 
+            /**
+             *  Refer to the Laravel XML Support Package:
+             *  https://github.com/mtvbrianking/laravel-xml
+             */
             return response()->xml($data, $status, $headers);
         }
     }
