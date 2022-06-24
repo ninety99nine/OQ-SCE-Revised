@@ -19,7 +19,7 @@ class SessionController extends Controller
         //  Version options
         $versionOptions = $app->versions()->select('id', 'number')->get();
 
-        //  Set the props
+        //  Prepare Response
         $props = array_merge([
             'appPayload' => $app,
             'projectPayload' => $project,
@@ -27,19 +27,22 @@ class SessionController extends Controller
             'versionPayload' => $version->makeHidden('builder'),
         ], $sessionServiceResponse);
 
-        //  Show the user sessions
-        return Inertia::render('Sessions/List', $props);
+        //  Return Response
+        return request()->expectsJson() ? $props : Inertia::render('Sessions/List', $props);
     }
 
     public function show(Project $project, App $app, Version $version, UssdSession $session)
     {
-        //  Show the user sessions
-        return Inertia::render('Sessions/Show', [
+        //  Prepare Response
+        $props = [
             'appPayload' => $app,
             'projectPayload' => $project,
             'sessionPayload' => $session,
             'versionPayload' => $version->makeHidden('builder')
-        ]);
+        ];
+
+        //  Return Response
+        return request()->expectsJson() ? $props : Inertia::render('Sessions/Show', $props);
     }
 
     public function create()

@@ -266,7 +266,7 @@
                  */
                 const axiosSource = axios.CancelToken.source();
 
-                const url = route('launch-ussd');
+                const url = route('launch.ussd.simulation');
                 this.request = { cancel: axiosSource.cancel };
 
                 axios.post(url, this.form, { cancelToken: axiosSource.token })
@@ -371,7 +371,7 @@
             },
             stopApiSimulationRequest() {
 
-                const url = route('stop-ussd', { session: this.form.session_id });
+                const url = route('stop.ussd.simulation', { session: this.form.session_id });
 
                 axios.post(url)
                     .then((response) => {

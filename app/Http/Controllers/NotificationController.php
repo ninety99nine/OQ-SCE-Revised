@@ -13,13 +13,13 @@ class NotificationController extends Controller
 {
     public function index(Project $project, App $app, Version $version)
     {
-        //  Get the notification service response
-        $notificationServiceResponse = (new SessionNotificationService())->getNotifications();
-
         //  Version options
         $versionOptions = $app->versions()->select('id', 'number')->get();
 
-        //  Set the props
+        //  Get the notification service response
+        $notificationServiceResponse = (new SessionNotificationService())->getNotifications();
+
+        //  Prepare Response
         $props = array_merge([
             'appPayload' => $app,
             'projectPayload' => $project,
@@ -27,19 +27,22 @@ class NotificationController extends Controller
             'versionPayload' => $version->makeHidden('builder'),
         ], $notificationServiceResponse);
 
-        //  Show the user notifications
-        return Inertia::render('Notifications/List', $props);
+        //  Return Response
+        return request()->expectsJson() ? $props : Inertia::render('Notifications/List', $props);
     }
 
     public function show(Project $project, App $app, Version $version, SessionNotification $notification)
     {
-        //  Show the user notifications
-        return Inertia::render('Notifications/Show', [
+        //  Prepare Response
+        $props = [
             'appPayload' => $app,
             'projectPayload' => $project,
             'notificationPayload' => $notification,
             'versionPayload' => $version->makeHidden('builder')
-        ]);
+        ];
+
+        //  Return Response
+        return request()->expectsJson() ? $props : Inertia::render('Notifications/Show', $props);
     }
 
     public function create()

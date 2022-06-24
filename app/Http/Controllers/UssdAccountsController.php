@@ -9,6 +9,7 @@ use App\Models\Project;
 use App\Models\UssdAccount;
 use App\Services\Session\SessionService;
 use App\Services\Session\DatabaseEntryService;
+use App\Services\Session\GlobalVariableService;
 use App\Services\Session\SessionNotificationService;
 
 class UssdAccountsController extends Controller
@@ -44,8 +45,8 @@ class UssdAccountsController extends Controller
 
         $accountsPayload = $accounts->search($search)->withCount(['sessions', 'sessionNotifications', 'globalVariables'])->latest()->paginate()->withQueryString();
 
-        //  Show the user accounts
-        return Inertia::render('Accounts/List', [
+        //  Prepare Response
+        $props = [
             'appPayload' => $app,
             'projectPayload' => $project,
             'accountsPayload' => $accountsPayload,
@@ -55,7 +56,11 @@ class UssdAccountsController extends Controller
                 'totalMobileAccounts' => number_format($totalMobileAccounts, 0, '', ','),
                 'totalSimulatorAccounts' => number_format($totalSimulatorAccounts, 0, '', ','),
             ]
-        ]);
+        ];
+
+        //  Return Response
+        return request()->expectsJson() ? $props : Inertia::render('Accounts/List', $props);
+
     }
 
     public function show(Project $project, App $app, Version $version)
@@ -78,12 +83,17 @@ class UssdAccountsController extends Controller
             //  Get the database entries service response
             $serviceResponse = (new DatabaseEntryService())->getDatabaseEntries();
 
+        }else if ( request()->routeIs('account.global.variables.show') ) {
+
+            //  Get the global variables service response
+            $serviceResponse = (new GlobalVariableService())->getGlobalVariables();
+
         }
 
         //  Version options
         $versionOptions = $app->versions()->select('id', 'number')->get();
 
-        //  Set the props
+        //  Prepare Response
         $props = array_merge([
             'appPayload' => $app,
             'projectPayload' => $project,
@@ -92,8 +102,9 @@ class UssdAccountsController extends Controller
             'versionPayload' => $version->makeHidden('builder'),
         ], $serviceResponse);
 
-        //  Show the user accounts
-        return Inertia::render('Accounts/Show', $props);
+        //  Return Response
+        return request()->expectsJson() ? $props : Inertia::render('Accounts/Show', $props);
+
     }
 
     public function create()

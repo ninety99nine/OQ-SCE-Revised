@@ -18,7 +18,7 @@
         <div :class="{ 'p-8 bg-white rounded-md shadow-md hover:shadow-lg' : showingOnMainMenu }">
 
             <!-- App Header -->
-            <Header />
+            <Header v-model:prettifyJson="prettifyJson" @response="databaseEntriesPayload = $event.databaseEntriesPayload" />
 
             <div class="shadow-md">
 
@@ -29,8 +29,7 @@
                             <!-- Table Header Columns Names -->
                             <th v-for="(header, index) in headers" :key="index" scope="col"
                                 :class="['px-6 py-3',
-                                    { 'whitespace-nowrap text-right' : header == 'Created Date' },
-                                    { 'text-center' : (header == 'Interactions') }
+                                    { 'whitespace-nowrap text-right' : header == 'Created Date' }
                                 ]">
                                 <span>{{ header }}</span>
                             </th>
@@ -40,7 +39,7 @@
                     <!-- Table Body -->
                     <tbody>
 
-                        <TableRow v-for="databaseEntry in databaseEntriesPayload.data" :key="databaseEntry.id" :databaseEntry="databaseEntry" :headers="headers"></TableRow>
+                        <TableRow v-for="databaseEntry in databaseEntriesPayload.data" :key="databaseEntry.id" :databaseEntry="databaseEntry" :headers="headers" :prettifyJson="prettifyJson"></TableRow>
 
                     </tbody>
 
@@ -77,6 +76,7 @@
         components: { Head, TableRow, Header, BackButton, DefaultPagination },
         data() {
             return {
+                prettifyJson: true,
                 headers: this.getHeaders(),
                 appPayload: this.$page.props.appPayload,
                 versionPayload: this.$page.props.versionPayload,
@@ -98,7 +98,7 @@
                 //  If the database entries are viewed from the account menu, then we need to show the following
                 var headers = ['Name', 'Metadata', 'Created Date'];
 
-                if( this.showingOnMainMenu ) {
+                if( this.checkIfShowingOnMainMenu() ) {
 
                     //  If the database entries are viewed from the database entries menu, then we need to add the following
                     headers.unshift('Number');

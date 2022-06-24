@@ -13,7 +13,7 @@
         </td>
 
         <!-- Metadata -->
-        <td v-if="headers.includes('Metadata')" scope="row" class="px-6 py-4 text-xs">
+        <td v-if="headers.includes('Metadata')" scope="row" :class="['px-6 py-4 text-xs', { 'whitespace-pre-wrap' : prettifyJson }]">
             <span>{{ databaseEntry.metadata }}</span>
         </td>
 
@@ -33,6 +33,7 @@
     export default {
         props: {
             headers: Array,
+            prettifyJson: Boolean,
             databaseEntry: Object,
         },
         data() {

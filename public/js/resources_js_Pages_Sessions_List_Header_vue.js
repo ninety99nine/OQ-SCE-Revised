@@ -11,15 +11,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _components_Select_DefaultSelect__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @components/Select/DefaultSelect */ "./resources/js/Components/Select/DefaultSelect.vue");
-/* harmony import */ var _components_SearchBar_DefaultSearchBar__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @components/SearchBar/DefaultSearchBar */ "./resources/js/Components/SearchBar/DefaultSearchBar.vue");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _components_Select_DefaultSelect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @components/Select/DefaultSelect */ "./resources/js/Components/Select/DefaultSelect.vue");
+/* harmony import */ var _components_SearchBar_DefaultSearchBar__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @components/SearchBar/DefaultSearchBar */ "./resources/js/Components/SearchBar/DefaultSearchBar.vue");
+
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: ['showingOnMainMenu'],
   components: {
-    DefaultSelect: _components_Select_DefaultSelect__WEBPACK_IMPORTED_MODULE_0__["default"],
-    DefaultSearchBar: _components_SearchBar_DefaultSearchBar__WEBPACK_IMPORTED_MODULE_1__["default"]
+    DefaultSelect: _components_Select_DefaultSelect__WEBPACK_IMPORTED_MODULE_1__["default"],
+    DefaultSearchBar: _components_SearchBar_DefaultSearchBar__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
     var _this$route$params$or, _this$route$params$re, _this$route$params$st;
@@ -85,6 +88,8 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     refreshContent: function refreshContent() {
+      var _this = this;
+
       var url;
 
       if (route().current() === 'sessions.show') {
@@ -108,12 +113,9 @@ __webpack_require__.r(__webpack_exports__);
         search: this.search,
         requestType: this.requestType
       };
-      var options = {
-        preserveScroll: true,
-        preserveState: true,
-        replace: true
-      };
-      this.$inertia.get(url, data, options);
+      axios__WEBPACK_IMPORTED_MODULE_0___default().get(url, data).then(function (response) {
+        _this.$emit('response', response.data);
+      })["catch"](function (error) {})["finally"](function () {});
     },
     cleanUp: function cleanUp() {
       clearInterval(this.refreshContentInterval);

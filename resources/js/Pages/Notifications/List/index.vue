@@ -18,7 +18,7 @@
         <div :class="{ 'p-8 bg-white rounded-md shadow-md hover:shadow-lg' : showingOnMainMenu }">
 
             <!-- App Header -->
-            <Header />
+            <Header @response="notificationsPayload = $event.notificationsPayload" />
 
             <div class="shadow-md">
 
@@ -29,8 +29,7 @@
                             <!-- Table Header Columns Names -->
                             <th v-for="(header, index) in headers" :key="index" scope="col"
                                 :class="['px-6 py-3',
-                                    { 'whitespace-nowrap text-right' : header == 'Created Date' },
-                                    { 'text-center' : (header == 'Interactions') }
+                                    { 'whitespace-nowrap text-right' : header == 'Created Date' }
                                 ]">
                                 <span>{{ header }}</span>
                             </th>
@@ -98,7 +97,7 @@
                 //  If the notifications are viewed from the account menu, then we need to show the following
                 var headers = ['Message', 'Created Date'];
 
-                if( this.showingOnMainMenu ) {
+                if( this.checkIfShowingOnMainMenu() ) {
 
                     //  If the notifications are viewed from the notifications menu, then we need to add the following
                     headers.unshift('Number');

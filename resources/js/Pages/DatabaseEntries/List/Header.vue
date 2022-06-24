@@ -20,17 +20,26 @@
 
         </div>
 
+        <div class="flex justify-center bg-blue-50 p-2">
+
+            <DefaultCheckbox v-model="prettifyJson" @onChange="$emit('update:prettifyJson', $event)" label="Prettify Metadata"></DefaultCheckbox>
+
+        </div>
+
     </div>
 
 </template>
 
 <script>
 
+    import axios from 'axios';
     import DefaultSelect from "@components/Select/DefaultSelect";
+    import DefaultCheckbox from "@components/Checkbox/DefaultCheckbox";
     import DefaultSearchBar from "@components/SearchBar/DefaultSearchBar";
 
     export default {
-        components: { DefaultSelect, DefaultSearchBar },
+        props: ['prettifyJson'],
+        components: { DefaultCheckbox, DefaultSelect, DefaultSearchBar },
         data() {
             return {
                 totalDatabaseEntries: this.$page.props.statistics.totalDatabaseEntries,
@@ -75,13 +84,15 @@
                     search: this.search
                  };
 
-                const options = {
-                    preserveScroll: true,
-                    preserveState: true,
-                    replace: true
-                };
+                axios.get(url, data).then((response) => {
 
-                this.$inertia.get(url, data, options);
+                    this.$emit('response', response.data);
+
+                }).catch((error) => {
+
+                }).finally(() => {
+
+                });
 
             },
             cleanUp() {

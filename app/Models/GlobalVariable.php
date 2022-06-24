@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class GlobalVariable extends Model
 {
     use HasFactory;
+
+    protected $with = ['account'];
 
     /**
      * The table associated with the model.
@@ -34,5 +37,23 @@ class GlobalVariable extends Model
         /*  Ownership Information  */
         'app_id', 'version_id'
     ];
+
+    /**
+     *  Scope: Search by name
+     */
+    public function scopeSearch($query, $search)
+    {
+        return empty($search) ? $query : $query->whereHas('account', function (Builder $query) use ($search) {
+            $query->search($search);
+        });
+    }
+
+    /*
+     *  Returns ussd account
+     */
+    public function account()
+    {
+        return $this->belongsTo(UssdAccount::class, 'ussd_account_id');
+    }
 
 }

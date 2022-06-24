@@ -1,14 +1,17 @@
 <?php
 
+use App\Http\Controllers\DatabaseEntryController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\UssdAccountsController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\SimulationController;
 use App\Http\Controllers\VersionController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\AppController;
+use App\Http\Controllers\GlobalVariableController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -99,6 +102,7 @@ Route::middleware(['auth'])->group(function () {
                                         Route::get('/sessions', 'show')->name('sessions.show');
                                         Route::get('/notifications', 'show')->name('notifications.show');
                                         Route::get('/database-entries', 'show')->name('database.entries.show');
+                                        Route::get('/global-variables', 'show')->name('global.variables.show');
                                         Route::delete('/', 'delete')->name('delete');
                                     });
 
@@ -136,6 +140,38 @@ Route::middleware(['auth'])->group(function () {
 
                                 });
 
+                                //  Database Entries
+                                Route::controller(DatabaseEntryController::class)
+                                    ->prefix('database-entries')
+                                    ->group(function () {
+
+                                    Route::get('/', 'index')->name('database.entries.show');
+
+                                    Route::prefix('/{database_entry}')->name('database-entry.')->group(function () {
+
+                                        Route::get('/', 'show')->name('show');
+                                        Route::delete('/', 'delete')->name('delete');
+
+                                    });
+
+                                });
+
+                                //  Global Variables
+                                Route::controller(GlobalVariableController::class)
+                                    ->prefix('global-variables')
+                                    ->group(function () {
+
+                                    Route::get('/', 'index')->name('global.variables.show');
+
+                                    Route::prefix('/{global_variable}')->name('global.variable.')->group(function () {
+
+                                        Route::get('/', 'show')->name('show');
+                                        Route::delete('/', 'delete')->name('delete');
+
+                                    });
+
+                                });
+
                             });
 
                         });
@@ -147,5 +183,11 @@ Route::middleware(['auth'])->group(function () {
             });
 
         });
+
+    /**
+     *  The below routes are used by the USSD Simulator (Test sessions)
+     */
+    Route::post('/launch/ussd/simulation', [SimulationController::class, 'launchUssd'])->name('launch.ussd.simulation');
+    Route::post('/{session}/stop/ussd/simulation', [SimulationController::class, 'stopUssd'])->name('stop.ussd.simulation');
 
 });

@@ -25,12 +25,12 @@
                 </Link>
             </li>
             <li :class="[selectedDatabaseEntriesMenu ? 'border-blue-500' : 'border-transparent', 'border-b-2 hover:border-blue-500 hover:bg-blue-50 active:bg-blue-100 text-blue-500']">
-                <Link :href="route('version.show', { project: projectId, app: appId, version: versionId })" class="inline-flex items-center text-sm pt-4 pb-4 pr-4 px-4 cursor-pointer">
+                <Link :href="route('database.entries.show', { project: projectId, app: appId, version: versionId })" class="inline-flex items-center text-sm pt-4 pb-4 pr-4 px-4 cursor-pointer">
                     <span>Database Entries</span>
                 </Link>
             </li>
             <li :class="[selectedGlobalVariablesMenu ? 'border-blue-500' : 'border-transparent', 'border-b-2 hover:border-blue-500 hover:bg-blue-50 active:bg-blue-100 text-blue-500']">
-                <Link :href="route('version.show', { project: projectId, app: appId, version: versionId })" class="inline-flex items-center text-sm pt-4 pb-4 pr-4 px-4 cursor-pointer">
+                <Link :href="route('global.variables.show', { project: projectId, app: appId, version: versionId })" class="inline-flex items-center text-sm pt-4 pb-4 pr-4 px-4 cursor-pointer">
                     <span>Global Variables</span>
                 </Link>
             </li>
@@ -125,7 +125,8 @@
                        route().current('database.entry.show', { project: this.projectId, app: this.appId, version: this.versionId });
             },
             checkIfSelectedGlobalVariablesMenu() {
-                return false;
+                return route().current('global.variables.show', { project: this.projectId, app: this.appId, version: this.versionId }) ||
+                       route().current('global.variable.show', { project: this.projectId, app: this.appId, version: this.versionId });
             }
         },
         created() {

@@ -45,10 +45,10 @@
     import AccountDetails from "./Details";
     import { Head } from '@inertiajs/inertia-vue3';
     import AccountSessions from '@pages/Sessions/List';
-    import AccountGlobalVariables from "./GlobalVariables";
     import DefaultTabs from '@components/Tabs/DefaultTabs';
     import AccountNotifications from '@pages/Notifications/List';
     import AccountDatabaseEntries from '@pages/DatabaseEntries/List';
+    import AccountGlobalVariables from '@pages/GlobalVariables/List';
 
     export default {
         props: {

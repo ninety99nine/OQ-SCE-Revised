@@ -14,7 +14,7 @@
         <div class="p-8 bg-white rounded-md shadow-md hover:shadow-lg">
 
             <!-- App Header -->
-            <Header />
+            <Header @response="accountsPayload = $event.accountsPayload" />
 
             <div class="shadow-md">
 
@@ -78,6 +78,7 @@
         components: { Head, TableRow, Header, BackButton, DefaultPagination },
         data() {
             return {
+                response: null,
                 headers: ['Number', 'Origin', 'Sessions', 'Notifications', 'Global Variables', 'Created Date']
             }
         }

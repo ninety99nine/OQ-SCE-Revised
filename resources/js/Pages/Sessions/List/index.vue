@@ -18,7 +18,7 @@
         <div :class="{ 'p-8 bg-white rounded-md shadow-md hover:shadow-lg' : showingOnMainMenu }">
 
             <!-- App Header -->
-            <Header :showingOnMainMenu="showingOnMainMenu" />
+            <Header :showingOnMainMenu="showingOnMainMenu" @response="sessionsPayload = $event.sessionsPayload" />
 
             <div class="shadow-md">
 
@@ -98,7 +98,7 @@
                 //  If the sessions are viewed from the account menu, then we need to show the following
                 var headers = ['Request', 'Status', 'Interactions', 'Duration', 'Created Date'];
 
-                if( this.showingOnMainMenu ) {
+                if( this.checkIfShowingOnMainMenu() ) {
 
                     //  If the sessions are viewed from the sessions menu, then we need to add the following
                     headers.unshift('MSISDN', 'Origin');

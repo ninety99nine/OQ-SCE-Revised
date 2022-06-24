@@ -48,6 +48,7 @@
 
 <script>
 
+    import axios from 'axios';
     import DefaultSelect from "@components/Select/DefaultSelect";
     import DefaultSearchBar from "@components/SearchBar/DefaultSearchBar";
 
@@ -169,13 +170,15 @@
 
                  };
 
-                const options = {
-                    preserveScroll: true,
-                    preserveState: true,
-                    replace: true
-                };
+                axios.get(url, data).then((response) => {
 
-                this.$inertia.get(url, data, options);
+                    this.$emit('response', response.data);
+
+                }).catch((error) => {
+
+                }).finally(() => {
+
+                });
 
             },
             cleanUp() {

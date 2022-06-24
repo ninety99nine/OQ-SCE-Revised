@@ -34,6 +34,7 @@
 
 <script>
 
+    import axios from 'axios';
     import DefaultSelect from "@components/Select/DefaultSelect";
     import DefaultSearchBar from "@components/SearchBar/DefaultSearchBar";
 
@@ -66,7 +67,11 @@
                 ],
 
                 search: this.route().params.search,
-                refreshContentInterval: null
+                refreshContentInterval: null,
+
+                appId: this.route().params.app,
+                projectId: this.route().params.project,
+                versionId: this.route().params.version,
             }
         },
         methods: {
@@ -81,15 +86,17 @@
                 const data = {
                     origin: this.origin,
                     search: this.search
-                 };
-
-                const options = {
-                    preserveScroll: true,
-                    preserveState: true,
-                    replace: true
                 };
 
-                this.$inertia.get(url, data, options);
+                axios.get(url, data).then((response) => {
+
+                    this.$emit('response', response.data);
+
+                }).catch((error) => {
+
+                }).finally(() => {
+
+                });
 
             },
             cleanUp() {

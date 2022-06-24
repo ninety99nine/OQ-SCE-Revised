@@ -174,7 +174,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
        */
 
       var axiosSource = axios__WEBPACK_IMPORTED_MODULE_0___default().CancelToken.source();
-      var url = route('launch-ussd');
+      var url = route('launch.ussd.simulation');
       this.request = {
         cancel: axiosSource.cancel
       };
@@ -256,7 +256,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     stopApiSimulationRequest: function stopApiSimulationRequest() {
       var _this2 = this;
 
-      var url = route('stop-ussd', {
+      var url = route('stop.ussd.simulation', {
         session: this.form.session_id
       });
       axios__WEBPACK_IMPORTED_MODULE_0___default().post(url).then(function (response) {})["catch"](function (error) {
