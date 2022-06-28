@@ -61,12 +61,27 @@ __webpack_require__.r(__webpack_exports__);
   components: {
     Link: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_0__.Link
   },
-  computed: {
-    showingSignInPage: function showingSignInPage() {
-      return true;
+  data: function data() {
+    return {
+      showingLogin: this.checkIfShowingSignIn(),
+      showingRegister: this.checkIfShowingSignUp()
+    };
+  },
+  watch: {
+    /**
+     *  Watch for changes on the page url
+     */
+    '$page.url': function $pageUrl(newUrl, oldUrl) {
+      this.showingLogin = this.checkIfShowingSignIn();
+      this.showingRegister = this.checkIfShowingSignUp();
+    }
+  },
+  methods: {
+    checkIfShowingSignIn: function checkIfShowingSignIn() {
+      return route().current('login.show');
     },
-    showingSignUpPage: function showingSignUpPage() {
-      return false;
+    checkIfShowingSignUp: function checkIfShowingSignUp() {
+      return route().current('register.show');
     }
   }
 });
@@ -84,22 +99,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @inertiajs/inertia-vue3 */ "./node_modules/@inertiajs/inertia-vue3/dist/index.js");
-/* harmony import */ var _components_Input_DefaultInput__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @components/Input/DefaultInput */ "./resources/js/Components/Input/DefaultInput.vue");
-/* harmony import */ var _components_Loader_LoaderOverlay__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @components/Loader/LoaderOverlay */ "./resources/js/Components/Loader/LoaderOverlay.vue");
-/* harmony import */ var _components_Button_PrimaryButton__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @components/Button/PrimaryButton */ "./resources/js/Components/Button/PrimaryButton.vue");
-/* harmony import */ var _Layouts_GuestDashboard_GuestDashboardLayout_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../Layouts/GuestDashboard/GuestDashboardLayout.vue */ "./resources/js/Layouts/GuestDashboard/GuestDashboardLayout.vue");
+/* harmony import */ var _components_Logo_Logo__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @components/Logo/Logo */ "./resources/js/Components/Logo/Logo.vue");
+/* harmony import */ var _components_Input_DefaultInput__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @components/Input/DefaultInput */ "./resources/js/Components/Input/DefaultInput.vue");
+/* harmony import */ var _components_Loader_LoaderOverlay__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @components/Loader/LoaderOverlay */ "./resources/js/Components/Loader/LoaderOverlay.vue");
+/* harmony import */ var _components_Button_PrimaryButton__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @components/Button/PrimaryButton */ "./resources/js/Components/Button/PrimaryButton.vue");
+/* harmony import */ var _Layouts_GuestDashboard_GuestDashboardLayout_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../Layouts/GuestDashboard/GuestDashboardLayout.vue */ "./resources/js/Layouts/GuestDashboard/GuestDashboardLayout.vue");
+
 
 
 
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  layout: _Layouts_GuestDashboard_GuestDashboardLayout_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
+  layout: _Layouts_GuestDashboard_GuestDashboardLayout_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
   components: {
     Head: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_0__.Head,
-    DefaultInput: _components_Input_DefaultInput__WEBPACK_IMPORTED_MODULE_1__["default"],
-    LoaderOverlay: _components_Loader_LoaderOverlay__WEBPACK_IMPORTED_MODULE_2__["default"],
-    PrimaryButton: _components_Button_PrimaryButton__WEBPACK_IMPORTED_MODULE_3__["default"]
+    Logo: _components_Logo_Logo__WEBPACK_IMPORTED_MODULE_1__["default"],
+    DefaultInput: _components_Input_DefaultInput__WEBPACK_IMPORTED_MODULE_2__["default"],
+    LoaderOverlay: _components_Loader_LoaderOverlay__WEBPACK_IMPORTED_MODULE_3__["default"],
+    PrimaryButton: _components_Button_PrimaryButton__WEBPACK_IMPORTED_MODULE_4__["default"]
   },
   data: function data() {
     return {
@@ -221,7 +239,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("nav", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ol", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([{
-      'border-blue-500 bg-blue-50': $options.showingSignInPage
+      'border-blue-500 bg-blue-50': $data.showingLogin
     }, "border-b-2 border-transparent hover:border-blue-500 hover:bg-blue-50 active:bg-blue-100 text-blue-500"])
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Link, {
     href: _ctx.route('login.show'),
@@ -239,7 +257,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* CLASS */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([{
-      'border-blue-500 bg-blue-50': $options.showingSignUpPage
+      'border-blue-500 bg-blue-50': $data.showingRegister
     }, "border-b-2 border-transparent hover:border-blue-500 hover:bg-blue-50 active:bg-blue-100 text-blue-500"])
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Link, {
     href: _ctx.route('register.show'),
@@ -276,26 +294,31 @@ var _hoisted_1 = {
   "class": "flex flex-row h-screen justify-center items-center"
 };
 var _hoisted_2 = {
-  "class": "w-1/3 p-5 bg-white rounded-md shadow-md hover:shadow-lg -mt-20"
+  "class": "w-1/3 -mt-40 -mb-20"
+};
+var _hoisted_3 = {
+  "class": "p-5 bg-white rounded-md shadow-md hover:shadow-lg"
 };
 
-var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
+var _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
   "class": "text-xl font-medium text-gray-900 border-b pb-5 mb-5"
 }, "Sign Up", -1
 /* HOISTED */
 );
 
-var _hoisted_4 = {
+var _hoisted_5 = {
   "class": "relative mb-5"
 };
-var _hoisted_5 = {
+var _hoisted_6 = {
   "class": "flex justify-end"
 };
 
-var _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Sign Up ");
+var _hoisted_7 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Sign Up ");
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Head = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Head");
+
+  var _component_Logo = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Logo");
 
   var _component_LoaderOverlay = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("LoaderOverlay");
 
@@ -305,7 +328,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Head, {
     title: "Sign Up"
-  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Title "), _hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Loading overlay "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_LoaderOverlay, {
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Logo, {
+    "class": "m-auto mb-10",
+    width: "w-32"
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Title "), _hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Loading overlay "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_LoaderOverlay, {
     show: $data.form.processing
   }, null, 8
   /* PROPS */
@@ -351,21 +377,21 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, ["enter"]))
   }, null, 8
   /* PROPS */
-  , ["modelValue", "disabled", "error"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_PrimaryButton, {
+  , ["modelValue", "disabled", "error"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_PrimaryButton, {
     disabled: $data.form.processing,
     onClick: _cache[6] || (_cache[6] = function ($event) {
       return $options.register();
     })
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_6];
+      return [_hoisted_7];
     }),
     _: 1
     /* STABLE */
 
   }, 8
   /* PROPS */
-  , ["disabled"])])])])], 64
+  , ["disabled"])])])])])], 64
   /* STABLE_FRAGMENT */
   );
 }

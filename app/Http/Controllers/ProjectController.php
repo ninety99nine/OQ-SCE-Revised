@@ -40,16 +40,22 @@ class ProjectController extends Controller
         $search = request()->input('search');
 
         //  Get the user project apps
-        $appsPayload = $project->apps()->withCount('versions')->with(['shortCode', 'activeVersion', 'versions' => function($query) {
-            $query->select('id', 'app_id', 'number');
-        }])->search($search)->latest()->paginate(6)->withQueryString();
+        $appsPayload = $project->apps()->withCount('versions')->with([
+            'shortCode',
+            'versions' => function($query) {
+                $query->select('id', 'app_id', 'number');
+            },
+            'activeVersion' => function($query) {
+                $query->select('id', 'app_id', 'number', 'features');
+            },
+        ])->search($search)->latest()->paginate(6)->withQueryString();
 
         //  Get the shared shortcodes
-        $sharedShortCodeOptions = SharedShortCode::all();
+        $sharedShortCodesPayload = SharedShortCode::all();
 
         //  Show the user projects
         return Inertia::render('Projects/Show', [
-            'sharedShortCodes' => $sharedShortCodeOptions,
+            'sharedShortCodesPayload' => $sharedShortCodesPayload,
             'projectPayload' => $project,
             'appsPayload' => $appsPayload,
         ]);

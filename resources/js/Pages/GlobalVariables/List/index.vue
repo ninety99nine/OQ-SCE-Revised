@@ -18,7 +18,7 @@
         <div :class="{ 'p-8 bg-white rounded-md shadow-md hover:shadow-lg' : showingOnMainMenu }">
 
             <!-- App Header -->
-            <Header v-model:prettifyJson="prettifyJson" @response="globalVariablesPayload = $event.globalVariablesPayload" />
+            <Header v-model:prettifyJson="prettifyJson" @response="globalVariablesPayload = $event.globalVariablesPayload" @isLoading="isLoading = $event" />
 
             <div class="shadow-md">
 
@@ -37,18 +37,24 @@
                     </thead>
 
                     <!-- Table Body -->
-                    <tbody>
+                    <tbody class="relative">
 
+                        <!-- Loading overlay -->
+                        <LoaderOverlay :show="isLoading" />
+
+                        <!-- Global Variable -->
                         <TableRow v-for="globalVariable in globalVariablesPayload.data" :key="globalVariable.id" :globalVariable="globalVariable" :headers="headers" :prettifyJson="prettifyJson"></TableRow>
+
+                        <!-- No Global Variables -->
+                        <tr v-if="globalVariablesPayload.data.length == false">
+                            <td colspan="3" class="bg-gray-50 p-8">
+                                <span class="text-gray-500 text-xs">No Global Variables</span>
+                            </td>
+                        </tr>
 
                     </tbody>
 
                 </table>
-
-
-                <div v-if="globalVariablesPayload.data.length == false" class="flex items-center bg-gray-50 p-8">
-                    <span class="text-gray-500 text-xs">No Global Variables</span>
-                </div>
 
             </div>
 
@@ -71,12 +77,14 @@
     import TableRow from './TableRow';
     import BackButton from "./BackButton";
     import { Head } from '@inertiajs/inertia-vue3';
+    import LoaderOverlay from "@components/Loader/LoaderOverlay";
     import DefaultPagination from "@components/Pagination/DefaultPagination";
 
     export default {
-        components: { Head, TableRow, Header, BackButton, DefaultPagination },
+        components: { Head, TableRow, Header, BackButton, LoaderOverlay, DefaultPagination },
         data() {
             return {
+                isLoading: false,
                 prettifyJson: true,
                 headers: this.getHeaders(),
                 appPayload: this.$page.props.appPayload,

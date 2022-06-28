@@ -4,8 +4,13 @@
 
         <!-- Navigation Breadcrubs -->
         <ol class="inline-flex items-center">
-            <li class="border-b-2 border-transparent hover:border-blue-500 hover:bg-blue-50 active:bg-blue-100 text-blue-500 inline-flex items-center">
-                <Link :href="route('projects.show')" class="inline-flex items-center text-sm pt-4 pb-4 pr-4 px-2 cursor-pointer">
+            <li>
+                <Link :href="route('projects.show')" class="block py-3 mx-6 cursor-pointer">
+                    <Logo />
+                </Link>
+            </li>
+            <li v-if="projectId" class="border-b-2 border-transparent hover:border-blue-500 hover:bg-blue-50 active:bg-blue-100 text-blue-500 inline-flex items-center">
+                <Link :href="route('projects.show')" class="inline-flex items-center text-sm py-4 pr-4 px-2 cursor-pointer">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                     </svg>
@@ -13,19 +18,19 @@
                 </Link>
             </li>
             <li v-if="projectId" class="border-b-2 border-transparent hover:border-blue-500 hover:bg-blue-50 active:bg-blue-100 text-blue-500">
-                <Link :href="route('project.show', { project: projectId })" class="flex items-center text-sm pt-4 pb-4 pr-4 px-2 cursor-pointer">
+                <Link :href="route('project.show', { project: projectId })" class="flex items-center text-sm py-4 pr-4 px-2 cursor-pointer">
                     <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
                     <span>{{ project.name }}</span>
                 </Link>
             </li>
             <li v-if="appId" class="border-b-2 border-transparent hover:border-blue-500 hover:bg-blue-50 active:bg-blue-100 text-blue-500">
-                <Link :href="route('app.show', { project: projectId, app: appId })" class="flex items-center text-sm pt-4 pb-4 pr-4 px-2 cursor-pointer">
+                <Link :href="route('app.show', { project: projectId, app: appId })" class="flex items-center text-sm py-4 pr-4 px-2 cursor-pointer">
                     <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
                     <span>{{ app.name }}</span>
                 </Link>
             </li>
             <li v-if="versionId" class="border-b-2 border-transparent hover:border-blue-500 hover:bg-blue-50 active:bg-blue-100 text-blue-500">
-                <Link :href="route('version.show', { project: projectId, app: appId, version: versionId })" class="flex items-center text-sm pt-4 pb-4 pr-4 px-2 cursor-pointer">
+                <Link :href="route('version.show', { project: projectId, app: appId, version: versionId })" class="flex items-center text-sm py-4 pr-4 px-2 cursor-pointer">
                     <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
                     <span>Version {{ version.number }}</span>
                 </Link>
@@ -57,13 +62,14 @@
 
 <script>
 
+    import Logo from "@components/Logo/Logo";
     import { Link } from "@inertiajs/inertia-vue3";
-    import { useForm } from '@inertiajs/inertia-vue3'
+    import { useForm } from '@inertiajs/inertia-vue3';
     import DefaultButton from "@components/Button/DefaultButton";
     import CreateProjectModal from "./../../../Pages/Projects/Create/CreateProjectModal";
 
     export default {
-        components: { Link, useForm, DefaultButton, CreateProjectModal },
+        components: { Link, Logo, useForm, DefaultButton, CreateProjectModal },
         data() {
             return {
                 form: useForm({

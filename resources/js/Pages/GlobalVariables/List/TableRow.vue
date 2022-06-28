@@ -14,7 +14,7 @@
 
         <!-- Created Date -->
         <td v-if="headers.includes('Created Date')" scope="row" class="px-6 py-4 text-xs text-gray-500 text-right">
-            <span>{{ prettifyJson }}</span>
+            <span>{{ moment(globalVariable.created_at).fromNow() }}</span>
         </td>
 
     </tr>

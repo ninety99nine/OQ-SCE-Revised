@@ -2,8 +2,8 @@
 
     <!-- Create App Modal -->
     <DefaultModal defaultText="Cancel"
-        @open="$emit('open')"
-        @close="$emit('close')"
+        @open="isOpen = true; $emit('open')"
+        @close="isOpen = false; $emit('close')"
         :defaultAction="cancelCreateApp" :isLoading="form.processing"
         :dangerText="mode == 'Delete' ? mode + ' App' : ''" :dangerAction="handleAction"
         :primaryText="['Create', 'Update'].includes(mode) ? (mode == 'Create' ? mode + ' App' : 'Save Changes') : ''" :primaryAction="handleAction">
@@ -12,7 +12,7 @@
         <template v-slot:title>{{ mode }} App</template>
 
         <!-- Create App Content (Modal Content) -->
-        <CreateOrUpdateAppForm :form="form" :app="app" :mode="mode" :sharedShortCodes="sharedShortCodes" />
+        <CreateOrUpdateAppForm :form="form" :app="app" :mode="mode" />
 
         <!-- Create App Button (Modal Trigger) -->
         <template v-slot:trigger>
@@ -87,12 +87,19 @@
             showButton: {
                 type: Boolean,
                 default: true
-            },
-            sharedShortCodes: Array
+            }
         },
         data() {
             return {
-                form: this.getForm()
+                form: this.getForm(),
+                isOpen: false
+            }
+        },
+        watch: {
+            app(newValue, oldValue) {
+                if( this.isOpen == false ) {
+                    this.form = this.getForm();
+                }
             }
         },
         methods: {
@@ -107,6 +114,15 @@
                         description: this.app.description,
                         offline_message: this.app.offline_message,
                         active_version_id: this.app.active_version_id,
+
+                        //  Indicate the shared shortcode
+                        shared_code: this.app.short_code.shared_code,
+
+                        //  Indicate the dedicated shortcode
+                        overide_dedicated_code: false,
+                        dedicated_code: this.app.short_code.dedicated_code,
+
+                        shared_short_code_id: this.app.short_code.shared_short_code_id,
 
                         //  Indicate that we should return to the project view
                         destination: 'project.show'
@@ -127,7 +143,7 @@
                         online: true,
                         description: '',
                         offline_message: 'This service is currently not available',
-                        shared_short_code: this.sharedShortCodes[0].code
+                        shared_short_code_id: this.$page.props.sharedShortCodesPayload[0].id
                     });
 
                 }else{

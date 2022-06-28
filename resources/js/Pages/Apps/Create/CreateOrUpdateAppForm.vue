@@ -16,19 +16,21 @@
             <span class="text-xs text-gray-400 ml-2"> &#8212; Your app is {{ form.online ? 'online' : 'offline' }}</span>
         </DefaultSwitch>
         <DefaultTextArea v-if="!form.online" v-model="form.offline_message" label="Offline Message" placeholder="This service is currently not available" :disabled="form.processing" :error="form.errors.offline_message" class="mb-4"></DefaultTextArea>
-    </template>
 
-    <!-- Create -->
-    <template v-if="mode == 'Create'">
-
-        <DefaultSelect v-model="form.shared_short_code" :options="sharedShortCodeOptions" label="Shared Short Code" placeholder="Select a shared shortcode" :disabled="form.processing" :error="form.errors.shared_short_code" class="mb-6"></DefaultSelect>
-
+        <div class="flex items-center justify-between mb-6">
+            <DefaultSelect v-model="form.shared_short_code_id" :options="sharedShortCodeOptions" label="Shared Short Code" placeholder="Select a shared shortcode" :disabled="form.processing" :error="form.errors.shared_short_code_id" class="w-60"></DefaultSelect>
+            <PrimaryBadge class="mt-4">{{ form.shared_code }}</PrimaryBadge>
+        </div>
     </template>
 
     <!-- Update -->
     <template v-if="mode == 'Update'">
 
-        <DefaultSelect v-model="form.active_version_id" :options="selectableVersionOptions" label="Active version" placeholder="Select a version" :disabled="form.processing" :error="form.errors.active_version_id" class="mb-6"></DefaultSelect>
+        <DefaultSelect v-model="form.active_version_id" :options="versionOptions" label="Active version" placeholder="Select a version" :disabled="form.processing" :error="form.errors.active_version_id" class="mb-6"></DefaultSelect>
+
+        <DefaultInput v-model="form.dedicated_code" label="Dedicated Code" placeholder="*123#" :disabled="form.processing" :error="form.errors.dedicated_code" class="mb-6"></DefaultInput>
+
+        <DefaultCheckbox v-if="form.errors.dedicated_code == 'The dedicated code is already used by another app. Do you want to reassign the shortcode?'" v-model="form.overide_dedicated_code" label="Reassign dedicated code to this app" :disabled="form.processing" :error="form.errors.overide_dedicated_code" class="mb-6"></DefaultCheckbox>
 
     </template>
 
@@ -36,43 +38,33 @@
 
 <script>
     import DefaultInput from "@components/Input/DefaultInput";
+    import PrimaryBadge from "@components/Badges/PrimaryBadge";
     import DefaultSelect from "@components/Select/DefaultSelect";
-    import DefaultSwitch from "@components/Switch/DefaultSwitch.vue";
-    import DefaultTextArea from "@components/TextArea/DefaultTextArea.vue";
+    import DefaultSwitch from "@components/Switch/DefaultSwitch";
+    import DefaultCheckbox from "@components/Checkbox/DefaultCheckbox";
+    import DefaultTextArea from "@components/TextArea/DefaultTextArea";
 
     export default {
-        components: { DefaultInput, DefaultSelect, DefaultSwitch, DefaultTextArea },
+        components: { DefaultInput, PrimaryBadge, DefaultSelect, DefaultSwitch, DefaultCheckbox, DefaultTextArea, PrimaryBadge },
         props: {
             form: Object,
             mode: String,
             app: {
                 type: Object,
                 default: null
-            },
-            versionOptions: {
-                type: Array,
-                default: () => {
-                    return [];
-                }
-            },
-            sharedShortCodes: {
-                type: Array,
-                default: () => {
-                    return [];
-                }
-            },
+            }
         },
         computed: {
             sharedShortCodeOptions() {
-                return this.sharedShortCodes.map((option) => {
+                return this.$page.props.sharedShortCodesPayload.map((option) => {
                     return {
                         label: option.code,
-                        value: option.code
+                        value: option.id
                     }
                 });
             },
-            selectableVersionOptions() {
-                let options = (this.app || {}).versions ? this.app.versions : this.versionOptions;
+            versionOptions() {
+                let options = (this.app || {}).versions ? this.app.versions : this.$page.props.versionsPayload;
 
                 return options.map((option) => {
                     return {

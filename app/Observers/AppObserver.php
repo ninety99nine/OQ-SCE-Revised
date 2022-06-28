@@ -3,9 +3,22 @@
 namespace App\Observers;
 
 use App\Models\App;
+use App\Models\ShortCode;
 
 class AppObserver
 {
+    public function creating(App $app)
+    {
+        //  Generate a confirmation code
+        $app->confirmation_code = $app->generateConfirmationCode();
+    }
+
+    public function saving(App $app)
+    {
+        //  Generate a confirmation code
+        $app->confirmation_code = $app->generateConfirmationCode();
+    }
+
     public function created(App $app)
     {
         //  Re-Cache this app

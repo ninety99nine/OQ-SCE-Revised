@@ -153,9 +153,6 @@ class App extends Model
             //  before delete() method call this
             static::deleting(function ($app) {
 
-                //  Delete shortcode
-                $app->shortCode()->delete();
-
                 //  Delete sessions
                 $app->sessions()->delete();
 
@@ -167,6 +164,12 @@ class App extends Model
 
                 //  Delete session notifications
                 $app->sessionNotifications()->delete();
+
+                //  Remove shortcode ownership
+                $app->shortCode()->update([
+                    'dedicated_code' => null,
+                    'app_id' => null
+                ]);
 
                 //  Foreach app version
                 foreach($app->versions as $version) {

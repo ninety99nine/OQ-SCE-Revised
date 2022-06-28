@@ -1,7 +1,7 @@
 <script>
 
-    import moment from 'moment'
-    import InfoPopover from '@components/Popover/InfoPopover';
+    import moment from 'moment';
+    import FeaturePopover from './Features/FeaturePopover';
     import CreateOrUpdateVersionModal from './../../../Versions/Create/CreateOrUpdateVersionModal';
 
     export default {
@@ -9,7 +9,7 @@
             version: Object,
             appPayload: Object
         },
-        components: { InfoPopover, CreateOrUpdateVersionModal },
+        components: { FeaturePopover, CreateOrUpdateVersionModal },
         data() {
             return {
                 moment: moment,

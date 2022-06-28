@@ -24,7 +24,7 @@
 
             <DefaultSelect v-model="origin" :options="originOptions" @change="refreshContent()" label="Filter by origin" placeholder="Select origin" class="w-60"></DefaultSelect>
 
-            <DefaultSearchBar v-model="search" @onSearch="refreshContent" placeholder="Search sessions" />
+            <DefaultSearchBar v-model="search" @onSearch="refreshContent()" placeholder="Search sessions" />
 
         </div>
 
@@ -50,7 +50,7 @@
                 totalMobileAccounts: this.$page.props.statistics.totalMobileAccounts,
                 totalSimulatorAccounts: this.$page.props.statistics.totalSimulatorAccounts,
 
-                origin: this.route().params.origin ?? 'any',
+                origin: 'any',
                 originOptions: [
                     {
                         label: 'Any',
@@ -66,7 +66,8 @@
                     }
                 ],
 
-                search: this.route().params.search,
+                search: null,
+                request: null,
                 refreshContentInterval: null,
 
                 appId: this.route().params.app,
@@ -75,26 +76,55 @@
             }
         },
         methods: {
-            refreshContent() {
+            refreshContent(canCancel = true) {
+
+                //  If we can't cancel the previous request that has not eneded, then deny refreshing of content
+                if(canCancel == false && this.request) return;
+
+                //  If we can cancel the previous
+                if( canCancel == true ) {
+
+                    //  If the request is cancellable, cancel the previous request
+                    if(this.request) this.request.cancel();
+
+                    //  Start loader
+                    this.$emit('isLoading', true);
+
+                }
+
+
+                /**
+                 *  Generate the axios cancel token to allow this request
+                 *  to be cancelled if this action is required
+                 *
+                 *  Reference: https://stackoverflow.com/questions/50516438/cancel-previous-request-using-axios-with-vue-js
+                 */
+                const axiosSource = axios.CancelToken.source();
+                this.request = { cancel: axiosSource.cancel };
+
+                const config = {
+                    cancelToken: axiosSource.token
+                };
 
                 const url = route('accounts.show', {
                     project: this.route().params.project,
                     version: this.route().params.version,
                     app: this.route().params.app,
-                });
 
-                const data = {
+                    //  Query params
                     origin: this.origin,
                     search: this.search
-                };
+                });
 
-                axios.get(url, data).then((response) => {
+                axios.get(url, config).then((response) => {
 
                     this.$emit('response', response.data);
 
-                }).catch((error) => {
+                    //  Stop loader
+                    this.$emit('isLoading', false);
 
-                }).finally(() => {
+                    //  Set the request to null to grant refreshing of content
+                    this.request = null;
 
                 });
 
@@ -108,7 +138,7 @@
 
             //  Keep refreshing this page content every 3 seconds
             this.refreshContentInterval = setInterval(function() {
-                this.refreshContent();
+                this.refreshContent(false);
             }.bind(this), 3000);
 
         },

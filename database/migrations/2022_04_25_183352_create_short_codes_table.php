@@ -23,6 +23,7 @@ class CreateShortCodesTable extends Migration
 
             /*  Ownership Information  */
             $table->unsignedInteger('app_id')->nullable();
+            $table->unsignedInteger('shared_short_code_id')->nullable();
 
             /*  Indexes  */
             $table->index('shared_code');

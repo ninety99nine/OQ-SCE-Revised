@@ -12,7 +12,7 @@
             <div v-if="appsPayload.total > 0">
 
                 <!-- Create App Modal -->
-                <CreateOrUpdateAppModal :sharedShortCodes="sharedShortCodes"></CreateOrUpdateAppModal>
+                <CreateOrUpdateAppModal></CreateOrUpdateAppModal>
 
             </div>
 
@@ -46,7 +46,7 @@
                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                                     <tr>
                                         <!-- Table Header Columns Names -->
-                                        <th v-for="(header, index) in headers" :key="index" scope="col" class="px-6 py-3">
+                                        <th v-for="(header, index) in headers" :key="index" scope="col" :class="['px-6 py-3', { 'text-center' : ['Version', 'Shortcode'].includes(header) }]">
                                             <span>{{ header }}</span>
                                         </th>
 
@@ -78,7 +78,7 @@
                             <AppCard v-for="app in appsPayload.data" :key="app.id" :app="app"></AppCard>
 
                             <!-- No Apps -->
-                            <NoApps v-if="appsPayload.total == 0" :sharedShortCodes="sharedShortCodes"></NoApps>
+                            <NoApps v-if="appsPayload.total == 0"></NoApps>
 
                         </div>
 
@@ -111,12 +111,11 @@
     import UpdateProject from './UpdateProject';
     import DeleteProject from './DeleteProject';
     import { Head } from '@inertiajs/inertia-vue3';
-    import CreateOrUpdateAppModal from './../../Apps/Create/CreateOrUpdateAppModal';
     import DefaultPagination from "@components/Pagination/DefaultPagination";
+    import CreateOrUpdateAppModal from './../../Apps/Create/CreateOrUpdateAppModal';
 
     export default {
         props: {
-            sharedShortCodes: Array,
             projectPayload: Object,
             appsPayload: Object
         },

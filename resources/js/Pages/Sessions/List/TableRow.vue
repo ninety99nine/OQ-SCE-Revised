@@ -3,7 +3,7 @@
     <tr @click="showSession" class="group border-b cursor-pointer hover:bg-gray-50">
 
         <!-- Mobile Number -->
-        <td v-if="headers.includes('MSISDN')" scope="row" class="px-6 py-4 text-xs">
+        <td v-if="headers.includes('Number')" scope="row" class="px-6 py-4 text-xs">
             <span>{{ session.mobile_number }}</span>
         </td>
 

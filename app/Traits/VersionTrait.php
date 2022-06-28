@@ -163,7 +163,7 @@ trait VersionTrait
                         'code_editor_text' => '',
                         'code_editor_mode' => false
                     ],
-                    'message' => ''
+                    'message' => 'Access denied to service'
                 ],
                 'whitelist' => [
                     'active' => false,
@@ -172,7 +172,7 @@ trait VersionTrait
                         'code_editor_text' => '',
                         'code_editor_mode' => false
                     ],
-                    'message' => ''
+                    'message' => 'Access denied to service'
                 ]
             ],
             'simulator' => [

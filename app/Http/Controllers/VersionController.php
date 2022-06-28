@@ -12,10 +12,10 @@ use Illuminate\Support\Facades\Validator;
 
 class VersionController extends Controller
 {
-    public function show(Project $project, App $app, Version $version, Request $request)
+    public function show(Project $project, App $app, Version $version)
     {
         //  If this is a REST Api request
-        if ($request->expectsJson()) {
+        if (request()->expectsJson()) {
 
             //  Get the version builder
             $builder = $version->builder;
@@ -41,10 +41,10 @@ class VersionController extends Controller
         }
     }
 
-    public function create(Project $project, App $app, Request $request)
+    public function create(Project $project, App $app)
     {
         //  Validate the request inputs
-        $data = Validator::make($request->all(), [
+        $data = Validator::make(request()->all(), [
             'number' => ['required', 'numeric', 'between:0,9999.99', Rule::unique('versions')->where('app_id', $app->id)],
             'features' => ['sometimes', 'array'],
             'features.*' => ['required'],
@@ -56,29 +56,38 @@ class VersionController extends Controller
             'features.*' => 'feature',
         ])->validate();
 
-        //  Create new version
-        Version::create( array_merge($data, [
-            'builder' => (new Version)->getBuilderTemplate(),
-            'confirmation_code' => random_int(100000, 999999),
-            'app_id' => $app->id
-        ]));
+        //  Create new app version
+        $app->versions()->create($data);
 
         return redirect()->route('app.show', [ 'project' => $project->id, 'app' => $app->id ]);
     }
 
-    public function update(Project $project, App $app, Version $version, Request $request)
+    public function update(Project $project, App $app, Version $version)
     {
+        //  Check if the builder must be reset
         $wantsToResetBuilder = request()->input('reset_builder') == true;
 
-        if( $request->has('builder') && gettype($request->input('builder') === 'string')) {
+        //  If the builder is provided
+        if( request()->has('builder') ) {
 
-            //  Convert the builder provided from String to Array format
-            $request->merge(['builder' => json_decode(request()->input('builder'), true)]);
+            //  Incase we want to reset the builder
+            if( $wantsToResetBuilder ) {
+
+                //  Reset builder
+                request()->merge(['builder' => $version->getBuilderTemplate()]);
+
+            //  Incase the builder is provided in String format
+            }else if( gettype(request()->input('builder') === 'string') ) {
+
+                //  Convert the builder from String to Array format
+                request()->merge(['builder' => json_decode(request()->input('builder'), true)]);
+
+            }
 
         }
 
         //  Validate the request inputs
-        $data = Validator::make($request->all(), [
+        $data = Validator::make(request()->all(), [
             'number' => ['sometimes', 'required', 'numeric', 'between:0,9999.99', Rule::unique('versions')->where('app_id', $app->id)->ignore($version->id)],
             'description' => ['nullable', 'string', 'min:3', 'max:500'],
 
@@ -101,21 +110,16 @@ class VersionController extends Controller
             'features.*' => 'feature',
         ])->validate();
 
-        $builder = $wantsToResetBuilder ? $version->getBuilderTemplate() : ( request()->has('builder') ? request()->input('builder') : $version->builder);
-
         //  Update the existing version
-        $version->update( array_merge($data, [
-            'confirmation_code' => random_int(100000, 999999),
-            'builder' => $version->repairBuilder($builder)
-        ]));
+        $version->update($data);
 
         //  Check if we should show the app
-        if( $request->input('destination') === 'app.show' ) {
+        if( request()->input('destination') === 'app.show' ) {
 
             //  Show the app
             return redirect()->route('app.show', [ 'project' => $project->id, 'app' => $app->id ]);
 
-        }elseif( $request->input('destination') === 'version.show' ) {
+        }elseif( request()->input('destination') === 'version.show' ) {
 
             //  Show the version
             return redirect()->route('version.show', [ 'project' => $project->id, 'app' => $app->id, 'version' => $version->id ]);
@@ -123,10 +127,10 @@ class VersionController extends Controller
         }
     }
 
-    public function delete(Project $project, App $app, Version $version, Request $request)
+    public function delete(Project $project, App $app, Version $version)
     {
         //  Validate the request inputs
-        Validator::make($request->all(), [
+        Validator::make(request()->all(), [
             'confirmation_code' => ['required', 'string', 'size:6', Rule::exists('versions')->where(function ($query) use ($version) {
                 return $query->where('id', $version->id);
             })],
@@ -140,23 +144,34 @@ class VersionController extends Controller
         return redirect()->route('app.show', [ 'project' => $project->id, 'app' => $app->id ]);
     }
 
-    public function repair(Project $project, App $app, Version $version, Request $request)
+    public function repair(Project $project, App $app, Version $version)
     {
         //  If this is a REST Api request
-        if ( $request->expectsJson() ) {
+        if ( request()->expectsJson() ) {
 
-            if( $request->has('builder') && gettype($request->input('builder') === 'string')) {
+            //  If the builder is provided
+            if( request()->has('builder') ) {
 
-                //  Convert the builder provided from String to Array format
-                $request->merge(['builder' => json_decode(request()->input('builder'), true)]);
+                //  Incase the builder is provided in String format
+                if( gettype(request()->input('builder') === 'string') ) {
+
+                    //  Convert the builder from String to Array format
+                    request()->merge(['builder' => json_decode(request()->input('builder'), true)]);
+
+                }
+
+                //  Get the version builder
+                $builder = request()->input('builder');
+
+                //  Repair the version builder
+                $repaiedBuilder = $version->repairBuilder($builder);
+
+            }else{
+
+                //  Get the version builder
+                $repaiedBuilder = $version->getBuilderTemplate();
 
             }
-
-            //  Get the version builder
-            $builder = request()->input('builder');
-
-            //  Repair the version builder
-            $repaiedBuilder = $version->repairBuilder($builder);
 
             /**
              *  Calculate the content-length which is required by the Axios REST Api call

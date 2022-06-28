@@ -9,7 +9,7 @@
             <!-- Back Button -->
             <BackButton>{{ projectPayload.name }}</BackButton>
 
-            <div v-if="versionsPayload.total > 0">
+            <div v-if="appVersionsPayload.total > 0">
 
                 <!-- Create App Modal -->
                 <CreateOrUpdateVersionModal></CreateOrUpdateVersionModal>
@@ -23,7 +23,7 @@
             <div class="col-span-4">
 
                 <!-- Update App -->
-                <UpdateApp :appPayload="appPayload" :versionOptions="versionOptions" />
+                <UpdateApp :appPayload="appPayload" />
 
                 <!-- Delete App -->
                 <DeleteApp :appPayload="appPayload" />
@@ -60,13 +60,13 @@
                                 <!-- Table Body -->
                                 <tbody>
 
-                                    <VersionList v-for="version in versionsPayload.data" :key="version.id" :version="version" :appPayload="appPayload"></VersionList>
+                                    <VersionList v-for="version in appVersionsPayload.data" :key="version.id" :version="version" :appPayload="appPayload"></VersionList>
 
                                 </tbody>
 
                             </table>
 
-                            <div v-if="versionsPayload.data.length == false" class="flex items-center bg-gray-50 p-8">
+                            <div v-if="appVersionsPayload.data.length == false" class="flex items-center bg-gray-50 p-8">
                                 <span class="text-gray-500 text-xs">No Results</span>
                             </div>
 
@@ -75,10 +75,10 @@
                         <div v-else-if="view == 'grid'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                             <!-- Apps -->
-                            <VersionCard v-for="version in versionsPayload.data" :key="version.id" :version="version" :appPayload="appPayload"></VersionCard>
+                            <VersionCard v-for="version in appVersionsPayload.data" :key="version.id" :version="version" :appPayload="appPayload"></VersionCard>
 
                             <!-- No Apps -->
-                            <NoVersions v-if="versionsPayload.total == 0"></NoVersions>
+                            <NoVersions v-if="appVersionsPayload.total == 0"></NoVersions>
 
                         </div>
 
@@ -87,7 +87,7 @@
                     <div class="flex justify-end mt-10">
 
                         <!-- Pagination -->
-                        <DefaultPagination :pagination="versionsPayload" />
+                        <DefaultPagination :pagination="appVersionsPayload" />
 
                     </div>
 
@@ -117,9 +117,8 @@
     export default {
         props: {
             appPayload: Object,
-            versionOptions: Array,
             projectPayload: Object,
-            versionsPayload: Object,
+            appVersionsPayload: Object,
         },
         components: { Head, NoVersions, VersionCard, VersionList, AppHeader, BackButton, UpdateApp, DeleteApp, DefaultPagination, CreateOrUpdateVersionModal },
         data() {

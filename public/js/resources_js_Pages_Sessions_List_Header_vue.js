@@ -25,8 +25,6 @@ __webpack_require__.r(__webpack_exports__);
     DefaultSearchBar: _components_SearchBar_DefaultSearchBar__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
-    var _this$route$params$or, _this$route$params$re, _this$route$params$st;
-
     return {
       //  General stats
       totalSessions: this.$page.props.statistics.totalSessions,
@@ -36,7 +34,7 @@ __webpack_require__.r(__webpack_exports__);
       //  Origin stats
       totalMobileSessions: this.$page.props.statistics.totalMobileSessions,
       totalSimulatorSessions: this.$page.props.statistics.totalSimulatorSessions,
-      origin: (_this$route$params$or = this.route().params.origin) !== null && _this$route$params$or !== void 0 ? _this$route$params$or : 'any',
+      origin: 'any',
       originOptions: [{
         label: 'Any',
         value: 'any'
@@ -47,7 +45,7 @@ __webpack_require__.r(__webpack_exports__);
         label: 'Simulator',
         value: 'simulator'
       }],
-      requestType: (_this$route$params$re = this.route().params.requestType) !== null && _this$route$params$re !== void 0 ? _this$route$params$re : 'any',
+      requestType: 'any',
       requestTypeOptions: [{
         label: 'Any',
         value: 'any'
@@ -64,7 +62,7 @@ __webpack_require__.r(__webpack_exports__);
         label: 'Timed Out',
         value: '4'
       }],
-      status: (_this$route$params$st = this.route().params.status) !== null && _this$route$params$st !== void 0 ? _this$route$params$st : 'any',
+      status: 'any',
       statusOptions: [{
         label: 'Any',
         value: 'any'
@@ -82,7 +80,8 @@ __webpack_require__.r(__webpack_exports__);
           value: option.id
         };
       }),
-      search: this.route().params.search,
+      search: null,
+      request: null,
       refreshContentInterval: null
     };
   },
@@ -90,32 +89,67 @@ __webpack_require__.r(__webpack_exports__);
     refreshContent: function refreshContent() {
       var _this = this;
 
+      var canCancel = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+      //  If we can't cancel the previous request that has not eneded, then deny refreshing of content
+      if (canCancel == false && this.request) return; //  If we can cancel the previous
+
+      if (canCancel == true) {
+        //  If the request is cancellable, cancel the previous request
+        if (this.request) this.request.cancel(); //  Start loader
+
+        this.$emit('isLoading', true);
+      }
+      /**
+       *  Generate the axios cancel token to allow this request
+       *  to be cancelled if this action is required
+       *
+       *  Reference: https://stackoverflow.com/questions/50516438/cancel-previous-request-using-axios-with-vue-js
+       */
+
+
+      var axiosSource = axios__WEBPACK_IMPORTED_MODULE_0___default().CancelToken.source();
+      this.request = {
+        cancel: axiosSource.cancel
+      };
+      var config = {
+        cancelToken: axiosSource.token
+      };
       var url;
 
       if (route().current() === 'sessions.show') {
         url = route(route().current(), {
           project: this.route().params.project,
           app: this.route().params.app,
-          version: this.selectedVersion
+          version: this.selectedVersion,
+          //  Query params
+          origin: this.origin,
+          status: this.status,
+          search: this.search,
+          requestType: this.requestType
         });
       } else if (route().current() === 'account.sessions.show') {
         url = route(route().current(), {
           project: this.route().params.project,
           account: this.route().params.account,
           app: this.route().params.app,
-          version: this.selectedVersion
+          version: this.selectedVersion,
+          //  Query params
+          origin: this.origin,
+          status: this.status,
+          search: this.search,
+          requestType: this.requestType
         });
       }
 
-      var data = {
-        origin: this.origin,
-        status: this.status,
-        search: this.search,
-        requestType: this.requestType
-      };
-      axios__WEBPACK_IMPORTED_MODULE_0___default().get(url, data).then(function (response) {
-        _this.$emit('response', response.data);
-      })["catch"](function (error) {})["finally"](function () {});
+      axios__WEBPACK_IMPORTED_MODULE_0___default().get(url, config).then(function (response) {
+        _this.$emit('response', response.data); //  Stop loader
+
+
+        _this.$emit('isLoading', false); //  Set the request to null to grant refreshing of content
+
+
+        _this.request = null;
+      });
     },
     cleanUp: function cleanUp() {
       clearInterval(this.refreshContentInterval);
@@ -125,7 +159,7 @@ __webpack_require__.r(__webpack_exports__);
   created: function created() {
     //  Keep refreshing this page content every 3 seconds
     this.refreshContentInterval = setInterval(function () {
-      this.refreshContent();
+      this.refreshContent(false);
     }.bind(this), 3000);
   },
   unmounted: function unmounted() {
@@ -304,11 +338,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
       return $data.search = $event;
     }),
-    onOnSearch: $options.refreshContent,
+    onOnSearch: _cache[9] || (_cache[9] = function ($event) {
+      return $options.refreshContent();
+    }),
     placeholder: "Search sessions"
   }, null, 8
   /* PROPS */
-  , ["modelValue", "onOnSearch"])])]);
+  , ["modelValue"])])]);
 }
 
 /***/ }),

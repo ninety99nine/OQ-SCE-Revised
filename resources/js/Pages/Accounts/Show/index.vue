@@ -59,24 +59,7 @@
         components: { Head, BackButton, AccountDetails, AccountSessions, AccountNotifications, AccountGlobalVariables, AccountDatabaseEntries, DefaultTabs },
         data() {
             return {
-                tabs: [
-                    {
-                        label: 'Sessions',
-                        value: 'account.sessions.show'
-                    },
-                    {
-                        label: 'Notifications',
-                        value: 'account.notifications.show'
-                    },
-                    {
-                        label: 'Database Entries',
-                        value: 'account.database.entries.show'
-                    },
-                    {
-                        label: 'Global Variables',
-                        value: 'account.global.variables.show'
-                    }
-                ],
+                tabs: this.getTabs(),
                 refreshContentInterval: null,
             }
         },
@@ -105,6 +88,32 @@
                     this.$inertia.get(url, {}, options);
 
                 }
+            }
+        },
+        methods: {
+            getTabs() {
+                return [
+                    {
+                        label: 'Sessions',
+                        value: 'account.sessions.show',
+                        count: this.accountPayload.sessions_count
+                    },
+                    {
+                        label: 'Notifications',
+                        value: 'account.notifications.show',
+                        count: this.accountPayload.session_notifications_count
+                    },
+                    {
+                        label: 'Database Entries',
+                        value: 'account.database.entries.show',
+                        count: this.accountPayload.database_entries_count
+                    },
+                    {
+                        label: 'Global Variables',
+                        value: 'account.global.variables.show',
+                        count: this.accountPayload.global_variables_count
+                    }
+                ];
             }
         }
     };

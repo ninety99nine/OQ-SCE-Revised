@@ -4,27 +4,33 @@
 
     <div class="flex flex-row h-screen justify-center items-center">
 
-        <div class="w-1/3 p-5 bg-white rounded-md shadow-md hover:shadow-lg -mt-20">
+        <div class="w-1/3 -mt-40 -mb-20">
 
-            <!-- Title -->
-            <h5 class="text-xl font-medium text-gray-900 border-b pb-5 mb-5">Sign Up</h5>
+            <Logo class="m-auto mb-10" width="w-32" />
 
-            <div class="relative mb-5">
+            <div class="p-5 bg-white rounded-md shadow-md hover:shadow-lg">
 
-                <!-- Loading overlay -->
-                <LoaderOverlay :show="form.processing" />
+                <!-- Title -->
+                <h5 class="text-xl font-medium text-gray-900 border-b pb-5 mb-5">Sign Up</h5>
 
-                <!-- Register form -->
-                <DefaultInput v-model="form.name" label="Name" :disabled="form.processing || form.processing" :error="form.errors.name" @keyup.enter="register()" class="mb-6"></DefaultInput>
-                <DefaultInput v-model="form.email" label="Email" :disabled="form.processing || form.processing" :error="form.errors.email" @keyup.enter="register()" class="mb-6"></DefaultInput>
-                <DefaultInput v-model="form.password" type="password" label="Password" :disabled="form.processing || form.processing" :error="form.errors.password" @keyup.enter="register()"></DefaultInput>
+                <div class="relative mb-5">
 
-            </div>
+                    <!-- Loading overlay -->
+                    <LoaderOverlay :show="form.processing" />
 
-            <div class="flex justify-end">
-                <PrimaryButton :disabled="form.processing" @click="register()">
-                    Sign Up
-                </PrimaryButton>
+                    <!-- Register form -->
+                    <DefaultInput v-model="form.name" label="Name" :disabled="form.processing || form.processing" :error="form.errors.name" @keyup.enter="register()" class="mb-6"></DefaultInput>
+                    <DefaultInput v-model="form.email" label="Email" :disabled="form.processing || form.processing" :error="form.errors.email" @keyup.enter="register()" class="mb-6"></DefaultInput>
+                    <DefaultInput v-model="form.password" type="password" label="Password" :disabled="form.processing || form.processing" :error="form.errors.password" @keyup.enter="register()"></DefaultInput>
+
+                </div>
+
+                <div class="flex justify-end">
+                    <PrimaryButton :disabled="form.processing" @click="register()">
+                        Sign Up
+                    </PrimaryButton>
+                </div>
+
             </div>
 
         </div>
@@ -37,6 +43,7 @@
 
     import { useForm, Head } from '@inertiajs/inertia-vue3';
 
+    import Logo from "@components/Logo/Logo";
     import DefaultInput from "@components/Input/DefaultInput";
     import LoaderOverlay from "@components/Loader/LoaderOverlay";
     import PrimaryButton from "@components/Button/PrimaryButton";
@@ -44,7 +51,7 @@
 
     export default {
         layout: GuestDashboardLayout,
-        components: { Head, DefaultInput, LoaderOverlay, PrimaryButton },
+        components: { Head, Logo, DefaultInput, LoaderOverlay, PrimaryButton },
         data() {
             return {
                 form: useForm({

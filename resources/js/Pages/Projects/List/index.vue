@@ -1,6 +1,6 @@
 <template>
 
-    <div class="bg-gray-100 pt-8 mt-4">
+    <div class="pt-8 mt-4">
 
         <Head title="Projects" />
 

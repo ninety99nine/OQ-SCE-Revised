@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Inertia\Inertia;
-use App\Models\User;
 use App\Models\App;
+use Inertia\Inertia;
 use App\Models\Project;
-use App\Models\ShortCode;
 use App\Models\Version;
+use App\Models\ShortCode;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
+use App\Models\SharedShortCode;
 use Illuminate\Support\Facades\Validator;
 
 class AppController extends Controller
@@ -21,18 +19,22 @@ class AppController extends Controller
         //  Get the search term
         $search = request()->input('search');
 
+        //  Shared Shortcodes options
+        $sharedShortCodes = SharedShortCode::all();
+
         //  Version options
-        $versionOptions = $app->versions()->select('id', 'number')->get();
+        $versionsPayload = $app->versions()->select('id', 'number')->get();
 
         //  Get the user app versiosn
-        $versionsPayload = $app->versionsWithoutBuilder()->search($search)->latest()->paginate(6)->withQueryString();
+        $appVersionsPayload = $app->versionsWithoutBuilder()->search($search)->latest()->paginate(6)->withQueryString();
 
         //  Show the user apps
         return Inertia::render('Apps/Show', [
             'appPayload' => $app,
             'projectPayload' => $project,
-            'versionOptions' => $versionOptions,
             'versionsPayload' => $versionsPayload,
+            'appVersionsPayload' => $appVersionsPayload,
+            'sharedShortCodesPayload' => $sharedShortCodes
         ]);
     }
 
@@ -43,33 +45,35 @@ class AppController extends Controller
             'online' => ['required', 'boolean'],
             'description' => ['nullable', 'string', 'min:3', 'max:500'],
             'offline_message' => ['nullable', 'string', 'min:3', 'max:120'],
+            'shared_short_code_id' => [Rule::exists('shared_short_codes', 'id')],
+            'dedicated_code' => ['nullable', 'regex:/^\*[0-9]+(\*[0-9]+)*#$/',
+                $request->input('overide_dedicated_code') == true ? '' : Rule::unique('short_codes')
+            ],
             'name' => ['required', 'string', 'min:3', 'max:30', Rule::unique('apps')->where('project_id', $project->id)],
+        ], [
+            'dedicated_code.unique' => 'The :attribute is already used by another app. Do you want to reassign the shortcode?'
         ])->validate();
 
+        //  Create new app (Set the verison as the active version)
+        $app = App::create(array_merge($data, [
+            'project_id' => $project->id,
+        ]));
+
         //  Create new version
-        $version = Version::create([
+        $version = $app->versions()->create([
             'builder' => (new Version)->getBuilderTemplate(),
-            'confirmation_code' => random_int(100000, 999999),
             'description' => $data['description'],
             'features' => []
         ]);
 
-        //  Create new app (Set the verison as the active version)
-        $app = App::create( array_merge($data, [
-            'confirmation_code' => random_int(100000, 999999),
-            'active_version_id' => $version->id,
-            'project_id' => $project->id,
-        ]));
+        //  Assign the active version
+        $app->assignActiveVersion($version->id);
 
-        //  Create new shared shortcode for this new app
-        $shortCode = ShortCode::create([
-            'app_id' => $app->id
-        ]);
+        //  Assign the dedicated code
+        $app->assignDedicatedCode( $request->input('dedicated_code') );
 
-        //  Associate the active version with the new app
-        $version->update([
-            'app_id' => $app->id
-        ]);
+        //  Assign the shared code
+        $app->assignSharedCode( $request->input('shared_short_code_id') );
 
         return redirect()->route('project.show', ['project' => $project->id]);
     }
@@ -81,16 +85,29 @@ class AppController extends Controller
             'online' => ['required', 'boolean'],
             'active_version_id' => ['required', 'integer'],
             'description' => ['nullable', 'string', 'min:3', 'max:500'],
+            'shared_short_code_id' => [Rule::exists('shared_short_codes', 'id')],
             'name' => ['required', 'string', 'min:3', 'max:30', Rule::unique('apps')->where('project_id', $project->id)->ignore($app->id)],
             'offline_message' => ['string', 'min:3', 'max:120', Rule::requiredIf( request()->input('online') == false )],
-        ], [], [
+            'dedicated_code' => ['nullable', 'regex:/^\*[0-9]+(\*[0-9]+)*#$/',
+                $request->input('overide_dedicated_code') == true ? '' : Rule::unique('short_codes')->ignore($app->id, 'app_id')
+            ]
+        ], [
+            'dedicated_code.unique' => 'The :attribute is already used by another app. Do you want to reassign the shortcode?'
+        ], [
             'active_version_id' => 'active version'
         ])->validate();
 
-        //  Update the existing app
-        $app->update( array_merge($data, [
-            'confirmation_code' => random_int(100000, 999999)
-        ]));
+        //  Update app
+        $app->update($data);
+
+        //  Assign the active version
+        $app->assignActiveVersion( $request->input('active_version_id') );
+
+        //  Assign the dedicated code
+        $app->assignDedicatedCode( $request->input('dedicated_code') );
+
+        //  Assign the shared code
+        $app->assignSharedCode( $request->input('shared_short_code_id') );
 
         //  Check if we should show the project
         if( $request->input('destination') === 'project.show' ) {

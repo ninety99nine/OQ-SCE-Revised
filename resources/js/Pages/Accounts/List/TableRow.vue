@@ -22,6 +22,11 @@
             <span>{{ account.session_notifications_count }}</span>
         </td>
 
+        <!-- Database Entries -->
+        <td scope="row" class="text-center px-6 py-4 text-xs">
+            <span>{{ account.database_entries_count }}</span>
+        </td>
+
         <!-- Global Variables -->
         <td scope="row" class="text-center px-6 py-4 text-xs">
             <span>{{ account.global_variables_count }}</span>

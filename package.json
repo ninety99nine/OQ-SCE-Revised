@@ -14,9 +14,11 @@
         "autoprefixer": "^10.4.7",
         "axios": "^0.21",
         "flowbite": "^1.4.4",
+        "laravel-echo": "^1.12.0",
         "laravel-mix": "^6.0.6",
         "lodash": "^4.17.21",
         "postcss": "^8.4.13",
+        "pusher-js": "^7.1.1-beta",
         "tailwindcss": "^3.0.24",
         "tailwindcss-named-groups": "^0.0.5",
         "vue-loader": "^16.8.3"

@@ -31,6 +31,8 @@
             <div v-if="app.active_version" class="flex items-center">
                 <span class="text-gray-500 text-xs mr-1">Version</span>
                 <span class="text-gray-500 text-xs font-bold">{{ app.active_version.number }}</span>
+                <!-- Feature Info Icon -->
+                <FeaturePopover :version="app.active_version" class="ml-2"></FeaturePopover>
             </div>
             <div class="flex items-center">
                 <span class="text-gray-500 text-xs mr-1">Dial</span>

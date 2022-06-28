@@ -18,7 +18,7 @@
         <div :class="{ 'p-8 bg-white rounded-md shadow-md hover:shadow-lg' : showingOnMainMenu }">
 
             <!-- App Header -->
-            <Header @response="notificationsPayload = $event.notificationsPayload" />
+            <Header @response="notificationsPayload = $event.notificationsPayload" @isLoading="isLoading = $event" />
 
             <div class="shadow-md">
 
@@ -37,17 +37,24 @@
                     </thead>
 
                     <!-- Table Body -->
-                    <tbody>
+                    <tbody class="relative">
 
+                        <!-- Loading overlay -->
+                        <LoaderOverlay :show="isLoading" />
+
+                        <!-- Notification -->
                         <TableRow v-for="notification in notificationsPayload.data" :key="notification.id" :notification="notification" :headers="headers"></TableRow>
+
+                        <!-- No Notification -->
+                        <tr v-if="notificationsPayload.data.length == false">
+                            <td colspan="3" class="bg-gray-50 p-8">
+                                <span class="text-gray-500 text-xs">No Notification</span>
+                            </td>
+                        </tr>
 
                     </tbody>
 
                 </table>
-
-                <div v-if="notificationsPayload.data.length == false" class="flex items-center bg-gray-50 p-8">
-                    <span class="text-gray-500 text-xs">No Notifications</span>
-                </div>
 
             </div>
 
@@ -70,12 +77,14 @@
     import TableRow from './TableRow';
     import BackButton from "./BackButton";
     import { Head } from '@inertiajs/inertia-vue3';
+    import LoaderOverlay from "@components/Loader/LoaderOverlay";
     import DefaultPagination from "@components/Pagination/DefaultPagination";
 
     export default {
-        components: { Head, TableRow, Header, BackButton, DefaultPagination },
+        components: { Head, TableRow, Header, BackButton, LoaderOverlay, DefaultPagination },
         data() {
             return {
+                isLoading: false,
                 headers: this.getHeaders(),
                 appPayload: this.$page.props.appPayload,
                 versionPayload: this.$page.props.versionPayload,

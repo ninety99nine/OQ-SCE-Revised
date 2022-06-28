@@ -43,7 +43,7 @@ class UssdAccountsController extends Controller
             }
         }
 
-        $accountsPayload = $accounts->search($search)->withCount(['sessions', 'sessionNotifications', 'globalVariables'])->latest()->paginate()->withQueryString();
+        $accountsPayload = $accounts->search($search)->withCount(['sessions', 'sessionNotifications', 'databaseEntries', 'globalVariables'])->latest()->paginate()->withQueryString();
 
         //  Prepare Response
         $props = [
@@ -66,7 +66,7 @@ class UssdAccountsController extends Controller
     public function show(Project $project, App $app, Version $version)
     {
         //  Get the account
-        $account = UssdAccount::withCount(['sessions', 'sessionNotifications', 'globalVariables'])->findOrFail(request()->account);
+        $account = UssdAccount::withCount(['sessions', 'sessionNotifications', 'databaseEntries', 'globalVariables'])->findOrFail(request()->account);
 
         if ( request()->routeIs('account.sessions.show') ) {
 

@@ -15,7 +15,7 @@ class ShortCode extends Model
      * @var array
      */
     protected $fillable = [
-        'shared_code', 'dedicated_code', 'app_id'
+        'shared_code', 'dedicated_code', 'shared_short_code_id', 'app_id'
     ];
 
     /*
@@ -26,6 +26,14 @@ class ShortCode extends Model
         return $this->belongsTo(App::class);
     }
 
+    /*
+     *  Returns the shared shortcode of this shortcode
+     */
+    public function sharedShortCode()
+    {
+        return $this->belongsTo(SharedShortCode::class);
+    }
+
     /****************************
      *  ACCESSORS               *
      ***************************/
@@ -34,7 +42,7 @@ class ShortCode extends Model
 
     public function getPrimaryCodeAttribute()
     {
-        return $this->dedicated_code ?? $this->shared_code;
+        return empty($this->dedicated_code) ? $this->shared_code : $this->dedicated_code;
     }
 
 }

@@ -1,6 +1,6 @@
 <template>
 
-    <div class="relative min-h-screen pb-20">
+    <div class="relative min-h-screen pb-20 bg-contain bg-center bg-[url('/images/flow-bg.png')]">
 
         <!-- Dashboard Header For Authenticated User -->
         <DashboardHeader></DashboardHeader>

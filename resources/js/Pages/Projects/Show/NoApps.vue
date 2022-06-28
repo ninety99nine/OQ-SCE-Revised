@@ -13,7 +13,7 @@
         <div class="flex justify-end">
 
             <!-- Create App Modal -->
-            <CreateOrUpdateAppModal :sharedShortCodes="sharedShortCodes"></CreateOrUpdateAppModal>
+            <CreateOrUpdateAppModal></CreateOrUpdateAppModal>
 
         </div>
     </div>
@@ -25,9 +25,6 @@
     import CreateOrUpdateAppModal from './../../Apps/Create/CreateOrUpdateAppModal';
 
     export default {
-        props: {
-            sharedShortCodes: Array,
-        },
         components: { CreateOrUpdateAppModal },
     };
 

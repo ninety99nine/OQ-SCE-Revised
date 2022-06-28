@@ -38,7 +38,7 @@
 
             <DefaultSelect v-model="status" :options="statusOptions" @change="refreshContent()" label="Filter by status" placeholder="Select status" class="w-40"></DefaultSelect>
 
-            <DefaultSearchBar v-model="search" @onSearch="refreshContent" placeholder="Search sessions" />
+            <DefaultSearchBar v-model="search" @onSearch="refreshContent()" placeholder="Search sessions" />
 
         </div>
 
@@ -69,7 +69,7 @@
                 totalMobileSessions: this.$page.props.statistics.totalMobileSessions,
                 totalSimulatorSessions: this.$page.props.statistics.totalSimulatorSessions,
 
-                origin: this.route().params.origin ?? 'any',
+                origin: 'any',
                 originOptions: [
                     {
                         label: 'Any',
@@ -85,7 +85,7 @@
                     }
                 ],
 
-                requestType: this.route().params.requestType ?? 'any',
+                requestType: 'any',
                 requestTypeOptions: [
                     {
                         label: 'Any',
@@ -109,7 +109,7 @@
                     }
                 ],
 
-                status: this.route().params.status ?? 'any',
+                status: 'any',
                 statusOptions: [
                     {
                         label: 'Any',
@@ -134,12 +134,41 @@
                     }
                 }),
 
-                search: this.route().params.search,
-                refreshContentInterval: null
+                search: null,
+                request: null,
+                refreshContentInterval: null,
             }
         },
         methods: {
-            refreshContent() {
+            refreshContent(canCancel = true) {
+
+                //  If we can't cancel the previous request that has not eneded, then deny refreshing of content
+                if(canCancel == false && this.request) return;
+
+                //  If we can cancel the previous
+                if( canCancel == true ) {
+
+                    //  If the request is cancellable, cancel the previous request
+                    if(this.request) this.request.cancel();
+
+                    //  Start loader
+                    this.$emit('isLoading', true);
+
+                }
+
+
+                /**
+                 *  Generate the axios cancel token to allow this request
+                 *  to be cancelled if this action is required
+                 *
+                 *  Reference: https://stackoverflow.com/questions/50516438/cancel-previous-request-using-axios-with-vue-js
+                 */
+                const axiosSource = axios.CancelToken.source();
+                this.request = { cancel: axiosSource.cancel };
+
+                const config = {
+                    cancelToken: axiosSource.token
+                };
 
                 var url;
 
@@ -148,7 +177,13 @@
                     url = route(route().current(), {
                         project: this.route().params.project,
                         app: this.route().params.app,
-                        version: this.selectedVersion
+                        version: this.selectedVersion,
+
+                        //  Query params
+                        origin: this.origin,
+                        status: this.status,
+                        search: this.search,
+                        requestType: this.requestType
                     });
 
                 }else if( route().current() === 'account.sessions.show' ) {
@@ -157,26 +192,26 @@
                         project: this.route().params.project,
                         account: this.route().params.account,
                         app: this.route().params.app,
-                        version: this.selectedVersion
+                        version: this.selectedVersion,
+
+                        //  Query params
+                        origin: this.origin,
+                        status: this.status,
+                        search: this.search,
+                        requestType: this.requestType
                     });
 
                 }
 
-                const data = {
-                    origin: this.origin,
-                    status: this.status,
-                    search: this.search,
-                    requestType: this.requestType,
-
-                 };
-
-                axios.get(url, data).then((response) => {
+                axios.get(url, config).then((response) => {
 
                     this.$emit('response', response.data);
 
-                }).catch((error) => {
+                    //  Stop loader
+                    this.$emit('isLoading', false);
 
-                }).finally(() => {
+                    //  Set the request to null to grant refreshing of content
+                    this.request = null;
 
                 });
 
@@ -190,7 +225,7 @@
 
             //  Keep refreshing this page content every 3 seconds
             this.refreshContentInterval = setInterval(function() {
-                this.refreshContent();
+                this.refreshContent(false);
             }.bind(this), 3000);
 
         },

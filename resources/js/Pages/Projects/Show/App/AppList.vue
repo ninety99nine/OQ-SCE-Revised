@@ -8,12 +8,12 @@
         </td>
 
         <!-- Active Version -->
-        <td scope="row" class="px-6 py-4 text-xs">
+        <td scope="row" class="px-6 py-4 text-xs text-center">
             <span>{{ app.active_version.number }}</span>
         </td>
 
         <!-- Short Code -->
-        <td scope="row" class="px-6 py-4 text-xs">
+        <td scope="row" class="px-6 py-4 text-xs text-center">
             <span>{{ (app.short_code || {}).primary_code}}</span>
         </td>
 

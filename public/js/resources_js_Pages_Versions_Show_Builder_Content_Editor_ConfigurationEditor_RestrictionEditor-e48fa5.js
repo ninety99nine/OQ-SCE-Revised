@@ -13,14 +13,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _stores_VersionBuilder__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @stores/VersionBuilder */ "./resources/js/Stores/VersionBuilder.js");
 /* harmony import */ var _components_Select_DefaultSelect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @components/Select/DefaultSelect */ "./resources/js/Components/Select/DefaultSelect.vue");
-/* harmony import */ var _components_TextOrCodeEditor_TextOrCodeEditor__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @components/TextOrCodeEditor/TextOrCodeEditor */ "./resources/js/Components/TextOrCodeEditor/TextOrCodeEditor.vue");
+/* harmony import */ var _components_TextArea_DefaultTextArea__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @components/TextArea/DefaultTextArea */ "./resources/js/Components/TextArea/DefaultTextArea.vue");
+/* harmony import */ var _components_TextOrCodeEditor_TextOrCodeEditor__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @components/TextOrCodeEditor/TextOrCodeEditor */ "./resources/js/Components/TextOrCodeEditor/TextOrCodeEditor.vue");
+
 
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
     DefaultSelect: _components_Select_DefaultSelect__WEBPACK_IMPORTED_MODULE_1__["default"],
-    TextOrCodeEditor: _components_TextOrCodeEditor_TextOrCodeEditor__WEBPACK_IMPORTED_MODULE_2__["default"]
+    DefaultTextarea: _components_TextArea_DefaultTextArea__WEBPACK_IMPORTED_MODULE_2__["default"],
+    TextOrCodeEditor: _components_TextOrCodeEditor_TextOrCodeEditor__WEBPACK_IMPORTED_MODULE_3__["default"]
   },
   data: function data() {
     return {
@@ -55,7 +58,7 @@ var _hoisted_1 = {
 };
 
 var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
-  "class": "text-gray-500 text-xs mt-4"
+  "class": "text-gray-500 text-xs mt-4 mb-6"
 }, "Block access to all mobile numbers except the numbers provided above", -1
 /* HOISTED */
 );
@@ -65,7 +68,7 @@ var _hoisted_3 = {
 };
 
 var _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
-  "class": "text-gray-500 text-xs mt-4"
+  "class": "text-gray-500 text-xs mt-4 mb-6"
 }, "Grant access to all mobile numbers except the numbers provided above", -1
 /* HOISTED */
 );
@@ -78,6 +81,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_DefaultSelect = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("DefaultSelect");
 
   var _component_TextOrCodeEditor = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("TextOrCodeEditor");
+
+  var _component_DefaultTextarea = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("DefaultTextarea");
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_DefaultSelect, {
     modelValue: $data.useVersionBuilder.builder.restrictions.selected_type,
@@ -102,22 +107,42 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }),
         label: "Whitelist",
         placeholder: "number1, number2, e.t.c",
-        note: "Separate numbers by comma",
+        info: "Separate numbers by comma",
         showCode: true
       }, null, 8
       /* PROPS */
-      , ["modelValue"]), _hoisted_2])) : $data.useVersionBuilder.builder.restrictions.selected_type == 'Blacklist' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_TextOrCodeEditor, {
-        modelValue: $data.useVersionBuilder.builder.restrictions.blacklist.numbers,
+      , ["modelValue"]), _hoisted_2, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_DefaultTextarea, {
+        modelValue: $data.useVersionBuilder.builder.restrictions.whitelist.message,
         "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
+          return $data.useVersionBuilder.builder.restrictions.whitelist.message = $event;
+        }),
+        label: "Message",
+        placeholder: "Access denied to service",
+        info: "Message to show to numbers that do not appear on the whitelist"
+      }, null, 8
+      /* PROPS */
+      , ["modelValue"])])) : $data.useVersionBuilder.builder.restrictions.selected_type == 'Blacklist' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_TextOrCodeEditor, {
+        modelValue: $data.useVersionBuilder.builder.restrictions.blacklist.numbers,
+        "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
           return $data.useVersionBuilder.builder.restrictions.blacklist.numbers = $event;
         }),
         label: "Blacklist",
         placeholder: "number1, number2, e.t.c",
-        note: "Separate numbers by comma",
+        info: "Separate numbers by comma",
         showCode: true
       }, null, 8
       /* PROPS */
-      , ["modelValue"]), _hoisted_4])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_5, "Grant access to all mobile numbers"))];
+      , ["modelValue"]), _hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_DefaultTextarea, {
+        modelValue: $data.useVersionBuilder.builder.restrictions.blacklist.message,
+        "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
+          return $data.useVersionBuilder.builder.restrictions.blacklist.message = $event;
+        }),
+        label: "Message",
+        placeholder: "Access denied to service",
+        info: "Message to show to numbers that appear on the blacklist"
+      }, null, 8
+      /* PROPS */
+      , ["modelValue"])])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_5, "Grant access to all mobile numbers"))];
     }),
     _: 1
     /* STABLE */

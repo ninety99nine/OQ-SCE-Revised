@@ -11,7 +11,7 @@
             <LoaderOverlay :show="form.processing" />
 
             <!-- App form -->
-            <CreateOrUpdateAppForm :form="form" :versionOptions="versionOptions" mode="Update" />
+            <CreateOrUpdateAppForm :form="form" mode="Update" />
 
         </div>
 
@@ -35,8 +35,7 @@
     export default {
         components: { CreateOrUpdateAppForm, LoaderOverlay, PrimaryButton },
         props: {
-            appPayload: Object,
-            versionOptions: Array,
+            appPayload: Object
         },
         data() {
             return {
@@ -45,7 +44,16 @@
                     online: this.appPayload.online,
                     description: this.appPayload.description,
                     offline_message: this.appPayload.offline_message,
-                    active_version_id: this.appPayload.active_version_id
+                    active_version_id: this.appPayload.active_version_id,
+
+                    //  Indicate the shared shortcode
+                    shared_code: this.appPayload.short_code.shared_code,
+
+                    //  Indicate the dedicated shortcode
+                    overide_dedicated_code: false,
+                    dedicated_code: this.appPayload.short_code.dedicated_code,
+
+                    shared_short_code_id: this.appPayload.short_code.shared_short_code_id,
                 })
             }
         },

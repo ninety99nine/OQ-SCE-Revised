@@ -58,7 +58,6 @@
                 this.localModelValue = newValue;
             },
             localModelValue(newValue, oldValue) {
-                console.log(newValue);
                 this.$emit('update:modelValue', newValue);
                 this.$emit('onChange', newValue);
             }

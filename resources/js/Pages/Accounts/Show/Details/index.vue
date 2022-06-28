@@ -20,6 +20,10 @@
                 <span>{{ account.session_notifications_count }}</span>
             </li>
             <li class="flex justify-between">
+                <span>Database Entries</span>
+                <span>{{ account.database_entries_count }}</span>
+            </li>
+            <li class="flex justify-between">
                 <span>Global Variables</span>
                 <span>{{ account.global_variables_count }}</span>
             </li>

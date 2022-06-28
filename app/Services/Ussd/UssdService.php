@@ -1325,6 +1325,8 @@ class UssdService
                     'version_id' => $this->version->id,
                     'ussd_account_id' => $this->ussd_account->id,
                     'metadata' => json_encode($this->global_variables_to_save),
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]
             );
         }
@@ -1986,7 +1988,7 @@ class UssdService
         //  Set the whitelisted numbers
         $numbers = collect(explode(',', $outputResponse))->filter();
 
-        if( $active && count($numbers) ){
+        if( $active && count($numbers) ) {
 
             //  Check if the current user matches any of the given numbers
             $is_matching = collect($numbers)->contains(function ($number) {

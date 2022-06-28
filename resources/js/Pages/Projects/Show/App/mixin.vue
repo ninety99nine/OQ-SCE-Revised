@@ -2,13 +2,14 @@
 
     import moment from 'moment'
     import InfoPopover from '@components/Popover/InfoPopover';
+    import FeaturePopover from '@pages/Apps/Show/Version/Features/FeaturePopover';
     import CreateOrUpdateAppModal from './../../../Apps/Create/CreateOrUpdateAppModal';
 
     export default {
         props: {
             app: Object
         },
-        components: { InfoPopover, CreateOrUpdateAppModal },
+        components: { InfoPopover, FeaturePopover, CreateOrUpdateAppModal },
         data() {
             return {
                 moment: moment,
