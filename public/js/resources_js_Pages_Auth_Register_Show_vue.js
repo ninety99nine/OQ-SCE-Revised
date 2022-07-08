@@ -101,9 +101,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @inertiajs/inertia-vue3 */ "./node_modules/@inertiajs/inertia-vue3/dist/index.js");
 /* harmony import */ var _components_Logo_Logo__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @components/Logo/Logo */ "./resources/js/Components/Logo/Logo.vue");
 /* harmony import */ var _components_Input_DefaultInput__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @components/Input/DefaultInput */ "./resources/js/Components/Input/DefaultInput.vue");
-/* harmony import */ var _components_Loader_LoaderOverlay__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @components/Loader/LoaderOverlay */ "./resources/js/Components/Loader/LoaderOverlay.vue");
-/* harmony import */ var _components_Button_PrimaryButton__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @components/Button/PrimaryButton */ "./resources/js/Components/Button/PrimaryButton.vue");
-/* harmony import */ var _Layouts_GuestDashboard_GuestDashboardLayout_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../Layouts/GuestDashboard/GuestDashboardLayout.vue */ "./resources/js/Layouts/GuestDashboard/GuestDashboardLayout.vue");
+/* harmony import */ var _components_Alert_PrimaryAlert__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @components/Alert/PrimaryAlert */ "./resources/js/Components/Alert/PrimaryAlert.vue");
+/* harmony import */ var _components_Loader_LoaderOverlay__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @components/Loader/LoaderOverlay */ "./resources/js/Components/Loader/LoaderOverlay.vue");
+/* harmony import */ var _components_Button_PrimaryButton__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @components/Button/PrimaryButton */ "./resources/js/Components/Button/PrimaryButton.vue");
+/* harmony import */ var _components_Switch_DefaultSwitch__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @components/Switch/DefaultSwitch */ "./resources/js/Components/Switch/DefaultSwitch.vue");
+/* harmony import */ var _Layouts_GuestDashboard_GuestDashboardLayout_vue__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../../Layouts/GuestDashboard/GuestDashboardLayout.vue */ "./resources/js/Layouts/GuestDashboard/GuestDashboardLayout.vue");
+
+
 
 
 
@@ -111,20 +115,25 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  layout: _Layouts_GuestDashboard_GuestDashboardLayout_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
+  layout: _Layouts_GuestDashboard_GuestDashboardLayout_vue__WEBPACK_IMPORTED_MODULE_7__["default"],
   components: {
     Head: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_0__.Head,
     Logo: _components_Logo_Logo__WEBPACK_IMPORTED_MODULE_1__["default"],
     DefaultInput: _components_Input_DefaultInput__WEBPACK_IMPORTED_MODULE_2__["default"],
-    LoaderOverlay: _components_Loader_LoaderOverlay__WEBPACK_IMPORTED_MODULE_3__["default"],
-    PrimaryButton: _components_Button_PrimaryButton__WEBPACK_IMPORTED_MODULE_4__["default"]
+    PrimaryAlert: _components_Alert_PrimaryAlert__WEBPACK_IMPORTED_MODULE_3__["default"],
+    LoaderOverlay: _components_Loader_LoaderOverlay__WEBPACK_IMPORTED_MODULE_4__["default"],
+    DefaultSwitch: _components_Switch_DefaultSwitch__WEBPACK_IMPORTED_MODULE_6__["default"],
+    PrimaryButton: _components_Button_PrimaryButton__WEBPACK_IMPORTED_MODULE_5__["default"]
   },
   data: function data() {
     return {
       form: (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_0__.useForm)({
         name: '',
         email: '',
-        password: ''
+        password: '',
+        security_email: '',
+        security_password: '',
+        signin_with_acount: true
       })
     };
   },
@@ -294,7 +303,7 @@ var _hoisted_1 = {
   "class": "flex flex-row h-screen justify-center items-center"
 };
 var _hoisted_2 = {
-  "class": "w-1/3 -mt-40 -mb-20"
+  "class": "w-1/3"
 };
 var _hoisted_3 = {
   "class": "p-5 bg-white rounded-md shadow-md hover:shadow-lg"
@@ -309,11 +318,23 @@ var _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementV
 var _hoisted_5 = {
   "class": "relative mb-5"
 };
-var _hoisted_6 = {
+
+var _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" For security reasons please provide your security "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "font-semibold text-green-500"
+}, "Email"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" and "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "font-semibold text-green-500"
+}, "Password"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" to create this account ")], -1
+/* HOISTED */
+);
+
+var _hoisted_7 = {
+  "class": "grid grid-cols-2 gap-4"
+};
+var _hoisted_8 = {
   "class": "flex justify-end"
 };
 
-var _hoisted_7 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Sign Up ");
+var _hoisted_9 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Sign Up ");
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Head = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Head");
@@ -323,6 +344,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_LoaderOverlay = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("LoaderOverlay");
 
   var _component_DefaultInput = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("DefaultInput");
+
+  var _component_DefaultSwitch = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("DefaultSwitch");
+
+  var _component_PrimaryAlert = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("PrimaryAlert");
 
   var _component_PrimaryButton = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("PrimaryButton");
 
@@ -341,12 +366,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return $data.form.name = $event;
     }),
     label: "Name",
-    disabled: $data.form.processing || $data.form.processing,
+    disabled: $data.form.processing,
     error: $data.form.errors.name,
     onKeyup: _cache[1] || (_cache[1] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function ($event) {
       return $options.register();
     }, ["enter"])),
-    "class": "mb-6"
+    "class": "mb-4"
   }, null, 8
   /* PROPS */
   , ["modelValue", "disabled", "error"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_DefaultInput, {
@@ -355,12 +380,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return $data.form.email = $event;
     }),
     label: "Email",
-    disabled: $data.form.processing || $data.form.processing,
+    disabled: $data.form.processing,
     error: $data.form.errors.email,
     onKeyup: _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function ($event) {
       return $options.register();
     }, ["enter"])),
-    "class": "mb-6"
+    "class": "mb-4"
   }, null, 8
   /* PROPS */
   , ["modelValue", "disabled", "error"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_DefaultInput, {
@@ -370,21 +395,70 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     type: "password",
     label: "Password",
-    disabled: $data.form.processing || $data.form.processing,
+    disabled: $data.form.processing,
     error: $data.form.errors.password,
     onKeyup: _cache[5] || (_cache[5] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function ($event) {
+      return $options.register();
+    }, ["enter"])),
+    "class": "mb-4"
+  }, null, 8
+  /* PROPS */
+  , ["modelValue", "disabled", "error"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Toggle Sign Into Account "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_DefaultSwitch, {
+    modelValue: $data.form.signin_with_acount,
+    "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
+      return $data.form.signin_with_acount = $event;
+    }),
+    disabled: $data.form.processing,
+    error: $data.form.errors.signin_with_acount,
+    note: "Sign In with new account",
+    "class": "mb-4"
+  }, null, 8
+  /* PROPS */
+  , ["modelValue", "disabled", "error"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Explainer "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_PrimaryAlert, {
+    "class": "mb-6"
+  }, {
+    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [_hoisted_6];
+    }),
+    _: 1
+    /* STABLE */
+
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_DefaultInput, {
+    modelValue: $data.form.security_email,
+    "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
+      return $data.form.security_email = $event;
+    }),
+    type: "text",
+    label: "Security Email",
+    disabled: $data.form.processing,
+    error: $data.form.errors.security_email,
+    onKeyup: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function ($event) {
       return $options.register();
     }, ["enter"]))
   }, null, 8
   /* PROPS */
-  , ["modelValue", "disabled", "error"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_PrimaryButton, {
+  , ["modelValue", "disabled", "error"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_DefaultInput, {
+    modelValue: $data.form.security_password,
+    "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
+      return $data.form.security_password = $event;
+    }),
+    type: "password",
+    label: "Security Password",
     disabled: $data.form.processing,
-    onClick: _cache[6] || (_cache[6] = function ($event) {
+    error: $data.form.errors.security_password,
+    onKeyup: _cache[10] || (_cache[10] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function ($event) {
+      return $options.register();
+    }, ["enter"]))
+  }, null, 8
+  /* PROPS */
+  , ["modelValue", "disabled", "error"])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_PrimaryButton, {
+    disabled: $data.form.processing,
+    onClick: _cache[11] || (_cache[11] = function ($event) {
       return $options.register();
     })
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_7];
+      return [_hoisted_9];
     }),
     _: 1
     /* STABLE */
