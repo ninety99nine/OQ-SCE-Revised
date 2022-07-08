@@ -184,7 +184,7 @@ trait VersionTrait
                     'return_summarized_logs' => true,
                 ],
                 'subscriber' => [
-                    'phone_number' => '26777479083',
+                    'phone_number' => '26772000001',
                 ],
                 'settings' => [
                     'allow_timeouts' => true,
