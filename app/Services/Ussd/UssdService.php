@@ -2076,6 +2076,7 @@ class UssdService
          *  performance.
          */
         if (count($global_variables)) {
+
             /**
              *  Get the Global Variables saved to the database
              *
@@ -2117,14 +2118,21 @@ class UssdService
             $type = $global_variable['type'];
             $value = $global_variable['value'];
 
+            $hasPreviousSessionValue = collect($global_variables_to_save)->contains(function($currValue, $currName) use ($name) {
+                return $currName === $name;
+            }) == true;
+
+            $isGlobal = isset($global_variable['is_global']) && ($global_variable['is_global'] == true);
+
             if ($name) {
 
                 //  If the given Global Variable was previously saved on the last session
-                if (collect($global_variables_to_save)->contains($name) == true) {
+                if ($isGlobal && $hasPreviousSessionValue) {
 
                     //  Get the value from the last session
                     $value = $global_variables_to_save[$name];
 
+                //  Otherwise lets process the current session value
                 } else {
 
                     if ($type == 'string') {
@@ -2197,7 +2205,7 @@ class UssdService
                 }
 
                 //  If this property should be saved to the database but does not already exist
-                if (isset($global_variable['is_global']) && ($global_variable['is_global'] == true)) {
+                if ( $isGlobal ) {
 
                     //  Add the new global variable to save to the database
                     $this->global_variables_to_save[$name] = $value;
