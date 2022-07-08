@@ -19,7 +19,7 @@
 
         </div>
 
-        <div class="flex">
+        <div class="flex input-wrapper">
 
             <!-- Append Content -->
             <span v-if="$slots.append" :class="['inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md', ...appendClasses]">
@@ -88,12 +88,28 @@
         },
         data(){
             return {
-                uniqueId: uniqueId('input-')
+                uniqueId: uniqueId('input-'),
+                initialValue: this.modelValue,
+                initialType: typeof this.modelValue
             }
         },
         methods: {
             updateValue(event) {
-                this.$emit('update:modelValue', event.target.value);
+
+                var value = event.target.value;
+
+                //  If isNaN() returns false, the value is a number
+                if( this.initialType === 'number' && isNaN(value) == false ) {
+
+                    value = parseInt(value);
+
+                }else if( this.initialValue === null && value === '' ) {
+
+                    value = null;
+
+                }
+
+                this.$emit('update:modelValue', value);
             }
         },
         mounted() {

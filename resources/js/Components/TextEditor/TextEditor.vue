@@ -94,7 +94,7 @@
                 //  Insert dynamic content inside curly braces within span tags with special styles
                 function wrapInHTMLTags(match, offset, string){
 
-                    return '<span class="bg-blue-100 text-blue-900 shadow-sm rounded-md py-1 px-2">' + match + '</span>';
+                    return '<span class="bg-blue-100 text-blue-900 shadow-sm rounded-md whitespace-nowrap py-1 px-2">' + match + '</span>';
 
                 }
 

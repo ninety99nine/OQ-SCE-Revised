@@ -5,12 +5,10 @@ namespace App\Http\Controllers;
 use Inertia\Inertia;
 use App\Models\User;
 use App\Models\Project;
-use App\Models\App;
-use App\Models\SharedShortCode;
 use Illuminate\Http\Request;
+use App\Models\SharedShortCode;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class ProjectController extends Controller

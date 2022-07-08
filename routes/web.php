@@ -147,9 +147,10 @@ Route::middleware(['auth'])->group(function () {
 
                                     Route::get('/', 'index')->name('database.entries.show');
 
-                                    Route::prefix('/{database_entry}')->name('database-entry.')->group(function () {
+                                    Route::prefix('/{database_entry}')->name('database.entry.')->group(function () {
 
                                         Route::get('/', 'show')->name('show');
+                                        Route::put('/', 'update')->name('update');
                                         Route::delete('/', 'delete')->name('delete');
 
                                     });
@@ -166,6 +167,7 @@ Route::middleware(['auth'])->group(function () {
                                     Route::prefix('/{global_variable}')->name('global.variable.')->group(function () {
 
                                         Route::get('/', 'show')->name('show');
+                                        Route::put('/', 'update')->name('update');
                                         Route::delete('/', 'delete')->name('delete');
 
                                     });

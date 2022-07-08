@@ -2076,11 +2076,10 @@ class UssdService
          *  performance.
          */
         if (count($global_variables)) {
-            /** Get the Global Variables saved to the database
+            /**
+             *  Get the Global Variables saved to the database
              *
-             *  1. The Global Variables record must match the subscribers mobile number (MSISDN).
-             *  2. The Global Variables record must match the test/live mode of this request.
-             *  3. The Global Variables record must belong to this app.
+             *  1. The Global Variables record must match the subscriber account
              */
             $global_variables_record = DB::table('global_variables')->where([
                 'ussd_account_id' => $this->ussd_account->id,
@@ -2119,14 +2118,17 @@ class UssdService
             $value = $global_variable['value'];
 
             if ($name) {
+
                 //  If the given Global Variable was previously saved on the last session
-                if (collect($global_variables_to_save)->contains('name', $name) == true) {
+                if (collect($global_variables_to_save)->contains($name) == true) {
+
                     //  Get the value from the last session
-                    $value = collect(collect($global_variables_to_save)->filter(function ($global_variable_to_save) use ($name) {
-                        return $global_variable_to_save['name'] == $name;
-                    })->first())->get('value');
+                    $value = $global_variables_to_save[$name];
+
                 } else {
+
                     if ($type == 'string') {
+
                         /*************************
                          * BUILD STRING VALUE    *
                          ************************/
@@ -2141,7 +2143,9 @@ class UssdService
 
                         //  Get the generated output - Convert to (String) otherwise default to empty string
                         $value = $this->convertToString($outputResponse) ?? '';
+
                     } elseif ($type == 'integer') {
+
                         /*************************
                          * BUILD NUMBER VALUE    *
                          ************************/
@@ -2156,7 +2160,9 @@ class UssdService
 
                         //  Get the generated output - Convert to (Integer) otherwise default to (0)
                         $value = $this->convertToInteger($outputResponse) ?? 0;
+
                     } elseif ($type == 'boolean') {
+
                         $value = $value['boolean'];
 
                         if ($value == 'true') {
@@ -2164,7 +2170,9 @@ class UssdService
                         } elseif ($value == 'false') {
                             $value = false;
                         }
+
                     } elseif ($type == 'code') {
+
                         $code = $value['code'];
 
                         //  Process the PHP Code
@@ -2176,23 +2184,24 @@ class UssdService
                         }
 
                         $value = $outputResponse;
+
                     } elseif ($type == 'null') {
+
                         $value = null;
+
                     } elseif ($type == 'empty array') {
+
                         $value = [];
+
                     }
                 }
 
                 //  If this property should be saved to the database but does not already exist
                 if (isset($global_variable['is_global']) && ($global_variable['is_global'] == true)) {
-                    //  If we don't already have the global variable saved to the database
-                    if (collect($this->global_variables_to_save)->contains('name', $name) == false) {
-                        //  Add the new global variable to save to the database
-                        array_push($this->global_variables_to_save, [
-                            'name' => $name,
-                            'value' => $value,
-                        ]);
-                    }
+
+                    //  Add the new global variable to save to the database
+                    $this->global_variables_to_save[$name] = $value;
+
                 }
 
                 //  Store the value data using the given item reference name
@@ -2267,13 +2276,14 @@ class UssdService
     public function updateGlobalVariablesToSave()
     {
         if (count($this->global_variables_to_save)) {
+
             $this->logInfo('Save updated Global Variables for next session');
 
-            foreach ($this->global_variables_to_save as $key => $global_variable) {
-                $name = $global_variable['name'];
+            foreach ($this->global_variables_to_save as $name => $value) {
 
                 //  Get the updated value of the global variable (It is also possible that this value has not changed)
-                $this->global_variables_to_save[$key]['value'] = $this->getDynamicData($name);
+                $this->global_variables_to_save[$name] = $this->getDynamicData($name);
+
             }
         }
     }

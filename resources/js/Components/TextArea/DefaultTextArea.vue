@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="textarea-wrapper">
 
         <div v-if="label || note || $slots.info" class="flex mb-2">
 

@@ -19,7 +19,7 @@
 
         </div>
 
-        <div class="flex">
+        <div class="flex select-wrapper">
 
             <!-- Append Content -->
             <span v-if="$slots.append" :class="['inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md', ...appendClasses]">
@@ -27,7 +27,7 @@
             </span>
 
             <select :value="modelValue" @input="updateValue" :name="label" :placeholder="placeholder" :disabled="disabled" :class="['bg-gray-50 border border-gray-300 text-gray-900 text-'+size+' focus:ring-transparent focus:border-blue-400 block w-full p-2.5', $slots.append ? '' : 'rounded-l-lg', $slots.prepend ? '' : 'rounded-r-lg']">
-                <option v-for="option in options" :key="option" :value="option.value || option.label">{{ option.label }}</option>
+                <option v-for="option in options" :key="option" :value="option.hasOwnProperty('value') ? option.value : option.label">{{ option.label }}</option>
             </select>
 
             <!-- Prepend Content -->
@@ -49,7 +49,7 @@
     export default {
         components: { InfoPopover, DefaultError },
         props: {
-            modelValue: [String, Number],
+            modelValue: [String, Number, Boolean],
             label: String,
             info: String,
             note: String,
@@ -87,7 +87,20 @@
         },
         methods: {
             updateValue(event) {
-                this.$emit('update:modelValue', event.target.value);
+
+                var value = event.target.value;
+
+                if( value === 'true' ) {
+
+                    value = true;
+
+                }else if( value === 'false' ) {
+
+                    value = false;
+
+                }
+
+                this.$emit('update:modelValue', value);
             }
         }
     }

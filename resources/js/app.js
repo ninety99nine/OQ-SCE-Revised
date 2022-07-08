@@ -13,6 +13,7 @@ import 'element-plus/dist/index.css';
 
 //  Components that must be registered Globally
 import EventsEditor from "@eventsEditor";
+import KeyValueInput from "@globalComponents/KeyValueInput";
 
 createInertiaApp({
   /**
@@ -52,6 +53,7 @@ createInertiaApp({
 
         //  Components that must be registered Globally
         .component('EventsEditor', EventsEditor)
+        .component('KeyValueInput', KeyValueInput)
 
         /**
          *  The mixin below allows us to offer ziggy support so that

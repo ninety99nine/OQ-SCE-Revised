@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\App;
-use App\Models\DatabaseEntry;
 use Inertia\Inertia;
 use App\Models\Project;
 use App\Models\Version;
-use App\Models\SessionNotification;
+use App\Models\DatabaseEntry;
+use Illuminate\Support\Facades\Validator;
 use App\Services\Session\DatabaseEntryService;
 
 class DatabaseEntryController extends Controller
@@ -50,8 +50,19 @@ class DatabaseEntryController extends Controller
     {
     }
 
-    public function update()
+    public function update(Project $project, App $app, Version $version, DatabaseEntry $databaseEntry)
     {
+        //  Validate the request inputs
+        $data = Validator::make(request()->all(), [
+            'metadata' => ['required', 'array']
+        ])->validate();
+
+        //  Update the existing project
+        $databaseEntry->update([
+            'metadata' => $data['metadata']
+        ]);
+
+        return redirect()->back();
     }
 
     public function delete()

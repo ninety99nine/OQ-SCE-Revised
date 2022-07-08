@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\App;
-use App\Models\GlobalVariable;
 use Inertia\Inertia;
 use App\Models\Project;
 use App\Models\Version;
-use App\Models\SessionNotification;
+use App\Models\GlobalVariable;
+use Illuminate\Support\Facades\Validator;
 use App\Services\Session\GlobalVariableService;
 
 class GlobalVariableController extends Controller
@@ -50,8 +50,19 @@ class GlobalVariableController extends Controller
     {
     }
 
-    public function update()
+    public function update(Project $project, App $app, Version $version, GlobalVariable $globalVariable)
     {
+        //  Validate the request inputs
+        $data = Validator::make(request()->all(), [
+            'metadata' => ['required', 'array']
+        ])->validate();
+
+        //  Update the existing project
+        $globalVariable->update([
+            'metadata' => $data['metadata']
+        ]);
+
+        return redirect()->back();
     }
 
     public function delete()

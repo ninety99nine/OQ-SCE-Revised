@@ -14,7 +14,6 @@
             :selector_displayed_by_default="selector_displayed_by_default" :display_language="display_language"
             :copy_code="copy_code" :z_index="z_index" :font_size="font_size" :theme="theme">
         </CodeEditor>
-
         <DefaultError :error="error" class="mt-2"></DefaultError>
     </div>
 </template>

@@ -529,6 +529,14 @@ trait VersionTrait
                 //  Fix issues related to the "Event Collection" event handler
                 if( $event['type'] ==  'Event Collection') {
 
+                    //  If the "collection" key does not exist on the event data
+                    if( !isset($events[$x]['event_data']['events']['collection']) ) {
+
+                        //  Set the "collection" key with the list of events as the initial value
+                        $events[$x]['event_data']['events']['collection'] = $events[$x]['event_data']['events'];
+
+                    }
+
                     //  If the "conditional" key does not exist on the event data
                     if( !isset($events[$x]['event_data']['events']['conditional']) ) {
 
@@ -540,15 +548,15 @@ trait VersionTrait
 
                     }
 
-                    //  If the "collection" key does not exist on the event data
-                    if( !isset($events[$x]['event_data']['events']['collection']) ) {
-
-                        //  Set the "collection" key with the list of events as the initial value
-                        $events[$x]['event_data']['events']['collection'] = $events[$x]['event_data']['events'];
-
-                        unset($events[$x]['event_data']['events']);
-
-                    }
+                    /**
+                     *  Remove anything that is misplaced on the "events" key, this makes sure that only
+                     *  the "collection" and "conditional" keys and data exist within the "events"
+                     *  property
+                     */
+                    $events[$x]['event_data']['events'] = [
+                        'collection' => $events[$x]['event_data']['events']['collection'],
+                        'conditional' => $events[$x]['event_data']['events']['conditional']
+                    ];
 
                     //  Fix the nested events of the collection
                     $events[$x]['event_data']['events']['collection'] = $fixEvents($events[$x]['event_data']['events']['collection']);

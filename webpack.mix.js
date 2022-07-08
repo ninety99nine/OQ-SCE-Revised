@@ -27,6 +27,7 @@ mix.js('resources/js/app.js', 'public/js')
                 '@stores': __dirname + '/resources/js/Stores',
                 '@layouts': __dirname + '/resources/js/Layouts',
                 '@components': __dirname + '/resources/js/Components',
+                '@globalComponents': __dirname + '/resources/js/GlobalComponents',
                 '@versionBuilder': __dirname + '/resources/js/Pages/Versions/Show/Builder',
                 '@builderComponents': __dirname + '/resources/js/Pages/Versions/Show/Builder/Components',
                 '@eventsEditor': __dirname + '/resources/js/Pages/Versions/Show/Builder/Content/Editor/EventsEditor',

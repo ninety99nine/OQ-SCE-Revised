@@ -1,6 +1,6 @@
 <template>
 
-    <tr @click="showglobalVariable" class="group border-b cursor-pointer hover:bg-gray-50">
+    <tr @click="showGlobalVariable" class="group border-b cursor-pointer hover:bg-gray-50">
 
         <!-- Mobile Number -->
         <td v-if="headers.includes('Number')" scope="row" class="px-6 py-4 text-xs">
@@ -37,7 +37,7 @@
             }
         },
         methods: {
-            showglobalVariable() {
+            showGlobalVariable() {
                 this.$inertia.get(route('global.variable.show', { project: this.route().params.project, app: this.route().params.app, version: this.route().params.version, global_variable: this.globalVariable.id }));
             }
         }
