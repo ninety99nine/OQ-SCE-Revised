@@ -90,7 +90,7 @@
         },
         methods: {
             showSession() {
-                this.$inertia.get(route('session.show', { project: this.route().params.project, app: this.route().params.app, version: this.route().params.version, session: this.session.id }));
+                this.$inertia.get(route('session.show', { project: this.route().params.project, app: this.route().params.app, version: this.session.version_id, session: this.session.id }));
             }
         }
     };

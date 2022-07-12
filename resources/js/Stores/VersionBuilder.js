@@ -1011,9 +1011,9 @@ export const useVersionBuilder = defineStore('version_builder', {
 
             var event = {};
 
-            if( type == 'CRUD API' ){
+            if( type == 'REST API' ){
 
-                event = this.get_CRUD_API_Event();
+                event = this.get_REST_API_Event();
 
             }else if( type == 'SMS API' ){
 
@@ -1111,7 +1111,7 @@ export const useVersionBuilder = defineStore('version_builder', {
 
             }, event);
         },
-        get_CRUD_API_Event(){
+        get_REST_API_Event(){
 
             return {
                 event_data: {
@@ -1582,7 +1582,7 @@ export const useVersionBuilder = defineStore('version_builder', {
             _.pullAt(events, indexes);
         },
 
-        //  CRUD Api Event Query Param Methods
+        //  REST Api Event Query Param Methods
         searchQueryParams(queryParams, search, exactMatch = false) {
             if( search !== null && search !== '' ) {
 
@@ -1632,7 +1632,7 @@ export const useVersionBuilder = defineStore('version_builder', {
             _.pullAt(queryParams, indexes);
         },
 
-        //  CRUD Api Event Header Methods
+        //  REST Api Event Header Methods
         searchHeaders(headers, search, exactMatch = false) {
             if( search !== null && search !== '' ) {
 
@@ -1682,7 +1682,7 @@ export const useVersionBuilder = defineStore('version_builder', {
             _.pullAt(headers, indexes);
         },
 
-        //  CRUD Api Event Body Param Methods
+        //  REST Api Event Body Param Methods
         searchBodyParams(params, search, exactMatch = false) {
             if( search !== null && search !== '' ) {
 
@@ -1732,7 +1732,7 @@ export const useVersionBuilder = defineStore('version_builder', {
             _.pullAt(params, indexes);
         },
 
-        //  CRUD Api Event Status Code Methods
+        //  REST Api Event Status Code Methods
         searchStatusCodes(statusCodes, search, exactMatch = false) {
             if( search !== null && search !== '' ) {
 
@@ -1792,7 +1792,7 @@ export const useVersionBuilder = defineStore('version_builder', {
             _.pullAt(statusCodes, indexes);
         },
 
-        //  CRUD Api Event Status Code Attribute Methods
+        //  REST Api Event Status Code Attribute Methods
         searchStatusCodeAttributes(attributes, search, exactMatch = false) {
             if( search !== null && search !== '' ) {
 

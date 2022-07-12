@@ -699,8 +699,8 @@ class UssdService
                          *  Get the specified version to simulate
                          *
                          *  Attempt to get the version from the CACHE otherwise perform a query.
-                         *  Note that the "getCacheNameById" is defined within CommonTraits and
-                         *  helps us get the correct cache naming convention for our version.
+                         *  Note that the "getCacheName" is defined within BaseTrait and helps
+                         *  us get the correct cache naming convention for our version.
                          */
                         $this->version = Cache::get((new Version())->getCacheName($this->version_id), function () {
 
@@ -715,8 +715,8 @@ class UssdService
                          *  Get the app's currently active version
                          *
                          *  Attempt to get the version from the CACHE otherwise perform a query.
-                         *  Note that the "getCacheNameById" is defined within CommonTraits and
-                         *  helps us get the correct cache naming convention for our version.
+                         *  Note that the "getCacheName" is defined within BaseTrait and helps
+                         *  us get the correct cache naming convention for our version.
                          */
                         $this->version = Cache::get((new Version())->getCacheName($this->app->active_version_id), function () {
 
@@ -875,7 +875,7 @@ class UssdService
         }
 
         //  If we are on TEST MODE and the existing session has timed out
-        if ($this->test_mode && $this->existing_session->has_timed_out) {
+        if ( $this->test_mode && $this->existing_session->has_timed_out ) {
 
             //  Prepare for timeout
             $this->request_type = '4';
@@ -1398,7 +1398,7 @@ class UssdService
         //  If the timeout message was not provided
         if (empty($timeout_msg)) {
 
-            //  Get the default timeout message found in "UssdSessionTraits" within "UssdSession"
+            //  Get the default timeout message found in "UssdSessionTrait" within "UssdSession"
             $timeout_msg = (new UssdSession())->default_timeout_message;
 
         }
@@ -6262,8 +6262,8 @@ class UssdService
             //  Get the current event
             $this->event = $event;
 
-            if ($event['type'] == 'CRUD API') {
-                $response = $this->handle_CRUD_API_Event();
+            if ($event['type'] == 'REST API') {
+                $response = $this->handle_REST_API_Event();
             } elseif ($event['type'] == 'SMS API') {
                 $response = $this->handle_SMS_API_Event();
             } elseif ($event['type'] == 'Airtime Billing API') {
@@ -6320,74 +6320,74 @@ class UssdService
     }
 
     /******************************************
-     *  CRUD API EVENT METHODS                *
+     *  REST API EVENT METHODS                *
      *****************************************/
-    public function handle_CRUD_API_Event()
+    public function handle_REST_API_Event()
     {
         if ($this->event) {
-            /** Run the CRUD API Call. This will render as: $this->get_CRUD_Api_URL()
+            /** Run the REST API Call. This will render as: $this->get_REST_Api_URL()
              *  while being called within a try/catch handler.
              */
-            $apiCallResponse = $this->tryCatch('run_CRUD_Api_Call');
+            $apiCallResponse = $this->tryCatch('run_REST_Api_Call');
 
             //  If we have a screen to show return the response otherwise continue
             if ($this->shouldDisplayScreen($apiCallResponse)) {
                 return $apiCallResponse;
             }
 
-            return $this->handle_CRUD_Api_Response($apiCallResponse);
+            return $this->handle_REST_Api_Response($apiCallResponse);
         }
     }
 
-    public function run_CRUD_Api_Call($method = null, $url = null, $request_options = [])
+    public function run_REST_Api_Call($method = null, $url = null, $request_options = [])
     {
         //  Check if we provided the API method and url manually
         if( empty($method) && empty($url) ){
 
-            /** Set the CRUD API URL. This will render as: $this->get_CRUD_Api_URL()
+            /** Set the REST API URL. This will render as: $this->get_REST_Api_URL()
              *  while being called within a try/catch handler.
              */
-            $url = $this->tryCatch('get_CRUD_Api_URL');
+            $url = $this->tryCatch('get_REST_Api_URL');
 
             //  If we have a screen to show return the response otherwise continue
             if ($this->shouldDisplayScreen($url)) {
                 return $url;
             }
 
-            /** Set the CRUD API METHOD. This will render as: $this->get_CRUD_Api_Method()
+            /** Set the REST API METHOD. This will render as: $this->get_REST_Api_Method()
              *  while being called within a try/catch handler.
              */
-            $method = $this->tryCatch('get_CRUD_Api_Method');
+            $method = $this->tryCatch('get_REST_Api_Method');
 
             //  If we have a screen to show return the response otherwise continue
             if ($this->shouldDisplayScreen($method)) {
                 return $method;
             }
 
-            /** Set the CRUD API HEADERS. This will render as: $this->get_CRUD_Api_Headers()
+            /** Set the REST API HEADERS. This will render as: $this->get_REST_Api_Headers()
              *  while being called within a try/catch handler.
              */
-            $headers = $this->tryCatch('get_CRUD_Api_Headers');
+            $headers = $this->tryCatch('get_REST_Api_Headers');
 
             //  If we have a screen to show return the response otherwise continue
             if ($this->shouldDisplayScreen($headers)) {
                 return $headers;
             }
 
-            /** Set the CRUD API FORM DATA. This will render as: $this->get_CRUD_Api_Form_Data()
+            /** Set the REST API FORM DATA. This will render as: $this->get_REST_Api_Form_Data()
              *  while being called within a try/catch handler.
              */
-            $form_data = $this->tryCatch('get_CRUD_Api_Form_Data');
+            $form_data = $this->tryCatch('get_REST_Api_Form_Data');
 
             //  If we have a screen to show return the response otherwise continue
             if ($this->shouldDisplayScreen($form_data)) {
                 return $form_data;
             }
 
-            /** Set the CRUD API QUERY PARAMS. This will render as: $this->get_CRUD_Api_Query_Params()
+            /** Set the REST API QUERY PARAMS. This will render as: $this->get_REST_Api_Query_Params()
              *  while being called within a try/catch handler.
              */
-            $query_params = $this->tryCatch('get_CRUD_Api_Query_Params');
+            $query_params = $this->tryCatch('get_REST_Api_Query_Params');
 
             //  If we have a screen to show return the response otherwise continue
             if ($this->shouldDisplayScreen($query_params)) {
@@ -6396,30 +6396,30 @@ class UssdService
 
         }
 
-        //  Check if the CRUD Url and Method has been provided
+        //  Check if the REST Url and Method has been provided
         if (empty($url) || !is_string($url) || empty($method)) {
 
-            //  Check if the CRUD Url has been provided
+            //  Check if the REST Url has been provided
             if (empty($url)) {
-                //  Set a warning log that the CRUD API Url was not provided
+                //  Set a warning log that the REST API Url was not provided
                 $this->logWarning('API Url was not provided');
 
                 //  Show the technical difficulties error screen to notify the user of the issue
                 return $this->showTechnicalDifficultiesErrorScreen();
             }
 
-            //  Check if the CRUD Url is a String
+            //  Check if the REST Url is a String
             if (!is_string($url)) {
-                //  Set a warning log that the CRUD API Url is not a string
+                //  Set a warning log that the REST API Url is not a string
                 $this->logWarning('API Url must be a string e.g http://www.example.com/api');
 
                 //  Show the technical difficulties error screen to notify the user of the issue
                 return $this->showTechnicalDifficultiesErrorScreen();
             }
 
-            //  Check if the CRUD Method has been provided
+            //  Check if the REST Method has been provided
             if (empty($method)) {
-                //  Set a warning log that the CRUD API Method was not provided
+                //  Set a warning log that the REST API Method was not provided
                 $this->logWarning('API Method was not provided');
 
                 //  Show the technical difficulties error screen to notify the user of the issue
@@ -6427,16 +6427,16 @@ class UssdService
             }
 
         } else {
-            //  Set an info log of the CRUD API Url provided
+            //  Set an info log of the REST API Url provided
             $this->logInfo('API Url: '.$this->wrapAsSuccessHtml($url));
 
-            //  Set an info log of the CRUD API Method provided
+            //  Set an info log of the REST API Method provided
             $this->logInfo('API Method: '.$this->wrapAsSuccessHtml(strtoupper($method)));
         }
 
         //  Check if the provided url is correct
         if (!$this->isValidUrl($url)) {
-            //  Set a warning log that the CRUD API Url provided is incorrect
+            //  Set a warning log that the REST API Url provided is incorrect
             $this->logWarning('API Url provided is incorrect ('.$this->wrapAsSuccessHtml($url).')');
 
             //  Show the technical difficulties error screen to notify the user of the issue
@@ -6449,7 +6449,7 @@ class UssdService
             $request_options['headers'] = $headers;
 
             foreach ($headers as $key => $value) {
-                //  Set an info log of the CRUD API header attribute
+                //  Set an info log of the REST API header attribute
                 $this->logInfo('Headers: '.$this->wrapAsSuccessHtml($key).' = '.$this->wrapAsSuccessHtml($value));
             }
         }
@@ -6460,7 +6460,7 @@ class UssdService
             $request_options['query'] = $query_params;
 
             foreach ($query_params as $key => $value) {
-                //  Set an info log of the CRUD API query param attribute
+                //  Set an info log of the REST API query param attribute
                 $this->logInfo('Query Params: '.$this->wrapAsSuccessHtml($key).' = '.$this->wrapAsSuccessHtml($value));
             }
         }
@@ -6479,7 +6479,7 @@ class UssdService
                 $request_options['form_params'] = $form_data;
             }
 
-            //  Set an info log of the CRUD API form data attribute
+            //  Set an info log of the REST API form data attribute
             $this->logInfo('Form Data: '.$this->wrapAsSuccessHtml($this->convertToString($form_data)));
 
         }
@@ -6501,7 +6501,7 @@ class UssdService
         //  Create a new Http Guzzle Client
         $httpClient = new \GuzzleHttp\Client();
 
-        //  Set an info log that we are performing CRUD API call
+        //  Set an info log that we are performing REST API call
         $this->logInfo('Run API call to: '.$this->wrapAsSuccessHtml($url));
 
         //  Perform and return the Http request
@@ -6593,7 +6593,7 @@ class UssdService
         return $response;
     }
 
-    public function get_CRUD_Api_URL()
+    public function get_REST_Api_URL()
     {
         $url = $this->event['event_data']['url'] ?? null;
 
@@ -6704,14 +6704,14 @@ class UssdService
         return $exploded_url[0];
     }
 
-    public function get_CRUD_Api_Method()
+    public function get_REST_Api_Method()
     {
         $method = $this->event['event_data']['method'] ?? null;
 
         return $method;
     }
 
-    public function get_CRUD_Api_Headers()
+    public function get_REST_Api_Headers()
     {
         $headers = $this->event['event_data']['headers'] ?? [];
 
@@ -6737,7 +6737,7 @@ class UssdService
         return $data;
     }
 
-    public function get_CRUD_Api_Form_Data()
+    public function get_REST_Api_Form_Data()
     {
         $use_code = $this->event['event_data']['form_data']['use_custom_code'];
         $convert_to_json_object = $this->event['event_data']['form_data']['convert_to_json'];
@@ -6782,7 +6782,7 @@ class UssdService
         return $data;
     }
 
-    public function get_CRUD_Api_Query_Params()
+    public function get_REST_Api_Query_Params()
     {
         $query_params = $this->event['event_data']['query_params'] ?? [];
 
@@ -6826,7 +6826,7 @@ class UssdService
         $data = array_merge($this->url_query_params, $data);
 
         /* Reset $this->url_query_params to an empty array. We need to
-         *  reset to an empty array so that the next CRUD EVENT does not
+         *  reset to an empty array so that the next REST EVENT does not
          *  use these old query params for its own request.
          */
         $this->url_query_params = [];
@@ -6834,7 +6834,7 @@ class UssdService
         return $data;
     }
 
-    public function get_CRUD_Api_Status_Handles()
+    public function get_REST_Api_Status_Handles()
     {
         $response_status_handles = $this->event['event_data']['response']['manual']['response_status_handles'] ?? [];
 
@@ -6846,10 +6846,10 @@ class UssdService
         return filter_var($url, FILTER_VALIDATE_URL) ? true : false;
     }
 
-    public function handle_CRUD_Api_Response($response = null)
+    public function handle_REST_Api_Response($response = null)
     {
         if ($response) {
-            /** Get the CRUD API return type. We use the return type to determine how we
+            /** Get the REST API return type. We use the return type to determine how we
              *  want to handle the response of the API Call. Our options are as follows:.
              *
              *  Automatic : Automatically display the default success/error message depending on the API success
@@ -6859,20 +6859,20 @@ class UssdService
              */
             $return_type = $this->event['event_data']['response']['selected_type'] ?? 'automatic';
 
-            //  Set an info log that we are starting to handle the CRUD API response
-            $this->logInfo('Start handling CRUD Api Response');
+            //  Set an info log that we are starting to handle the REST API response
+            $this->logInfo('Start handling REST Api Response');
 
             if ($return_type == 'manual') {
-                return $this->handle_CRUD_Api_Manual_Response($response);
+                return $this->handle_REST_Api_Manual_Response($response);
             } elseif ($return_type == 'automatic') {
-                return $this->handle_CRUD_Api_Automatic_Response($response);
+                return $this->handle_REST_Api_Automatic_Response($response);
             }
         }
     }
 
-    public function handle_CRUD_Api_Automatic_Response($response = null)
+    public function handle_REST_Api_Automatic_Response($response = null)
     {
-        //  Set an info log that the CRUD API will be handled automatically
+        //  Set an info log that the REST API will be handled automatically
         $this->logInfo('Handle response '.$this->wrapAsSuccessHtml('Automatically'));
 
         //  Get the response status code e.g "200"
@@ -6971,11 +6971,11 @@ class UssdService
         }
     }
 
-    public function handle_CRUD_Api_Manual_Response($response = null)
+    public function handle_REST_Api_Manual_Response($response = null)
     {
         //  Use the try/catch handles incase we run into any possible errors
         try {
-            //  Set an info log that the CRUD API will be handled manually
+            //  Set an info log that the REST API will be handled manually
             $this->logInfo('Handle response '.$this->wrapAsSuccessHtml('Manually'));
 
             //  Get the response status code e.g "200"
@@ -7117,7 +7117,7 @@ class UssdService
             $this->logWarning('Could not handle the response '.$this->wrapAsSuccessHtml('Manually').', attempt to handle response '.$this->wrapAsSuccessHtml('Automatically'));
 
             //  Handle the request automatically
-            return $this->handle_CRUD_Api_Automatic_Response($response);
+            return $this->handle_REST_Api_Automatic_Response($response);
         } catch (\Throwable $e) {
             //  Handle try catch error
             return $this->handleTryCatchError($e);
@@ -8251,11 +8251,11 @@ class UssdService
                     'form_params' => $form_params,
                 ];
 
-                /** Run the CRUD API Call. This will render as: $this->get_CRUD_Api_URL()
+                /** Run the REST API Call. This will render as: $this->get_REST_Api_URL()
                  *  while being called within a try/catch handler. We will also pass the
                  *  request options.
                  */
-                $apiCallResponse = $this->tryCatch('run_CRUD_Api_Call', [ $method, $url, $request_options ]);
+                $apiCallResponse = $this->tryCatch('run_REST_Api_Call', [ $method, $url, $request_options ]);
 
                 //  If we have a screen to show return the response otherwise continue
                 if ($this->shouldDisplayScreen($apiCallResponse)) {
@@ -8376,11 +8376,11 @@ class UssdService
                 'headers' => $headers
             ];
 
-            /** Run the CRUD API Call. This will render as: $this->get_CRUD_Api_URL()
+            /** Run the REST API Call. This will render as: $this->get_REST_Api_URL()
              *  while being called within a try/catch handler. We will also pass the
              *  request options.
              */
-            $apiCallResponse = $this->tryCatch('run_CRUD_Api_Call', [ $method, $url, $request_options ]);
+            $apiCallResponse = $this->tryCatch('run_REST_Api_Call', [ $method, $url, $request_options ]);
 
             //  If we have a screen to show return the response otherwise continue
             if ($this->shouldDisplayScreen($apiCallResponse)) {
@@ -8481,11 +8481,11 @@ class UssdService
                 'headers' => $headers
             ];
 
-            /** Run the CRUD API Call. This will render as: $this->get_CRUD_Api_URL()
+            /** Run the REST API Call. This will render as: $this->get_REST_Api_URL()
              *  while being called within a try/catch handler. We will also pass the
              *  request options.
              */
-            $apiCallResponse = $this->tryCatch('run_CRUD_Api_Call', [ $method, $url, $request_options ]);
+            $apiCallResponse = $this->tryCatch('run_REST_Api_Call', [ $method, $url, $request_options ]);
 
             //  If we have a screen to show return the response otherwise continue
             if ($this->shouldDisplayScreen($apiCallResponse)) {
@@ -8644,11 +8644,11 @@ class UssdService
                 'json' => $form_data,
             ];
 
-            /** Run the CRUD API Call. This will render as: $this->get_CRUD_Api_URL()
+            /** Run the REST API Call. This will render as: $this->get_REST_Api_URL()
              *  while being called within a try/catch handler. We will also pass the
              *  request options.
              */
-            $apiCallResponse = $this->tryCatch('run_CRUD_Api_Call', [ $method, $url, $request_options ]);
+            $apiCallResponse = $this->tryCatch('run_REST_Api_Call', [ $method, $url, $request_options ]);
 
             //  If we have a screen to show return the response otherwise continue
             if ($this->shouldDisplayScreen($apiCallResponse)) {
@@ -8816,13 +8816,13 @@ class UssdService
                  */
                 dispatch(function () use ($method, $url, $request_options) {
 
-                    info('dispatch: run_CRUD_Api_Call: '.$url);
+                    info('dispatch: run_REST_Api_Call: '.$url);
 
                     try {
 
                         //  sleep(5);
 
-                        $this->tryCatch('run_CRUD_Api_Call', [ $method, $url, $request_options ]);
+                        $this->tryCatch('run_REST_Api_Call', [ $method, $url, $request_options ]);
 
                     } catch (\Throwable $e) {
 

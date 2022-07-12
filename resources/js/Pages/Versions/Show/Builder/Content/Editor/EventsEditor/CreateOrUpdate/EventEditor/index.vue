@@ -12,8 +12,8 @@
                 <!-- General Event Settings -->
                 <General v-if="selectedTab == 1" :form="form" :event="event" :mode="mode"></General>
 
-                <!-- CRUD API -->
-                <CrudApiEvent v-if="event.type == 'CRUD API'" :selectedTab="selectedTab" :updateTabs="updateTabs" :form="form"></CrudApiEvent>
+                <!-- REST API -->
+                <RestApiEvent v-if="event.type == 'REST API'" :selectedTab="selectedTab" :updateTabs="updateTabs" :form="form"></RestApiEvent>
 
                 <!-- SMS API -->
                 <SmsApiEvent v-if="event.type == 'SMS API'" :selectedTab="selectedTab" :updateTabs="updateTabs" :form="form"></SmsApiEvent>
@@ -81,7 +81,7 @@
     import SmsApiEvent from './EventTypes/Apis/SmsApi';
     import AutoReplyEvent from './EventTypes/AutoReply';
     import CollectionEvent from './EventTypes/Collection';
-    import CrudApiEvent from './EventTypes/Apis/CrudApi';
+    import RestApiEvent from './EventTypes/Apis/RestApi';
     import FormattingEvent from './EventTypes/Formatting';
     import ValidationEvent from './EventTypes/Validation';
     import CustomCodeEvent from './EventTypes/CustomCode';
@@ -96,7 +96,7 @@
     export default {
         props: ['form', 'event', 'mode'],
         components: {
-            General, RevisitEvent, RedirectEvent, AutoLinkEvent, SmsApiEvent, AutoReplyEvent, CollectionEvent, CrudApiEvent,
+            General, RevisitEvent, RedirectEvent, AutoLinkEvent, SmsApiEvent, AutoReplyEvent, CollectionEvent, RestApiEvent,
             DefaultTabs, SetPropertyEvent, NotificationEvent, FormattingEvent, ValidationEvent, CustomCodeEvent,
             OrangeMoneyApiEvent, DatabaseEvent, AirtimeBillingApiEvent, AppWriteConnectionEvent, FirebaseConnectionEvent
         },

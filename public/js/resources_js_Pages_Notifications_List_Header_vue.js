@@ -70,21 +70,27 @@ __webpack_require__.r(__webpack_exports__);
       var url;
 
       if (route().current() === 'notifications.show') {
+        var _this$route$params$pa;
+
         url = route(route().current(), {
           project: this.route().params.project,
           app: this.route().params.app,
           version: this.selectedVersion,
           //  Query params
-          search: this.search
+          search: this.search,
+          page: (_this$route$params$pa = this.route().params.page) !== null && _this$route$params$pa !== void 0 ? _this$route$params$pa : 1
         });
       } else if (route().current() === 'account.notifications.show') {
+        var _this$route$params$pa2;
+
         url = route(route().current(), {
           project: this.route().params.project,
           account: this.route().params.account,
           app: this.route().params.app,
           version: this.selectedVersion,
           //  Query params
-          search: this.search
+          search: this.search,
+          page: (_this$route$params$pa2 = this.route().params.page) !== null && _this$route$params$pa2 !== void 0 ? _this$route$params$pa2 : 1
         });
       }
 

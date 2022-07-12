@@ -38,7 +38,7 @@
         },
         methods: {
             showGlobalVariable() {
-                this.$inertia.get(route('global.variable.show', { project: this.route().params.project, app: this.route().params.app, version: this.route().params.version, global_variable: this.globalVariable.id }));
+                this.$inertia.get(route('global.variable.show', { project: this.route().params.project, app: this.route().params.app, version: this.global_variable.version_id, global_variable: this.globalVariable.id }));
             }
         }
     };

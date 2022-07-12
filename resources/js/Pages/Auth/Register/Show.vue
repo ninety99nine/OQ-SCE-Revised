@@ -2,9 +2,9 @@
 
     <Head title="Sign Up" />
 
-    <div class="flex flex-row h-screen justify-center items-center">
+    <div class="flex flex-row justify-center items-center">
 
-        <div class="w-1/3">
+        <div class="w-1/3 mt-24 mb-28">
 
             <Logo class="m-auto mb-10" width="w-32" />
 

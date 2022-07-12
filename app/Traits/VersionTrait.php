@@ -134,7 +134,7 @@ trait VersionTrait
             ],
             'color_scheme'=> [
                 'event_colors'=> [
-                    'CRUD API' => '#2D8CF0',
+                    'REST API' => '#2D8CF0',
                     'SMS API' => '#2D8CF0',
                     'Airtime Billing API' => '#2D8CF0',
                     'Orange Money API' => '#2D8CF0',
@@ -274,6 +274,14 @@ trait VersionTrait
 
                 //  Fix issues related to the "CRUD API" event handler
                 if ($event['type'] == 'CRUD API') {
+
+                    //  Rename the event type
+                    $events[$x]['type'] = 'REST API';
+
+                }
+
+                //  Fix issues related to the "REST API" event handler
+                if ($event['type'] == 'REST API') {
 
                     //  (1) ENABLE CODE EDITOR MODE FOR THE RESPONSE STATUS HANDLE ATTRIBUTES
 

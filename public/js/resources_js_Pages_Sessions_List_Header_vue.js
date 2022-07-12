@@ -90,7 +90,8 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       var canCancel = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-      //  If we can't cancel the previous request that has not eneded, then deny refreshing of content
+      this.$emit('selectedVersion', this.selectedVersion); //  If we can't cancel the previous request that has not eneded, then deny refreshing of content
+
       if (canCancel == false && this.request) return; //  If we can cancel the previous
 
       if (canCancel == true) {
@@ -117,6 +118,8 @@ __webpack_require__.r(__webpack_exports__);
       var url;
 
       if (route().current() === 'sessions.show') {
+        var _this$route$params$pa;
+
         url = route(route().current(), {
           project: this.route().params.project,
           app: this.route().params.app,
@@ -125,9 +128,12 @@ __webpack_require__.r(__webpack_exports__);
           origin: this.origin,
           status: this.status,
           search: this.search,
-          requestType: this.requestType
+          requestType: this.requestType,
+          page: (_this$route$params$pa = this.route().params.page) !== null && _this$route$params$pa !== void 0 ? _this$route$params$pa : 1
         });
       } else if (route().current() === 'account.sessions.show') {
+        var _this$route$params$pa2;
+
         url = route(route().current(), {
           project: this.route().params.project,
           account: this.route().params.account,
@@ -137,7 +143,8 @@ __webpack_require__.r(__webpack_exports__);
           origin: this.origin,
           status: this.status,
           search: this.search,
-          requestType: this.requestType
+          requestType: this.requestType,
+          page: (_this$route$params$pa2 = this.route().params.page) !== null && _this$route$params$pa2 !== void 0 ? _this$route$params$pa2 : 1
         });
       }
 

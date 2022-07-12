@@ -43,7 +43,7 @@
         },
         methods: {
             showDatabaseEntry() {
-                this.$inertia.get(route('database.entry.show', { project: this.route().params.project, app: this.route().params.app, version: this.route().params.version, database_entry: this.databaseEntry.id }));
+                this.$inertia.get(route('database.entry.show', { project: this.route().params.project, app: this.route().params.app, version: this.databaseEntry.version_id, database_entry: this.databaseEntry.id }));
             }
         }
     };

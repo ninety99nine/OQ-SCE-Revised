@@ -39,7 +39,7 @@
         },
         methods: {
             showNotification() {
-                this.$inertia.get(route('notification.show', { project: this.route().params.project, app: this.route().params.app, version: this.route().params.version, notification: this.notification.id }));
+                this.$inertia.get(route('notification.show', { project: this.route().params.project, app: this.route().params.app, version: this.notification.version_id, notification: this.notification.id }));
             }
         }
     };

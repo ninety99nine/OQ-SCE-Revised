@@ -15137,7 +15137,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
 var _hoisted_1 = {
-  "class": "pt-8 px-16 mt-4"
+  "class": "pt-8 px-16 mt-4 pb-52"
 };
 var _hoisted_2 = {
   "class": "grid grid-cols-12 gap-2"

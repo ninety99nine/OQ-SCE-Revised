@@ -98,7 +98,7 @@
     }
 </script>
 
-<style>
+<style scoped>
     .div-wrapper,
     .input-wrapper,
     .select-wrapper,

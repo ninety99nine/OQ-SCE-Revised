@@ -90,7 +90,8 @@
                         version: this.selectedVersion,
 
                         //  Query params
-                        search: this.search
+                        search: this.search,
+                        page: this.route().params.page ?? 1
                     });
 
                 }else if( route().current() === 'account.notifications.show' ) {
@@ -102,7 +103,8 @@
                         version: this.selectedVersion,
 
                         //  Query params
-                        search: this.search
+                        search: this.search,
+                        page: this.route().params.page ?? 1
                     });
 
                 }

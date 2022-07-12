@@ -98,7 +98,8 @@
                         version: this.selectedVersion,
 
                         //  Query params
-                        search: this.search
+                        search: this.search,
+                        page: this.route().params.page ?? 1
                     });
 
                 }else if( route().current() === 'account.global.variables.show' ) {
@@ -110,7 +111,8 @@
                         version: this.selectedVersion,
 
                         //  Query params
-                        search: this.search
+                        search: this.search,
+                        page: this.route().params.page ?? 1
                     });
 
                 }

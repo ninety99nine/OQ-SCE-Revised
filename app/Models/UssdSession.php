@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\UssdSessionTrait;
 
 class UssdSession extends Model
 {
-    use HasFactory;
+    use HasFactory, UssdSessionTrait;
 
     protected $with = ['account'];
 

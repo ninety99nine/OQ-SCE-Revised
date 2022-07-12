@@ -136,11 +136,13 @@
 
                 search: null,
                 request: null,
-                refreshContentInterval: null,
+                refreshContentInterval: null
             }
         },
         methods: {
             refreshContent(canCancel = true) {
+
+                this.$emit('selectedVersion', this.selectedVersion);
 
                 //  If we can't cancel the previous request that has not eneded, then deny refreshing of content
                 if(canCancel == false && this.request) return;
@@ -183,7 +185,8 @@
                         origin: this.origin,
                         status: this.status,
                         search: this.search,
-                        requestType: this.requestType
+                        requestType: this.requestType,
+                        page: this.route().params.page ?? 1
                     });
 
                 }else if( route().current() === 'account.sessions.show' ) {
@@ -198,7 +201,8 @@
                         origin: this.origin,
                         status: this.status,
                         search: this.search,
-                        requestType: this.requestType
+                        requestType: this.requestType,
+                        page: this.route().params.page ?? 1
                     });
 
                 }

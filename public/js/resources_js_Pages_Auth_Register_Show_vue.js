@@ -11,7 +11,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var _components_Loader_Unique_WindTurbineLoader__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @components/Loader/Unique/WindTurbineLoader */ "./resources/js/Components/Loader/Unique/WindTurbineLoader.vue");
+/* harmony import */ var _components_Logo_Logo__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @components/Logo/Logo */ "./resources/js/Components/Logo/Logo.vue");
+
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  components: {
+    Logo: _components_Logo_Logo__WEBPACK_IMPORTED_MODULE_1__["default"],
+    WindTurbineLoader: _components_Loader_Unique_WindTurbineLoader__WEBPACK_IMPORTED_MODULE_0__["default"]
+  },
+  props: {
+    showWindTurbine: {
+      type: Boolean,
+      "default": true
+    }
+  },
   data: function data() {
     return {
       currentYear: new Date().getFullYear() // 2022
@@ -178,15 +192,27 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
 var _hoisted_1 = {
-  "class": "flex justify-center py-2 bg-white shadow-md absolute bottom-0 left-0 right-0"
+  "class": "flex justify-center -mb-8"
 };
 var _hoisted_2 = {
+  "class": "flex items-center justify-center py-4 pt-12 bg-white shadow-md"
+};
+var _hoisted_3 = {
   "class": "text-sm text-gray-500"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_2, "© 2018 - " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.currentYear) + " Optimum Quality. All Rights Reserved", 1
+  var _component_WindTurbineLoader = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("WindTurbineLoader");
+
+  var _component_Logo = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Logo");
+
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_WindTurbineLoader, {
+    "class": "scale-150"
+  })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Logo, {
+    width: "w-16",
+    "class": "mr-2"
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_3, "© 2018 - " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.currentYear) + " Optimum Quality. All Rights Reserved", 1
   /* TEXT */
-  )]);
+  )])]);
 }
 
 /***/ }),
@@ -300,10 +326,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
 var _hoisted_1 = {
-  "class": "flex flex-row h-screen justify-center items-center"
+  "class": "flex flex-row justify-center items-center"
 };
 var _hoisted_2 = {
-  "class": "w-1/3"
+  "class": "w-1/3 mt-24 mb-28"
 };
 var _hoisted_3 = {
   "class": "p-5 bg-white rounded-md shadow-md hover:shadow-lg"

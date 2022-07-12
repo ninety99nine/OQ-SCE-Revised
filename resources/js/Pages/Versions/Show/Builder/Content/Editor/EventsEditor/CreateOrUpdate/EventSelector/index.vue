@@ -32,7 +32,7 @@
                         type: "API's",
                         children: [
                             {
-                                type: "CRUD API"
+                                type: "REST API"
                             },
                             {
                                 type: "SMS API"

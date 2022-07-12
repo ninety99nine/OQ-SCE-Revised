@@ -1,6 +1,6 @@
 <template>
 
-    <div class="pt-8 mt-4">
+    <div class="pt-8 mt-4 mb-40">
 
         <Head title="Projects" />
 
@@ -9,7 +9,7 @@
             <DefaultSearchBar v-model="search" @onSearch="startSearch" placeholder="Search projects" />
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-2/3 m-auto mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-2/3 m-auto mb-12">
 
             <div v-for="project in projectsPayload.data" :key="project.id" @click="showProject(project)" class="bg-white p-6 rounded-md cursor-pointer shadow-sm hover:shadow-lg hover:bg-blue-50 active:shadow-xl active:bg-white">
 
@@ -53,8 +53,10 @@
             </div>
         </div>
 
-        <div v-if="projectsPayload.total > 0" class="w-2/3 m-auto flex justify-end">
-            <DefaultPagination :pagination="projectsPayload" />
+        <div class="flex justify-end w-2/3 m-auto mb-40">
+
+            <DefaultPagination v-if="projectsPayload.total > 0" :pagination="projectsPayload" />
+
         </div>
 
     </div>
@@ -63,10 +65,10 @@
 
 <script>
 
-import PrimaryButton from "@components/Button/PrimaryButton";
 import DefaultPagination from "@components/Pagination/DefaultPagination";
 import DefaultSearchBar from "@components/SearchBar/DefaultSearchBar";
 import CreateProjectModal from "./../Create/CreateProjectModal";
+import PrimaryButton from "@components/Button/PrimaryButton";
 import { Head } from '@inertiajs/inertia-vue3';
 import moment from 'moment'
 

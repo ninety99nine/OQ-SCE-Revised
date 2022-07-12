@@ -1,6 +1,6 @@
 <template>
 
-    <div :class="{ 'pt-8 px-16 mt-4' : showingOnMainMenu }">
+    <div :class="{ 'pt-8 px-16 mt-4 pb-52' : showingOnMainMenu }">
 
         <template v-if="showingOnMainMenu">
 

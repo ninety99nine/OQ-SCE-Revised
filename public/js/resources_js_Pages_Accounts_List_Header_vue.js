@@ -51,7 +51,8 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     refreshContent: function refreshContent() {
-      var _this = this;
+      var _this$route$params$pa,
+          _this = this;
 
       var canCancel = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
       //  If we can't cancel the previous request that has not eneded, then deny refreshing of content
@@ -84,7 +85,8 @@ __webpack_require__.r(__webpack_exports__);
         app: this.route().params.app,
         //  Query params
         origin: this.origin,
-        search: this.search
+        search: this.search,
+        page: (_this$route$params$pa = this.route().params.page) !== null && _this$route$params$pa !== void 0 ? _this$route$params$pa : 1
       });
       axios__WEBPACK_IMPORTED_MODULE_0___default().get(url, config).then(function (response) {
         _this.$emit('response', response.data); //  Stop loader

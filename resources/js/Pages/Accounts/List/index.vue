@@ -1,6 +1,6 @@
 <template>
 
-    <div class="py-12 px-16">
+    <div class="pt-8 px-16 mt-4 pb-52">
 
         <Head :title="appPayload.name + ' - Version ' + versionPayload.number" />
 

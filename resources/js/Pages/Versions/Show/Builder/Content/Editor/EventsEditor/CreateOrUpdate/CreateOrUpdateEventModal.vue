@@ -171,9 +171,9 @@
 
                     //  Validate on event type
 
-                    if( this.form.type == 'CRUD API' ) {
+                    if( this.form.type == 'REST API' ) {
 
-                       eventValidation.crudApi(this.form);
+                       eventValidation.restApi(this.form);
 
                     }else if( this.form.type == 'SMS API' ) {
 

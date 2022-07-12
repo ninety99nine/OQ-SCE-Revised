@@ -1,6 +1,6 @@
 export default {
 
-    crudApi: (form) => {
+    restApi: (form) => {
 
         if( form.event_data.url.code_editor_mode == false && ['', null].includes(form.event_data.url.text) ) {
 

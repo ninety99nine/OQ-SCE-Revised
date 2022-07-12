@@ -113,7 +113,8 @@
 
                     //  Query params
                     origin: this.origin,
-                    search: this.search
+                    search: this.search,
+                    page: this.route().params.page ?? 1
                 });
 
                 axios.get(url, config).then((response) => {
