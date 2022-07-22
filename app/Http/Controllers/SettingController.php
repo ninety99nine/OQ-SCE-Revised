@@ -73,7 +73,7 @@ class SettingController extends Controller
              */
             if(in_array($command, ['git pull'])) {
 
-                $response = shell_exec('cd '.base_path().' && '.$command);
+                $response = shell_exec('cd '.base_path().' && sudo '.$command);
 
             }if(in_array($command, ['composer install'])) {
 
