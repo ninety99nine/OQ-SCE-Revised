@@ -43,6 +43,9 @@
                             {
                                 type: "Orange Money API"
                             },
+                            {
+                                type: "Email API"
+                            },
                         ]
                     },
                     {

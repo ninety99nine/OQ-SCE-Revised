@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GlobalVariableController;
 use App\Http\Controllers\DatabaseEntryController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\NotificationController;
@@ -10,8 +11,8 @@ use App\Http\Controllers\SimulationController;
 use App\Http\Controllers\VersionController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\AppController;
-use App\Http\Controllers\GlobalVariableController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,7 +25,6 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
 Route::redirect('/', '/login', 301);
 Route::get('/login', [LoginController::class, 'show'])->name('login.show');
 Route::post('/login', [LoginController::class, 'authenticate'])->name('login.authenticate');
@@ -183,6 +183,26 @@ Route::middleware(['auth'])->group(function () {
                 });
 
             });
+
+        });
+
+    Route::controller(ProjectController::class)
+        ->prefix('settings')
+        ->name('settings.')
+        ->group(function () {
+
+            Route::get('/account', [SettingController::class, 'index'])->name('account');
+            Route::post('/account', [SettingController::class, 'updateAccount'])->name('account.update');
+
+            Route::get('/server-commands', [SettingController::class, 'index'])->name('server.commands');
+            Route::post('/server-commands', [SettingController::class, 'runServerCommands'])->name('server.commands.run');
+
+
+            Route::get('/users', [SettingController::class, 'index'])->name('users');
+            Route::get('/notifications', [SettingController::class, 'index'])->name('notifications');
+
+            Route::get('/application-logs', [SettingController::class, 'index'])->name('application.logs');
+            Route::get('/application-logs-file', [SettingController::class, 'downloadApplicationLogFile'])->name('application.logs.download');
 
         });
 

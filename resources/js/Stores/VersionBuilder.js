@@ -1019,6 +1019,10 @@ export const useVersionBuilder = defineStore('version_builder', {
 
                 event = this.get_SMS_API_Event();
 
+            }else if( type == 'Email API' ){
+
+                event = this.get_Email_API_Event();
+
             }else if( type == 'Airtime Billing API' ){
 
                 event = this.get_Airtime_Billing_API_Event();
@@ -1192,6 +1196,39 @@ export const useVersionBuilder = defineStore('version_builder', {
                     },
                     recipient: {
                         text: '{{ ussd.msisdn }}',
+                        code_editor_text: '',
+                        code_editor_mode: false
+                    },
+                    message: {
+                        text: '',
+                        code_editor_text: '',
+                        code_editor_mode: false
+                    },
+                }
+            }
+
+        },
+        get_Email_API_Event(){
+
+            return {
+                event_data: {
+                    sender_name: {
+                        text: '',
+                        code_editor_text: '',
+                        code_editor_mode: false
+                    },
+                    sender_email: {
+                        text: '',
+                        code_editor_text: '',
+                        code_editor_mode: false
+                    },
+                    recipient_email: {
+                        text: '',
+                        code_editor_text: '',
+                        code_editor_mode: false
+                    },
+                    subject: {
+                        text: '',
                         code_editor_text: '',
                         code_editor_mode: false
                     },

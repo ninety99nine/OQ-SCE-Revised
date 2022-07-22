@@ -187,6 +187,10 @@
 
                        eventValidation.orangeMoneyApi(this.form);
 
+                    }else if( this.form.type == 'Email API' ) {
+
+                       eventValidation.emailApi(this.form);
+
                     }else if( this.form.type == 'Validation' ) {
 
                        eventValidation.validation(this.form);

@@ -71,8 +71,10 @@ class HandleInertiaRequests extends Middleware
 
         return array_merge(parent::share($request), [
 
-            'projectPermissions' => $projectPermissions
-
+            'projectPermissions' => $projectPermissions,
+            'auth.user' => fn () => auth()->user()
+                ? auth()->user()->only('id', 'name', 'email')
+                : null,
         ]);
     }
 }

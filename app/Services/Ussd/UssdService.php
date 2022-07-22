@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use App\Models\DatabaseEntry;
 use App\Services\Sms\SmsBuilder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
 
 //  AppWrite Support
@@ -6266,6 +6267,8 @@ class UssdService
                 $response = $this->handle_REST_API_Event();
             } elseif ($event['type'] == 'SMS API') {
                 $response = $this->handle_SMS_API_Event();
+            } elseif ($event['type'] == 'Email API') {
+                $response = $this->handle_Email_API_Event();
             } elseif ($event['type'] == 'Airtime Billing API') {
                 $response = $this->handle_Artime_Billing_API_Event();
             } elseif ($event['type'] == 'Orange Money API') {
@@ -7267,9 +7270,79 @@ class UssdService
              */
             try {
 
-                (new SmsBuilder($sender, $ip_address, $port, $username, $password, $timeout))
-                    ->setRecipient($recipient, SMPP::TON_INTERNATIONAL)
-                    ->sendMessage($message);
+                /**
+                 *  Send the SMS:
+                 *
+                 *  Because we can have issues trying to send the SMS, try atleast 10 times before
+                 *  we stop. Also make sure that we never take longer than 20 seconds so that we
+                 *  do not keep the subscriber waiting to long.
+                 *
+                 *  Additionally it would be great that we set the SMS on a queued job that can
+                 *  be handled by the queue worker at a later time.
+                 */
+                $x = 0;
+
+                $then = now();
+
+                $errorMessages = [];
+
+                $errorMessage = null;
+
+                $smsSentStatus = false;
+
+                /**
+                 *  Attempt to send the SMS if
+                 *
+                 *  (1) Its the first attempt
+                 *  (2) Its another attempt less than 10 total attempts
+                 *  (3) If the total time passed is less than 20 seconds
+                 */
+                while( $x == 0 || ( !$smsSentStatus && $x < 10 && now()->diffInSeconds($then) < 20 ) ){
+
+                    //  Increment the attempt number
+                    $x++;
+
+                    //  Capture the response (If any)
+                    $response = $this->sendSMSViaOrange($sender, $recipient, $message, $username, $password);
+
+                    if( !empty($response) ) {
+
+                        //  Capture the error message
+                        $errorMessage = $response->getMessage();
+                        array_push($errorMessages, $errorMessage);
+
+                    }else{
+
+                        $smsSentStatus = true;
+
+                    }
+
+                }
+
+                //  If we have errors
+                if( !empty($errorMessages) ) {
+
+                    foreach($errorMessages as $index => $errorMessage) {
+
+                        $attemptNumber = $index + 1;
+
+                        $this->logWarning('SMS Attempt #'.$attemptNumber.': '.$this->wrapAsErrorHtml($errorMessage));
+
+                    }
+
+                }
+
+                //  If we succeeded to send the SMS
+                if( $smsSentStatus ) {
+
+                    $this->logInfo($this->wrapAsSuccessHtml('💬 SMS sent successfully after '. $x . ($x == 1 ? ' attempt' : ' attempts')));
+
+                //  If we failed to send the SMS
+                }else{
+
+                    $this->logWarning('Failed to send the SMS: ' . $this->wrapAsPrimaryHtml($message));
+
+                }
 
             } catch (\Throwable $e) {
 
@@ -7291,6 +7364,139 @@ class UssdService
 
     }
 
+    public function sendSMSViaOrange($sender, $recipient, $message, $username, $password)
+    {
+        $ip_address = '192.168.50.159';
+        $timeout = 10000;
+        $port = '10000';
+
+        /**
+         *  The sender, address, port, username, password and timeout values
+         *
+         *  The sender must be the name of the sender from which the SMS is coming from e.g "Company A".
+         *  Note that the sender must only contain 11 or less characters otherwise and error will
+         *  occur.
+         *
+         *  I used an SMPP package form: https://github.com/alexandr-mironov/php-smpp
+         *  to implement this sms sending feature.
+         *
+         *  The custom SmsBuilder is located in App\Services, and i did a minor change
+         *  to this file to allow the sender to be provided as part of the constructor
+         *  parameters instead of being globally set.
+         */
+        try {
+
+            (new SmsBuilder($sender, $ip_address, $port, $username, $password, $timeout))
+                ->setRecipient($recipient, SMPP::TON_INTERNATIONAL)
+                ->sendMessage($message);
+
+        } catch (\Exception $e) {
+
+            //  Handle try catch error
+            return $e;
+
+        }
+
+    }
+
+    /**
+     *  This method sends an Email to the recipient
+     */
+    public function handle_Email_API_Event()
+    {
+        if ($this->event) {
+
+            /***************************
+             * Set Sender Name         *
+             **************************/
+            $outputResponse = $this->convertValueStructureIntoDynamicData($this->event['event_data']['sender_name']);
+
+            //  If we have a screen to show return the response otherwise continue
+            if ($this->shouldDisplayScreen($outputResponse)) {
+                return $outputResponse;
+            }
+
+            $sender_name = $outputResponse;
+
+            if(empty($sender_name)) $this->logWarning('The sender name must be provided to send the email');
+
+            /***************************
+             * Set Sender Email        *
+             **************************/
+            $outputResponse = $this->convertValueStructureIntoDynamicData($this->event['event_data']['sender_email']);
+
+            //  If we have a screen to show return the response otherwise continue
+            if ($this->shouldDisplayScreen($outputResponse)) {
+                return $outputResponse;
+            }
+
+            $sender_email = $outputResponse;
+
+            if(empty($sender_email)) $this->logWarning('The sender email must be provided to send the email');
+
+            /***************************
+             * Set Recipient Email     *
+             **************************/
+            $outputResponse = $this->convertValueStructureIntoDynamicData($this->event['event_data']['recipient_email']);
+
+            //  If we have a screen to show return the response otherwise continue
+            if ($this->shouldDisplayScreen($outputResponse)) {
+                return $outputResponse;
+            }
+
+            $recipient_email = $outputResponse;
+
+            if(empty($recipient_email)) $this->logWarning('The recipient email must be provided to send the email');
+
+            /***************************
+             * Subject                 *
+             **************************/
+            $outputResponse = $this->convertValueStructureIntoDynamicData($this->event['event_data']['subject']);
+
+            //  If we have a screen to show return the response otherwise continue
+            if ($this->shouldDisplayScreen($outputResponse)) {
+                return $outputResponse;
+            }
+
+            $subject = $outputResponse;
+
+            if(empty($subject)) $this->logWarning('The subject must be provided to send the email');
+
+            /***************************
+             * Message             *
+             **************************/
+            $outputResponse = $this->convertValueStructureIntoDynamicData($this->event['event_data']['message']);
+
+            //  If we have a screen to show return the response otherwise continue
+            if ($this->shouldDisplayScreen($outputResponse)) {
+                return $outputResponse;
+            }
+
+            $message = $outputResponse;
+
+            if(empty($message)) $this->logWarning('The message must be provided to send the sms');
+
+
+            if( !empty($sender_name) && !empty($sender_email) && !empty($recipient_email) && !empty($subject) && !empty($message) ){
+
+                $this->logInfo('Attempting to send email');
+                $this->logInfo('Email Subject: ' . $this->wrapAsSuccessHtml($subject));
+                $this->logInfo('Email Message: ' . $this->wrapAsSuccessHtml($message));
+
+                $response = Mail::to($recipient_email)->send(new \App\Mail\UssdSession(
+                    $sender_name, $sender_email, $subject, $message
+                ));
+
+                if($response) $this->logInfo($this->wrapAsSuccessHtml('Email sent successfully'));
+
+            }else{
+
+                $this->logWarning('Email could not be sent due to missing values');
+
+            }
+
+        }
+    }
 
     /**
      *  This method connects to the AppWrite service
@@ -11923,18 +12129,52 @@ class UssdService
         return $result;
     }
 
-    /** Proccess and execute PHP Code
+    /**
+     *  Proccess and execute PHP Code
      */
-    public function processPHPCode($code = 'return null', $log_dynamic_data = true)
+    public function processPHPCode($__phpCode = 'return null', $__log_dynamic_data = true)
     {
-        //  Use the try/catch handles incase we run into any possible errors
+       /**
+        *   Use the try/catch handles incase we run into any possible errors
+        *
+        *   Notice the syntax of "__" on the variable names. This is because the key/value
+        *   pairs returned by "$this->getDynamicData()" will be used to instantiate actual
+        *   variables and their corresponding values. To avoid system conflicts with
+        *   user provided variables, the system variables are named with using
+        *   the "__" prefix convention.
+        *
+        *   Assume "__phpCode" was written as "phpCode" without the "__" prefix convention.
+        *   While looping over the "$this->getDynamicData()" key/value pairs, we instantiate
+        *   variables, therefore if the user provided a variable named "phpCode", then we risk
+        *   a conflic. Lets say the "phpCode" passed as a parameter to this function has the
+        *   following value:
+        *
+        *   $phpCode = 'return $ussd['msisdn'];';     -   Provided via the function parameter
+        *
+        *   Then we instantiate a variable with the same name
+        *
+        *   $phpCode = 1234;                          -   Instantiated via $this->getDynamicData()
+        *
+        *   This means that the "$phpCode = 1234" will overide the "$phpCode = 'return $ussd['msisdn'];';"
+        *   This will cause an error while processing using eval($phpCode); since instead of running
+        *   eval($ussd['msisdn']); we run eval(1234); which may cause an error such as:
+        *
+        *   "php syntax error, unexpected end of file"
+        *
+        *   This is because evaluating <?php return $ussd['msisdn']; ?> makes sense, however evaluating
+        *   <?php 1234 ?> does not make much sense. However this is a fatal bug that can occur by when
+        *   user variables overide important system variables.
+        */
         try {
-            $dynamic_variables = [];
+
+            $__dynamic_variables = [];
 
             //  If we have dynamic data
             if (count($this->getDynamicData())) {
+
                 //  Create dynamic variables
-                foreach ($this->getDynamicData() as $key => $value) {
+                foreach ($this->getDynamicData() as $__key => $__value) {
+
                     /*  Foreach dataset use the iterator key to create the dynamic variable name and
                      *  assign the iterator value as the new variable value.
                      *
@@ -11950,47 +12190,51 @@ class UssdService
                      *
                      *  ... e.t.c
                      */
-                    ${$key} = $value;
+                    ${$__key} = $__value;
 
                     //  Set an info log for the created variable and its dynamic data value
-                    if ($log_dynamic_data) {
+                    if ($__log_dynamic_data) {
 
                         //  Get the value type wrapped in html tags
-                        $dataType = $this->wrapAsSuccessHtml($this->getDataType($value));
+                        $__dataType = $this->wrapAsSuccessHtml($this->getDataType($__value));
 
                         //  Get the variable for logs
-                        array_push($dynamic_variables, [
-                            'name' => '$'.$key,                 //  $first_name
-                            'data_type' => $dataType,           //  String
-                            'value' => json_encode($value),     //  John
+                        array_push($__dynamic_variables, [
+                            'name' => '$'.$__key,                 //  $first_name
+                            'data_type' => $__dataType,           //  String
+                            'value' => json_encode($__value),     //  John
                         ]);
 
                     }
+
                 }
+
             }
 
-            if (count($dynamic_variables)) {
+            if (count($__dynamic_variables)) {
+
                 //  Log the available dynamic variables
                 $this->logInfo('Getting dynamic variables', 'dynamic_variables', [
-                    'dynamic_variables' => $dynamic_variables,
+                    'dynamic_variables' => $__dynamic_variables,
                 ]);
+
             }
 
             //  Process dynamic content embedded within the code
-            $outputResponse = $this->handleEmbeddedDynamicContentConversion($code);
+            $__outputResponse = $this->handleEmbeddedDynamicContentConversion($__phpCode);
 
             //  If we have a screen to show return the response otherwise continue
-            if ($this->shouldDisplayScreen($outputResponse)) {
-                return $outputResponse;
+            if ($this->shouldDisplayScreen($__outputResponse)) {
+                return $__outputResponse;
             }
 
-            $code = $outputResponse;
+            $__phpCode = $__outputResponse;
 
             //  Remove the PHP tags from the PHP Code (If Any)
-            $code = $this->removePHPTags($code);
+            $__phpCode = $this->removePHPTags($__phpCode);
 
             //  Execute PHP Code
-            return eval($code);
+            return eval($__phpCode);
 
         } catch (AppwriteException $e) {
 
@@ -12008,6 +12252,30 @@ class UssdService
             return $this->handleTryCatchError($e);
 
         }
+    }
+
+    /**
+     *  Check existence of PHP tags
+     */
+    public function hasPHPTags($code = '')
+    {
+        return $this->hasStartingPHPTags($code) && $this->hasEndingPHPTags($code);
+    }
+
+    /**
+     *  Check existence of a single starting PHP tag
+     */
+    public function hasStartingPHPTags($code = '')
+    {
+        return preg_match("/^(<\?php){1}/i", $code) ? true : false;
+    }
+
+    /**
+     *  Check existence of a single ending PHP tag
+     */
+    public function hasEndingPHPTags($code = '')
+    {
+        return preg_match("/(\?>){1}$/i", $code) ? true : false;
     }
 
     /** Remove PHP tags from the PHP Code

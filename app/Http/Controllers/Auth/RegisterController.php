@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 
 class RegisterController extends Controller
@@ -30,9 +31,9 @@ class RegisterController extends Controller
             'security_email' => ['required', 'email'],
             'security_password' => ['required'],
 
-            'email' => ['required', 'email', 'unique:users'],
             'name' => ['required', 'min:3', 'max:30'],
-            'password' => ['required']
+            'email' => ['required', 'email', 'unique:users'],
+            'password' => ['required', 'confirmed', Password::min(6)],
         ]);
 
         $securityCredentials = [

@@ -24,6 +24,9 @@
                 <!-- Orange Money API -->
                 <OrangeMoneyApiEvent v-if="event.type == 'Orange Money API'" :selectedTab="selectedTab" :updateTabs="updateTabs" :form="form"></OrangeMoneyApiEvent>
 
+                <!-- Email API -->
+                <EmailApiEvent v-if="event.type == 'Email API'" :selectedTab="selectedTab" :updateTabs="updateTabs" :form="form"></EmailApiEvent>
+
                 <!-- Validation -->
                 <ValidationEvent v-if="event.type == 'Validation'" :selectedTab="selectedTab" :updateTabs="updateTabs" :form="form"></ValidationEvent>
 
@@ -85,6 +88,7 @@
     import FormattingEvent from './EventTypes/Formatting';
     import ValidationEvent from './EventTypes/Validation';
     import CustomCodeEvent from './EventTypes/CustomCode';
+    import EmailApiEvent from './EventTypes/Apis/EmailApi';
     import DefaultTabs from '@components/Tabs/DefaultTabs';
     import SetPropertyEvent from './EventTypes/SetProperty';
     import NotificationEvent from './EventTypes/Notification';
@@ -97,7 +101,7 @@
         props: ['form', 'event', 'mode'],
         components: {
             General, RevisitEvent, RedirectEvent, AutoLinkEvent, SmsApiEvent, AutoReplyEvent, CollectionEvent, RestApiEvent,
-            DefaultTabs, SetPropertyEvent, NotificationEvent, FormattingEvent, ValidationEvent, CustomCodeEvent,
+            EmailApiEvent, DefaultTabs, SetPropertyEvent, NotificationEvent, FormattingEvent, ValidationEvent, CustomCodeEvent,
             OrangeMoneyApiEvent, DatabaseEvent, AirtimeBillingApiEvent, AppWriteConnectionEvent, FirebaseConnectionEvent
         },
         data() {

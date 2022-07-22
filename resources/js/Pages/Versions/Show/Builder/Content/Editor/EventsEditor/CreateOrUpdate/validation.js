@@ -145,13 +145,13 @@ export default {
 
     smsApi: (form) => {
 
-        if( form.event_data.sender.code_editor_mode == false && ['', null].includes(form.event_data.sender.text) ) {
+        if( form.event_data.sender_name.code_editor_mode == false && ['', null].includes(form.event_data.sender_name.text) ) {
 
-            form.setError('sender', 'The sender is required');
+            form.setError('sender_name', 'The sender_name is required');
 
-        }else if( form.event_data.sender.code_editor_mode == true && ['', null].includes(form.event_data.sender.code_editor_text) ) {
+        }else if( form.event_data.sender_name.code_editor_mode == true && ['', null].includes(form.event_data.sender_name.code_editor_text) ) {
 
-            form.setError('sender', 'The sender is required');
+            form.setError('sender_name', 'The sender_name is required');
 
         }
 
@@ -172,6 +172,60 @@ export default {
         }else if( form.event_data.message.code_editor_mode == true && ['', null].includes(form.event_data.message.code_editor_text) ) {
 
             form.setError('message', 'The message is required');
+
+        }
+
+    },
+
+    emailApi: (form) => {
+
+        if( form.event_data.subject.code_editor_mode == false && ['', null].includes(form.event_data.subject.text) ) {
+
+            form.setError('subject', 'The subject is required');
+
+        }else if( form.event_data.subject.code_editor_mode == true && ['', null].includes(form.event_data.subject.code_editor_text) ) {
+
+            form.setError('subject', 'The subject is required');
+
+        }
+
+        if( form.event_data.message.code_editor_mode == false && ['', null].includes(form.event_data.message.text) ) {
+
+            form.setError('message', 'The message is required');
+
+        }else if( form.event_data.message.code_editor_mode == true && ['', null].includes(form.event_data.message.code_editor_text) ) {
+
+            form.setError('message', 'The message is required');
+
+        }
+
+        if( form.event_data.sender_name.code_editor_mode == false && ['', null].includes(form.event_data.sender_name.text) ) {
+
+            form.setError('sender_name', 'The sender name is required');
+
+        }else if( form.event_data.sender_name.code_editor_mode == true && ['', null].includes(form.event_data.sender_name.code_editor_text) ) {
+
+            form.setError('sender_name', 'The sender name is required');
+
+        }
+
+        if( form.event_data.sender_email.code_editor_mode == false && ['', null].includes(form.event_data.sender_email.text) ) {
+
+            form.setError('sender_email', 'The sender email is required');
+
+        }else if( form.event_data.sender_email.code_editor_mode == true && ['', null].includes(form.event_data.sender_email.code_editor_text) ) {
+
+            form.setError('sender_email', 'The sender email is required');
+
+        }
+
+        if( form.event_data.recipient_email.code_editor_mode == false && ['', null].includes(form.event_data.recipient_email.text) ) {
+
+            form.setError('recipient_email', 'The recipient email is required');
+
+        }else if( form.event_data.recipient_email.code_editor_mode == true && ['', null].includes(form.event_data.recipient_email.code_editor_text) ) {
+
+            form.setError('recipient_email', 'The recipient email is required');
 
         }
 

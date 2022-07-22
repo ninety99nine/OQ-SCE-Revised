@@ -1,6 +1,6 @@
 <template>
 
-    <div>
+    <div class="relative">
 
         <!-- Dropdown Trigger -->
         <div :id="dropdownTriggerId">
@@ -21,7 +21,7 @@
         </div>
 
         <!-- Dropdown Menu -->
-        <div :id="dropdownMenuId" class="z-10 hidden bg-white divide-y divide-gray-100 rounded shadow w-44">
+        <div :id="dropdownMenuId" :class="['z-10 hidden bg-white divide-y divide-gray-100 rounded shadow', dropdownClasses]">
 
             <slot name="menu">
 
@@ -63,9 +63,22 @@
                     return []
                 }
             },
+            dropdownClasses: {
+                type: String,
+                default: 'w-44'
+            },
             placement: {
                 type: String,
-                default: 'bottom'
+                default: 'bottom-end',
+                validator(value) {
+                    // The value must match one of these strings
+                    return [
+                        'top', 'top-start', 'top-end',
+                        'left', 'left-start', 'left-end',
+                        'right', 'right-start', 'right-end',
+                        'bottom', 'bottom-start', 'bottom-end',
+                    ].includes(value)
+                }
             }
         },
         data(){
