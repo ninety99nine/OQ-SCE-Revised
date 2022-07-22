@@ -7294,10 +7294,10 @@ class UssdService
                  *  Attempt to send the SMS if
                  *
                  *  (1) Its the first attempt
-                 *  (2) Its another attempt less than 10 total attempts
+                 *  (2) Its another attempt less than 20 total attempts
                  *  (3) If the total time passed is less than 20 seconds
                  */
-                while( $x == 0 || ( !$smsSentStatus && $x < 10 && now()->diffInSeconds($then) < 20 ) ){
+                while( $x == 0 || ( !$smsSentStatus && $x < 20 && now()->diffInSeconds($then) < 20 ) ){
 
                     //  Increment the attempt number
                     $x++;
